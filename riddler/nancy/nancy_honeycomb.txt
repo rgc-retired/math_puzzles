@@ -1,0 +1,704 @@
+Note: not sure if I like these.
+
+They have repeated letters (which aren't allowed/used in
+the NYT puzzles) but it makes for a more meaningful puzzle
+string.  If I only use the unique letters then I need a
+longer phrase and after eliminating the duplicates the
+list of letters doesn't really mean much.
+
+Unfortunately, all of the interesting words to use as sets
+of letters have repeats: nancy, susan, melamed, cronce, etc.
+Need to rethink this just a bit.
+
+This is good enough for now.
+
+Puzzle = nancylynnm
+
+Total words = 29
+Score = 104
+pangrams = none
+Highest scoring word = almanac, malaca (7)
+Longest words (7 letters)
+
+       word  score  total
+0      alma      1      1
+1      amyl      1      2
+2      calm      1      3
+3      clam      1      4
+4      cyma      1      5
+5      lama      1      6
+6      mall      1      7
+7      malm      1      8
+8      mama      1      9
+9      mana      1     10
+10     many      1     11
+11     maya      1     12
+12     myna      1     13
+13    llama      5     18
+14    malmy      5     23
+15    mamma      5     28
+16    mammy      5     33
+17    manly      5     38
+18    manna      5     43
+19    mayan      5     48
+20   calmly      6     54
+21   cayman      6     60
+22   clammy      6     66
+23   layman      6     72
+24   mammal      6     78
+25   manana      6     84
+26   mannan      6     90
+27  almanac      7     97
+28  malacca      7    104
+
+Puzzle = nancylynnh
+
+Total words = 19
+Score = 86
+pangrams = none
+Highest scoring word = challah,clachan,halacha,halalah (7)
+Longest words (7 letters)
+
+       word  score  total
+0      achy      1      1
+1      ayah      1      2
+2      chay      1      3
+3      haha      1      4
+4      hall      1      5
+5      hyla      1      6
+6     clach      5     11
+7     lynch      5     16
+8    cancha      6     22
+9    chalah      6     28
+10   challa      6     34
+11   chally      6     40
+12   chancy      6     46
+13   halala      6     52
+14   hallah      6     58
+15  challah      7     65
+16  clachan      7     72
+17  halacha      7     79
+18  halalah      7     86
+
+Puzzle = nancymelamed
+
+Total words = 218
+Score = 1162
+pangrams = 1 (manacled)
+Highest scoring word = manacled (15)
+Longest words (9 letters)
+
+              word  score  total
+    213  allemande      9   1126
+    214  cancelled      9   1135
+    215  decadence      9   1144
+    216  decadency      9   1153
+    217  enamelled      9   1162
+
+
+     word  score  total
+0    aced      1      1
+1    cade      1      2
+2    cede      1      3
+3    clad      1      4
+4    dace      1      5
+5    dada      1      6
+6    dale      1      7
+7    dame      1      8
+8    damn      1      9
+9    dead      1     10
+10   deal      1     11
+11   dean      1     12
+12   deed      1     13
+13   deem      1     14
+14   dele      1     15
+15   dell      1     16
+16   deme      1     17
+17   demy      1     18
+18   dene      1     19
+19   deny      1     20
+20   dyad      1     21
+21   dyed      1     22
+22   dyne      1     23
+23   eddy      1     24
+24   emyd      1     25
+25   eyed      1     26
+26   lade      1     27
+27   lady      1     28
+28   land      1     29
+29   lead      1     30
+30   lend      1     31
+31   made      1     32
+32   mead      1     33
+33   meed      1     34
+34   meld      1     35
+35   mend      1     36
+36   nada      1     37
+37   need      1     38
+38   yald      1     39
+39   yeld      1     40
+40  acned      5     45
+41  added      5     50
+42  addle      5     55
+43  adeem      5     60
+44  adman      5     65
+45  admen      5     70
+46  aland      5     75
+47  amend      5     80
+48  caddy      5     85
+49  candy      5     90
+50   caned      5     95
+51   ceded      5    100
+52   clade      5    105
+53   cycad      5    110
+54   daddy      5    115
+55   dally      5    120
+56   daman      5    125
+57   dance      5    130
+58   dandy      5    135
+59   decal      5    140
+60   decay      5    145
+61   dedal      5    150
+62   deedy      5    155
+63   delay      5    160
+64   deled      5    165
+65   delly      5    170
+66   dynel      5    175
+67   edema      5    180
+68   eland      5    185
+69   emend      5    190
+70   emyde      5    195
+71   ended      5    200
+72   laced      5    205
+73   laded      5    210
+74   laden      5    215
+75   ladle      5    220
+76   lamed      5    225
+77   layed      5    230
+78   leady      5    235
+79   maced      5    240
+80   madam      5    245
+81   madly      5    250
+82   maned      5    255
+83   mayed      5    260
+84   medal      5    265
+85   menad      5    270
+86   naled      5    275
+87   named      5    280
+88   needy      5    285
+89  accede      6    291
+90  addend      6    297
+91  addled      6    303
+92  adenyl      6    309
+93  alcade      6    315
+94  anadem      6    321
+95  aneled      6    327
+96  called      6    333
+97  calmed      6    339
+98  candle      6    345
+99  canned      6    351
+100  celled      6    357
+101  clayed      6    363
+102  cycled      6    369
+103  daddle      6    375
+104  daedal      6    381
+105  dammed      6    387
+106  damned      6    393
+107  danced      6    399
+108  dandle      6    405
+109  deaden      6    411
+110  deadly      6    417
+111  deaned      6    423
+112  decade      6    429
+113  decane      6    435
+114  deeded      6    441
+115  deemed      6    447
+116  delead      6    453
+117  demand      6    459
+118  demean      6    465
+119  denned      6    471
+120  emceed      6    477
+121  ennead      6    483
+122  ladled      6    489
+123  lalled      6    495
+124  lammed      6    501
+125  lanced      6    507
+126  landed      6    513
+127  leaded      6    519
+128  leaden      6    525
+129  leaned      6    531
+130  macled      6    537
+131  madame      6    543
+132  madded      6    549
+133  madden      6    555
+134  madman      6    561
+135  madmen      6    567
+136  maenad      6    573
+137  malady      6    579
+138  malled      6    585
+139  manned      6    591
+140  mayday      6    597
+141  meddle      6    603
+142  medley      6    609
+143  melded      6    615
+144  melled      6    621
+145  mended      6    627
+146  needed      6    633
+147  needle      6    639
+148  yeaned      6    645
+149  yelled      6    651
+150    yenned      6    657
+151   academe      7    664
+152   academy      7    671
+153   acceded      7    678
+154   addedly      7    685
+155   addenda      7    692
+156   adeemed      7    699
+157   alameda      7    706
+158   alcalde      7    713
+159   alcayde      7    720
+160   allayed      7    727
+161   amended      7    734
+162   cadelle      7    741
+163   cadence      7    748
+164   cadency      7    755
+165   canaled      7    762
+166   candela      7    769
+167   candled      7    776
+168   clammed      7    783
+169   cleaned      7    790
+170   daddled      7    797
+171   dandled      7    804
+172   deadeye      7    811
+173   decadal      7    818
+174   decanal      7    825
+175   decayed      7    832
+176   decency      7    839
+177   delayed      7    846
+178   emended      7    853
+179   enlaced      7    860
+180   ladened      7    867
+181   lalland      7    874
+182   landman      7    881
+183   landmen      7    888
+184   leadman      7    895
+185   leadmen      7    902
+186   macadam      7    909
+187   mandala      7    916
+188   manmade      7    923
+189   medaled      7    930
+190   meddled      7    937
+191   melamed      7    944
+192   menaced      7    951
+193   needled      7    958
+194  aceldama      8    966
+195  adamance      8    974
+196  adamancy      8    982
+197  annealed      8    990
+198  cadenced      8    998
+199  calendal      8   1006
+200    canalled      8   1014
+201    canceled      8   1022
+202    cayenned      8   1030
+203    deadened      8   1038
+204    deleaded      8   1046
+205    demanded      8   1054
+206    demeaned      8   1062
+207    enameled      8   1070
+208    landlady      8   1078
+209    leadenly      8   1086
+210    maddened      8   1094
+211  manacled *     15   1109
+212    medalled      8   1117
+213   allemande      9   1126
+214   cancelled      9   1135
+215   decadence      9   1144
+216   decadency      9   1153
+217   enamelled      9   1162
+
+Puzzle = nancyhibbard
+
+Total words = 139
+Score = 773
+pangrams = 8 of them!
+Highest scoring word = bradycardia (18)
+Longest words = abracadabra, bradycardia (11 letters)
+
+Pangrams:
+
+                  word  score  total
+    102      diarchy *     14    431
+    111     arachnid *     15    503
+    122     dyarchic *     15    598
+    123     hairband *     15    613
+    125     hydracid *     15    636
+    126     radiancy *     15    651
+    135    hindbrain *     16    735
+    138  bradycardia *     18    773
+
+     word  score  total
+0    acid      1      1
+1    arid      1      2
+2    band      1      3
+3    bard      1      4
+4    bind      1      5
+5    bird      1      6
+6    brad      1      7
+7    cadi      1      8
+8    caid      1      9
+9    card      1     10
+10   chad      1     11
+11   chid      1     12
+12   dada      1     13
+13   darb      1     14
+14   darn      1     15
+15   didy      1     16
+16   drab      1     17
+17   dray      1     18
+18   drib      1     19
+19   dyad      1     20
+20   hand      1     21
+21   hard      1     22
+22   hind      1     23
+23   irid      1     24
+24   nada      1     25
+25   nard      1     26
+26   nidi      1     27
+27   raid      1     28
+28   rand      1     29
+29   rind      1     30
+30   rynd      1     31
+31   yard      1     32
+32   yird      1     33
+33  acidy      5     38
+34  acrid      5     43
+35  baddy      5     48
+36  bandy      5     53
+37  biddy      5     58
+38  bindi      5     63
+39  braid      5     68
+40  brand      5     73
+41  caddy      5     78
+42  caird      5     83
+43  candy      5     88
+44  canid      5     93
+45  chard      5     98
+46  cycad      5    103
+47  dacha      5    108
+48  daddy      5    113
+49  dairy      5    118
+50    dandy      5    123
+51    daric      5    128
+52    diary      5    133
+53    dinar      5    138
+54    drain      5    143
+55    dryad      5    148
+56    handy      5    153
+57    hardy      5    158
+58    hydra      5    163
+59    indri      5    168
+60    nadir      5    173
+61    naiad      5    178
+62    nicad      5    183
+63    rabid      5    188
+64    radar      5    193
+65    radii      5    198
+66    randy      5    203
+67    ranid      5    208
+68    yaird      5    213
+69   acarid      6    219
+70   acidic      6    225
+71   bardic      6    231
+72   bayard      6    237
+73   brandy      6    243
+74   briard      6    249
+75   canard      6    255
+76   candid      6    261
+77   cardia      6    267
+78   chadar      6    273
+79   chadri      6    279
+80   cicada      6    285
+81   cyanid      6    291
+82   dharna      6    297
+83   diacid      6    303
+84   dyadic      6    309
+85   hybrid      6    315
+86   hydria      6    321
+87   hydric      6    327
+88   hydrid      6    333
+89   indaba      6    339
+90   iridic      6    345
+91   nandin      6    351
+92   radian      6    357
+93   rancid      6    363
+94   randan      6    369
+95   riband      6    375
+96  accidia      7    382
+97  arcadia      7    389
+98  bandana      7    396
+99  candida      7    403
+100        carabid      7    410
+101        cardiac      7    417
+102      diarchy *     14    431
+103        dryadic      7    438
+104        dyarchy      7    445
+105        handcar      7    452
+106        indican      7    459
+107        indicia      7    466
+108        nandina      7    473
+109        ribband      7    480
+110       acaridan      8    488
+111     arachnid *     15    503
+112       arcadian      8    511
+113       bandanna      8    519
+114       barnyard      8    527
+115       characid      8    535
+116       dahabiah      8    543
+117       dahabiya      8    551
+118       diacidic      8    559
+119       diarchic      8    567
+120       dihybrid      8    575
+121       dihydric      8    583
+122     dyarchic *     15    598
+123     hairband *     15    613
+124       harridan      8    621
+125     hydracid *     15    636
+126     radiancy *     15    651
+127       radicand      8    659
+128       rainband      8    667
+129       rainbird      8    675
+130       yardbird      8    683
+131      birdbrain      9    692
+132      candidacy      9    701
+133      circadian      9    710
+134      cnidarian      9    719
+135    hindbrain *     16    735
+136      ninhydrin      9    744
+137    abracadabra     11    755
+138  bradycardia *     18    773
+
+Puzzle = louismelamed
+
+Total words = 791
+Score = 4950
+pangrams = 61
+Highest scoring word = mesdemoiselles (21)
+Longest words = mesdemoiselles (14 characters)
+
+Pangrams only
+
+            word  score  total
+503    almudes *     14   2316
+505    alodium *     14   2337
+510    amidols *     14   2379
+513    audiles *     14   2407
+525    damosel *     14   2498
+569    dualism *     14   2813
+585    isolead *     14   2932
+596    medials *     14   3016
+600    medusal *     14   3051
+603    melodia *     14   3079
+604    meloids *     14   3093
+605    miaoued *     14   3107
+606    miauled *     14   3121
+610    midsole *     14   3156
+615    misdeal *     14   3198
+621    mislead *     14   3247
+627    modules *     14   3296
+661   alamodes *     15   3543
+665   allodium *     15   3582
+670   assoiled *     15   3629
+672   damosels *     15   3652
+682   dilemmas *     15   3739
+690   dolmades *     15   3810
+691   dualisms *     15   3825
+695   idealism *     15   3864
+700   isoleads *     15   3911
+702   limeades *     15   3934
+704   maladies *     15   3957
+707   medullas *     15   3988
+708   medusoid *     15   4003
+711   melodies *     15   4034
+712   melodise *     15   4049
+715   midsoles *     15   4080
+716   miladies *     15   4095
+720   misdeals *     15   4134
+724   misleads *     15   4173
+726   modiolus *     15   4196
+728   mudslide *     15   4219
+733   sedilium *     15   4266
+737   sesamoid *     15   4305
+738   slalomed *     15   4320
+741   sodamide *     15   4351
+743   somedeal *     15   4374
+758  idealisms *     16   4515
+760  limuloids *     16   4540
+761  medusoids *     16   4556
+763  melodised *     16   4581
+764  melodises *     16   4597
+765  misallied *     16   4613
+767  misdialed *     16   4638
+768       mudslides *     16   4654
+769       oeillades *     16   4670
+772       semisolid *     16   4704
+773       sesamoids *     16   4720
+774       sodamides *     16   4736
+775      demoiselle *     17   4753
+776      desmosomal *     17   4770
+781      misdialled *     17   4827
+783      semisolids *     17   4854
+785     demoiselles *     18   4882
+790  mesdemoiselles *     21   4950
+
+
+Puzzle = susancronce
+
+Total words = 796
+Score = 5571
+pangrams = 49
+Highest scoring word = nonconcurrences (22)
+Longest words = 2 (15 characters)
+
+                  word  score  total
+794    erroneousnesses     15   5549
+795  nonconcurrences *     22   5571
+
+Pangrams only
+
+                  word  score  total
+399          acerous *     14   1891
+405          arenous *     14   1940
+420          carouse *     14   2052
+433          coarsen *     14   2150
+440          corneas *     14   2206
+468          narcose *     14   2409
+549         anserous *     15   2987
+551         araceous *     15   3010
+553         arsenous *     15   3033
+566         carouser *     15   3144
+567         carouses *     15   3159
+576         cernuous *     15   3238
+578         coarsens *     15   3261
+579         coenures *     15   3276
+580         coenurus *     15   3291
+584         corneous *     15   3330
+585         cornuses *     15   3345
+602         narcoses *     15   3488
+649         unreason *     15   3871
+652        anacruses *     16   3903
+654        announcer *     16   3928
+655        announces *     16   3944
+658        assurance *     16   3978
+666        carousers *     16   4057
+670        concourse *     16   4100
+682        nonsecure *     16   4215
+692        renounces *     16   4312
+696        resonance *     16   4355
+698        rosaceous *     16   4380
+713        uncrosses *     16   4522
+714        unreasons *     16   4538
+719       assurances *     17   4594
+721       cannoneers *     17   4621
+723       coarseness *     17   4648
+724       concourses *     17   4665
+731       racecourse *     17   4742
+736       renouncers *     17   4799
+737       resonances *     17   4816
+749       unconcerns *     17   4943
+756      nonrecourse *     18   5027
+758      occurrences *     18   5056
+760      racecourses *     18   5085
+762      reassurance *     18   5114
+769     coarsenesses *     19   5200
+771     concurrences *     19   5231
+775     reassurances *     19   5286
+787    reoccurrences *     20   5443
+791   nonoccurrences *     21   5506
+795  nonconcurrences *     22   5571
+
+Puzzle = richardcronce
+
+Total words = 863
+Score = 5767
+pangrams = 70
+Highest scoring word = incarnadined (19)
+Longest words = 2 (14 characters)
+
+               word  score  total
+861  chincherinchee     14   5753
+862  noncoincidence     14   5767
+
+Pangrams only
+
+            word  score  total
+497    aneroid *     14   2385
+500    archine *     14   2413
+504    cairned *     14   2448
+512    chained *     14   2511
+513    chaired *     14   2525
+530    choired *     14   2651
+533    chorine *     14   2679
+541    codeina *     14   2742
+591    echidna *     14   3099
+598    endarch *     14   3155
+603    handier *     14   3197
+608    hedonic *     14   3239
+622    hordein *     14   3344
+639    ranched *     14   3470
+657    roached *     14   3603
+662   acridine *     15   3649
+665   anechoic *     15   3680
+667   candider *     15   3703
+675   chancier *     15   3774
+678   chicaned *     15   3805
+679   chicaner *     15   3820
+680   choreoid *     15   3835
+684   cocinera *     15   3874
+689   coinhere *     15   3921
+696   corniced *     15   3984
+697   corniche *     15   3999
+700   cranched *     15   4030
+701   crannied *     15   4045
+718   dihedron *     15   4188
+726   echidnae *     15   4259
+727   echinoid *     15   4274
+729   enchoric *     15   4297
+730   encroach *     15   4312
+735   enriched *     15   4359
+737   hacienda *     15   4382
+738   hardcore *     15   4397
+754   ordained *     15   4532
+755   ordainer *     15   4547
+756   ordnance *     15   4562
+758   radiance *     15   4585
+759   ranchero *     15   4600
+760   rancored *     15   4615
+762   recoined *     15   4638
+776   reordain *     15   4757
+779   richened *     15   4788
+780   riddance *     15   4803
+783  adherence *     16   4837
+786  anhedonia *     16   4871
+790  carronade *     16   4914
+802  diarrheic *     16   5029
+803     diarrhoea *     16   5045
+804     enchained *     16   5061
+805     endocrine *     16   5077
+806     hacendado *     16   5093
+812     nondancer *     16   5154
+814     oceanaria *     16   5179
+823     rhinoceri *     16   5267
+826    accordance *     17   5302
+835    encroacher *     17   5399
+840    headachier *     17   5456
+843    irradiance *     17   5493
+844    noncarrier *     17   5510
+846    ordinarier *     17   5537
+847    ordonnance *     17   5554
+849    reordained *     17   5581
+852   concordance *     18   5620
+853   dodecahedra *     18   5638
+856   incarnadine *     18   5678
+857   incoherence *     18   5696
+859  incarnadined *     19   5727
+
