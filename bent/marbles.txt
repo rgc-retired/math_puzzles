@@ -1,0 +1,73 @@
+The minimum feasible game would be 10/11 moves.  A
+move can not be blocked until a saucer contains two
+other marbles.  The minimum configuration occurs
+after 10 marbles have been placed.
+
+We label the marbles as n_{i} and n_{i+1} with the
+constraint that n_{i+1} > n_{i} and n1-n10 map
+(somehow) to the integers 1-10:
+
+	Saucer 1: n1 n2
+	Saucer 2: n3 n4
+	Saucer 3: n5 n6
+	Saucer 4: n7 n8
+	Saucer 5: n9 n10
+
+When going to place m=11 this would be blocked under
+the following case:
+
+	11-n2 = n2-n1
+	11-n4 = n4-n3
+	11-n6 = n6-n5
+	11-n8 = n8-n7
+	11-n10 = n10-n9
+
+So, the question is whether or not this has solutions
+with integers 1-10 mapped to n1-n10.  The answer is no.
+
+One of the larger marbles in the saucers must be number 10.
+This defines the partner as 9.  The pair is 10,9.
+
+Of the remaining 4 saucers, one of the larger marbles must
+be 8.  This defines the partner as 5.  The pair is 8,5
+
+Of the remaining 3 saucers we have 7,3
+
+Of the remaining 2 saucers we have 6,1
+
+The final saucer has 4,2 which would allow marble 11.
+
+Conclude: you can always place 11 marbles.
+
+What about 12 marbles?  We have the five saucers as:
+
+	Saucer 1: n1 n2
+	Saucer 2: n3 n4
+	Saucer 3: n5 n6
+	Saucer 4: n7 n8
+	Saucer 5: n9 n10 n11
+
+When we go to place marble=12 we will be blocked if:
+
+	12-n2 = n2-n1
+	12-n4 = n4-n3
+	12-n6 = n6-n5
+	12-n8 = n8-n7
+
+	12-n11 = n11-n10 or n10-n9 or n11-n9
+		or
+	12-n10 =            n10-n9 or n11-n9
+
+To know if this can be solved we need to know where
+marble=11 is located.  If it is at one of the saucers
+with only two marbles then that immediately defines
+the partner (as above).  If marble=11 is located in
+saucer 5 then we require n11=11 and:
+
+	12-n11 = 1 --> n10=10 or n10-n9=1 for a block
+
+	if n10==10 then n9<9
+	if n10<10 then n9=n10-1
+
+Sort of stuck here ...
+
