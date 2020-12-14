@@ -1,0 +1,528 @@
+---
+title: "Bent Winter 2002"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2002
+
+
+## Problem 1
+
+    Two dice, one red and one white,
+    are thrown. The number shown on
+    the red die is divided by the number
+    shown on the white die. What is the
+    expected value of this quotient?
+    
+    -- William A. Whitworth, 1901
+
+Solution: Should just be able to enumerate these
+without much difficulty.  Consider each case
+of the red die (1:6) and the white die (1:6)
+for a matrix of 36 values.  The mean value
+should be the desired result.
+
+           ...... Red ............
+    White  1   2   3   4   5   6
+    1      1   2   3   4   5   6
+    2      1/2 2/2 3/2 4/2 5/2 6/2
+    3      1/3 2/3 3/3 4/3 5/3 6/3
+    4      1/4 2/4 3/4 4/4 5/4 6/4
+    5      1/5 2/5 3/5 4/5 5/5 6/5
+    6      1/6 2/6 3/6 4/6 5/6 6/6
+
+Now - is there a clever way of summing these or
+do we just use brute force?  We can sum the
+numerators on each row as 1+2+3+4+5+6 = 21 and
+then find a common denominator to add the row sums.
+
+    Total = 21*(1/1+1/2+1/3+1/4+1/5+1/6)
+
+The least common denominator is 60, so:
+
+    Total = 21/60*(60+30+20+15+12+10)
+          = 21/60*147
+
+The mean result is:
+
+    Mean = Total/36 = 21/60*147/36
+         = (21*147)/(60*36)
+         = (3*7*3*7*7)/(2*2*3*5*2*2*3*3)
+         = 7*7*7/(2*2*3*5*2*2)
+         = 343/240
+         ~ 1.429167
+         
+Just FYI - this is one line of R code
+
+```{r}
+mean(outer(1:6,1:6,"/"))
+```
+
+## Problem 2
+
+    Two painters accept a job painting
+    a room. Al can do the flat work in
+    two hours and the trim work in one
+    hour. Ben can do the flat work in
+    three hours and the trim work in two
+    hours. What is the minimum time, in
+    minutes, that the two painters can
+    paint the room if they divide the
+    work in the optimum manner?
+    
+    -- William S. Alderson, MI E'43
+
+Solution: this is like `distance=rate*time`
+
+    Intuitively it seems like the work should
+    be partitioned based on the relative
+    ability of the workers.  For example:
+    
+    If they are equal speed then each does
+    half the work.
+    
+    If one is 2X faster then they should
+    get 2X of the job.
+
+    When there are two jobs -- how do we
+    optimally partition this?
+
+    There must be an easier way to figure this out but
+    I am failing to see it.
+
+    Al flat rate  = 1/2 job per hour
+    Al trim rate  = 1/1 job per hour
+    Ben flat rate = 1/3 job per hour
+    Ben trim rate = 1/2 job per hour
+
+    If Ben did the trim and Al the flat then the
+    whole job would take 2 hours.  We should be
+    able to improve on that.
+    
+    Let Al do all the trim in 1 hour and Ben
+    would complete 1/3 of the flat.  This leaves
+    2/3 of the flat with both working on it:
+    
+    t*(1/2+1/3) = 2/3
+    t*(3/4+1/2) = 1
+    t*(5/4) = 1
+    t = 4/5 hours
+    
+    Total = 1.8 hours
+
+    Is this the best we can do?  Let's try analytically:
+    
+    pf = percent of flat work job performed by Al
+    pt = percent of trim work job performed by Al
+
+    Al_time = pf/(1/2)+pt/(1/1)
+    Ben_time = (1-pf)/(1/3)+(1-pt)/(1/2)
+    
+    Al_time = Ben_time
+    
+    2*pf + pt = 3*(1-pf)+2*(1-pt)
+    5*pf       = 5 - 3*pt
+    pf         = 1 - 3/5 * pt
+    
+    So: Al_time = 2*(1-3/5*pt) + pt
+                = 2 - 6/5*pt + pt
+                = 2 - 1/5*pt
+                
+    I want to minimize this so need maximum pt = 1, pf = 2/5
+
+    Al_time = 9/5 = 1.8
+    Ben_time = 3/5*1/3 + 0 = 9/5 = 1.8
+    
+    I guess this confirms my original guesstime for full time on trim.
+
+    Should I try Monte-Carlo just for grins???
+
+```{r}
+# Uniform random percent of each job performed by Al
+# Note that I added the underscore to prevent name
+# collision with R functions
+p_f=runif(100000)
+p_t=runif(100000)
+al_time = 2*p_f + p_t
+ben_time = 3*(1-p_f) + 2*(1-p_t)
+
+# We aren't done until the larger of these two have finished
+job_time = ifelse(al_time>ben_time,al_time,ben_time)
+
+# The best solution is the min of this value
+print(paste0('Best time = ',min(job_time)))
+
+# Allocation for this optimum
+print(paste0('Portion of flat work done by Al = ',p_f[which.min(job_time)]))
+print(paste0('Portion of trim work done by Al = ',p_t[which.min(job_time)]))
+
+```
+
+Which confirms the analysis above.  Al does all the trim and 40% of the flat work.
+Ben does the remaining 60% of the flat work.
+
+## Problem 3
+
+    Walking near a pond, a 45 kg boy
+    finds a hemispherical concrete shell
+    2.5 cm thick and tries to use it as a
+    boat. With the boy aboard and
+    crouching low for stability, the shell
+    floats with 10 cm of freeboard. If the
+    specific gravity of the concrete is 2.5,
+    what is the outside diameter of the
+    hemisphere?
+    
+    -- Craig K. Galer, MI A'77
+
+Solution: this goes back to a previous problem involving the volume of the
+lower portion of a hemisphere along with some interesting calculations.
+
+For a full hemisphere:
+
+    R = outside radius of the hemisphere
+    Vo = volume of the outside of the hemisphere
+    Vi = volume of the (hollow) inside of the hemisphere
+    Mh = mass of the hemisphere
+    
+    Vo = 2/3*pi*R^3
+    Vi = 2/3*pi*(R-2.5)^3
+    Mh = (Vo-Vi)*2.5
+    
+    Total Mass of "boat" = Mh + 45 kg
+    
+    Volume of Water displaced = lower part of hemisphere (all but top 10 cm).
+    
+    For a sphere of radius = R, height of h from bottom
+    
+    V = pi*R*h^2 - pi*h^3/3
+
+    Volume of water = pi*R*(R-10cm)^2 - pi*(R-10cm)^3/3
+    
+    If we assume water is 1000 kg per cubic meter and put everything in kg, meters:
+    
+    (pi*R*(R-0.1)^2 - pi*(R-0.1)^3/3)*1000 = (Vo-Vi)*2.5*1000 + 45
+            = (2/3*pi*R^3 - 2/3*pi*(R-0.025)^3)*2.5*1000+45
+            
+    2000*pi*R^3/3 - 100*pi*R^2 + pi/3 = 125*pi*R^2 - 25*pi*R/8 + 5*pi/192 + 45
+    
+    2000*pi*R^3/3 - 225*pi*R^2 + 25*pi*R/8 - 45 + 59*pi/192 = 0
+    
+    R = 0.436911963870549 meters
+    
+    Diameter = 2*R ~ 0.873823927741098 meters
+ 
+    (OK - I confess I used sympy in a separate ipython window for the heavy lifting)
+    
+    Check for sanity:
+    
+```{r}
+foo = function(r) {
+    return(2000*pi*r^3/3 - 225*pi*r^2 + 25*pi*r/8 - 45 + 59*pi/192)
+}
+
+r=uniroot(foo,c(0,1))$root
+print(paste0("Numerical solution for r     = ",r))
+
+r=0.436911963870549   # outside radius of hemisphere (from sympy)
+r2=r-0.025            # inside radius of hemisphere
+freeboard=0.1         # height from water to top of hemisphere
+boy_mass=45           # mass of the passenger
+
+water_volume = pi*r*(r-freeboard)^2 - pi*(r-freeboard)^3/3
+
+displaced_mass = water_volume*1000
+concrete_mass = (2/3*pi*r^3-2/3*pi*r2^3)*2.5*1000
+
+total_mass = concrete_mass + boy_mass
+
+print(paste0('Outside radius of hemisphere = ',r))
+print(paste0('Outside diameter of hemisphere = ',2*r))
+print(paste0('water volume     = ',water_volume))
+print(paste0('displaced mass   = ',displaced_mass))
+print(paste0('concrete mass    = ',concrete_mass))
+print(paste0('total craft mass = ',total_mass))
+
+```
+
+We should also be able to do this graphically:
+
+```{r}
+spec_gravity=2.5   # Given in problem definition
+freeboard=0.10     # Given in problem definition
+mass_boy=45        # Given in problem definition
+
+water_density=1000 # kg per m^3 (assumed water density)
+
+r=seq(0.1,1,length.out=200)   # Range of hemisphere radii to be explored
+
+outside_volume=2/3*pi*r^3
+inside_volume=2/3*pi*(r-0.025)^3
+concrete_mass=(outside_volume-inside_volume)*spec_gravity*water_density
+total_mass = concrete_mass + mass_boy
+
+## For bottom part of hemisphere (height = h)
+##
+##    V = pi*R*h^2 - pi*h^3/3
+
+displaced_volume = pi*r*(r-0.1)^2-pi*(r-0.1)^3/3
+buoyancy=displaced_volume*water_density
+
+plot(r,total_mass,type='l',xlab='Radius',ylab='kg - force',xlim=c(0.1,1),ylim=c(0,400))
+lines(r,buoyancy,col='red')
+legend(0.25,350,c('Total mass','Buoyancy'),lty="solid",col=c("black","red"))
+grid()
+```
+
+Clearly, for small radii the buoyancy is too small to support the mass of the shell
+and passenger.  When the shell gets *large enough* then the boat will float.
+
+To get a meaningful result we would need to zoom in the plot but it appears that
+a radius of (approximately) 0.44m is sufficient.
+
+
+## Problem 4
+
+    In how many different ways can
+    eight queens be placed on a chess
+    board such that no queen threatens
+    another queen and no queen occupies
+    a square that is on either major
+    diagonal? A solution is considered
+    different if it is not a rotation or
+    reflection of another solution.
+    
+    -- David H. Westwood, MN A'43
+
+TODO
+
+
+## Problem 5
+
+    During a recent game of fivecard-
+    draw poker, played with a
+    standard deck of cards, I was dealt a
+    hand with the following characteristics.
+    It contained no aces or face
+    cards and had no two cards of the
+    same value. All four suits were
+    present. The total value of the odd
+    cards equaled the total value of the
+    even cards. There were no three-card
+    straights. The total value of the black
+    cards was 10, and the total value of
+    the hearts was 14. And the card with
+    the lowest value was a spade.
+    Precisely what were the five cards?
+    
+    -- nearly impossible Brain Bafflers
+    by Tim Sole and Rod Marshall
+
+Solution:  Note that when I checked the solution I realized my final
+solution was correct but in my process I made a mistake.  I missed the
+fact that the two Hearts could be 10+4 so I have added that to the
+analysis.  There is no feasible hand with these cards so it did not
+affect the final solution.
+
+    Hand = 9H, 5H, 2S, 8C, 4D
+    
+    Details:
+
+    Since there are only 5 cards covering four suits
+    there can be no more than 2 cards of any one suit.
+    
+    All cards in range 2-10.  No pairs.
+    
+    Since the total value of the hearts is 14 we can
+    conclude that there are two hearts, either:
+    
+        10+4 of Hearts, 9+5 of Hearts, or 8+6 of Hearts
+        1 club
+        1 spade
+        1 diamond
+        
+    Total value of odd == total value of even
+    No three card straights
+    Total club+spade = 10, spade is lowest
+    
+        2 of Spades + 8 of Clubs, or
+        3 of Spades + 7 of Clubs, or
+        4 of Spades + 6 of Clubs
+        
+    Assume we have 8+6 of Hearts:  then we have a contradiction.
+    Can't have any of the Spade/Club combinations.
+    
+        2 of Spades + 8 of Clubs --> pair of 8s is disallowed
+        3 of Spades + 7 of Clubs --> 6,7,8 straight is disallowed
+        4 of Spades + 6 of Clubs --> pair of 6s is disallowed
+        
+    Assume we have 9+5 of Hearts
+        2 of Spades + 8 of Clubs --> feasible
+        3 of Spades + 7 of Clubs --> feasible
+        4 of Spades + 6 of Clubs --> 4,5,6 straight is disallowed
+
+    Assume we have 10+4 of Hearts
+        2 of Spades + 8 of Clubs --> feasible
+        3 of Spades + 7 of Clubs --> feasible
+        4 of Spades + 6 of Clubs --> pair of 4s is disallowed
+
+    Assume we have 9+5 of Hearts, 2 of Spades, 8 of Clubs then
+        Sum of odd == sum of even --> Need 4 of Diamonds --> feasible
+        
+    Assume we have 9+5 of Hearts, 3 of Spades, 7 of Clubs then
+        Sum of odd = 9+5+3+7 = 24 --> not feasible
+
+    Assume we have 10+4 of Hearts, 2 of Spades, 8 of Clubs then
+        Sum of even = 26 --> not feasible
+
+    Assume we have 10+4 of Hearts, 3 of Spades, 7 of Clubs then
+        Sum of odd == sum of even --> 10 vs. 14 --> not feasible
+        This would require 4 more counts for an odd card
+
+    Final Conclusion:
+    
+        9+5 of Hearts
+        2   of Spades
+        8   of Clubs
+        4   of Diamonds
+        
+        Heart total = 14
+        Black total = 10
+        Odd total = 14
+        Even total = 14
+        No three card straights
+        Lowest card is a Spade
+
+
+## Bonus
+
+    Ann and Bev play a game of
+    random tic-tac-toe. They start with a
+    tic-tac-toe grid with the boxes
+    labeled 1 through 9. Next, they
+    shuffle a deck of cards consisting of
+    the ace, 2, 3, 4, 5, 6, 7, 8, and 9 of
+    spades. They then take turns
+    drawing cards, without replacement,
+    and placing their initials in the
+    squares corresponding to the card
+    drawn until a winner is determined.
+    If Ann draws first, what is her
+    probability of winning, ignoring
+    games that end in a draw?
+    
+    -- The Surprise Attack in
+    Mathematical Problems
+    by L. A. Graham
+
+Solution:  Consider the tic-tac-toe grid as shown:
+
+    +---+---+---+
+    | 1 | 2 | 3 |
+    +---+---+---+
+    | 4 | 5 | 6 |
+    +---+---+---+
+    | 7 | 8 | 9 |
+    +---+---+---+
+
+    A win occurs when one player has any of the following
+    eight combinations:
+    
+    1-2-3
+    4-5-6
+    7-8-9
+    1-4-7
+    2-5-8
+    3-6-9
+    1-5-9
+    3-5-7
+
+    No one can win until they have three numbers.
+    
+    Ann gets to three numbers first.  There are 84 possible 3 number
+    combinations from 9 numbers.  Of these, 8 will win so the
+    probability that she wins is 8/84.
+    
+    Now it gets complicated since the remaining probabilities are
+    conditional on Ann failing.
+    
+    I tried to do this analytically and it was nonsense.
+
+    I suspect Bayes Theorem could be useful - but I will punt.
+
+    What about Monte-Carlo?
+    
+```{r}
+num_trial=10000
+
+win_code = function(s) {
+    r=0
+    if (all(c(1,2,3) %in% s)) {r=1}
+    if (all(c(4,5,6) %in% s)) {r=2}
+    if (all(c(7,8,9) %in% s)) {r=3}
+    if (all(c(1,4,7) %in% s)) {r=4}
+    if (all(c(2,5,8) %in% s)) {r=5}
+    if (all(c(3,6,9) %in% s)) {r=6}
+    if (all(c(1,5,9) %in% s)) {r=7}
+    if (all(c(3,5,7) %in% s)) {r=8}
+    return(r)    
+}
+
+result=c()
+for (i in 1:num_trial) {
+    ann=c()
+    bev=c()
+    s=sample(1:9)
+    for (k in 1:9) {
+        if (k%%2 == 1) {
+            ann=c(ann,s[k])
+            r=win_code(ann)
+            if (r > 0) {
+                result=c(result,1)
+                break
+            }
+        } else {
+            bev=c(bev,s[k])
+            r=win_code(bev)
+            if (r>0) {
+                result=c(result,2)
+                break
+            }
+            
+        }
+    }
+}
+print(paste0("Ann wins = ",sum(result==1)/length(result)))
+print(paste0("Bev wins = ",sum(result==2)/length(result)))
+print(paste0("Draws    = ",num_trial-length(result)))
+```
+
+So Ann wins about 2/3 of the time and Bev wins 1/3 of the time.
+This ignores the draws.  It is sort of interesting that draws
+only happen about 13% of the time with random square selection.
+
+They actually solve this analytically by looking at every possible
+tic-tac-toe grid and counting the solutions.  The likelihood that
+Ann wins (discounting ties) is precisely 0.67.
+
+
+## Double Bonus
+
+    Using only a pair of
+    compasses, locate the midpoint
+    between two given points, using
+    fewer than 10 compass operations.
+    
+    -- Elvin Greene, NJ Gamma'52
+
+TODO
+
+I looked at the solution and I could not follow it mentally.
+Need to make a drawing and try it.
+

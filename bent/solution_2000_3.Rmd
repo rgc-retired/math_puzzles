@@ -1,0 +1,351 @@
+---
+title: "Bent Fall 2000"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2000
+
+
+## Problem 1
+
+    Smith, Jones, and Robinson make
+    four statements each as follows:
+    
+        Smith:
+        1. Jones owes me $10.
+        2. Robinson owes me $5.
+        3. All Robinson's statements are true.
+        4. All Jones's statements are untrue.
+        
+        Jones:
+        1. I owe no money to Smith.
+        2. Robinson owes me $7.
+        3. I am British.
+        4. All Smith's statements are untrue.
+        
+        Robinson:
+        1. I owe no money to anybody.
+        2. Jones is a Dutchman.
+        3. I always tell the truth.
+        4. Two of Jones's statements are
+        true, and two are false.
+    
+    One person made 4 true statements.
+    Who? Find, for all of them,
+    which statements are true and which
+    are false.
+    
+    -- Brain Puzzler's Delight
+    by E. R. Emmet
+
+Solution:
+
+Jones is telling the truth.
+All statements by Smith and Robinson are false.
+
+Details of each possible scenario are given below.
+
+Assume Smith always tells the truth.
+
+    Veracity of others:
+    
+    Jones:
+    1. False (by Smith #1)
+    
+    Robinson:
+    1. False (by Smith #2)
+    
+    Conclude this is not feasible.  Smith #3 is False since not all of
+    Robinson's answers are truthful.
+
+Assume Jones always tells the truth.
+
+    Veracity of others:
+    
+    Smith:
+    1. False (by Jones #1)
+    2. False (by Jones #4)
+    3. False (see Robinson answers - some are false)
+    4. False (by assumption)
+    
+    Robinson:
+    1. False (by Jones #2)
+    2. False (by Jones #3)
+    3. False (not all answers are True)
+    4. False (by assumption)
+    
+    Conclude that this is feasible.  There are no contradictions.
+
+Assume that Robinson always tells the truth.
+If we assume they are all correct then we can assess
+the veracity of the others as:
+
+    Smith:
+    1. Unknown
+    2. False (per Robinson #1)
+    3. True (assume Robinson is truthful)
+    4. False (per Robinson #4)
+    
+    Jones:
+    
+    1. Unknown
+    2. False (Robinson says he doesn't owe money to anybody)
+    3. False (Robinson says he is a Dutch)
+    4. False (some of Smith's statements are true)
+    
+    Conclude that this is not feasible.  It is not possible for Robinson #4 to be true
+    since at least three of Jones statements are False.
+
+
+## Problem 2
+
+    Scalenia is a country bounded by
+    three straight frontiers called A, B,
+    and C, of course, each of a different
+    length but each an exact number of
+    kilometers long. The curious thing is
+    that the length of A+B+C, and
+    the lengths of A+B-C, A+C-B, and
+    B+C-A, are all precisely square
+    numbers of kilometers. If Scalenia
+    has the smallest perimeter consistent
+    with this curious fact, what is
+    the length of each of its frontiers?
+    -- An Enigma by Stephen Ainley
+
+Solution: try exhaustive search?  Arbitrarily use range of 1-100.
+
+It appears the lengths are 10, 10, and 16.
+
+    A=10, B=10, C=16
+    
+    10+10+16 = 36
+    10+10-16 = 4
+    10+16-10 = 16
+    10+16-10 = 16
+
+```{r}
+for (A in 1:100) {
+  for (B in 1:100) {
+    for (C in 1:100) {
+      d=A+B+C
+      if (trunc(sqrt(d))^2 == d) {
+        d=A+B-C
+        if ((d>0) & (trunc(sqrt(d))^2 == d)) {
+          d=A+C-B
+          if ((d>0) & (trunc(sqrt(d))^2 == d)) {
+            d=B+C-A
+            if ((d>0) & (trunc(sqrt(d))^2 == d)) {
+              print(c(A,B,C,A+B+C))
+            }
+          }
+        }
+        
+      }
+    }
+  }
+}
+```
+
+## Problem 3
+
+    A 12 hour AM/PM clock, whose
+    display always shows six digits in
+    the format hh:mm:ss, sits in a dark
+    room. The digits of the LED display
+    are formed by the familiar seven-element
+    figures that look like
+    dominos when all seven elements are
+    lit. Between which two consecutive
+    times is the change in the relative
+    brightness of the display the
+    greatest? Assume that, when it is lit,
+    each element of each digit emits
+    exactly the same amount of light.
+    Also, assume that 0 is 6 segments lit,
+    1 is 2 seg, 2 is 5 seg, 3 is 5 seg, 4 is 4
+    seg, 5 is 5 seg, 6 is 6 seg, 7 is 4 seg, 8
+    is 7 seg, and 9 is 6 segments lit.
+    -- The Platinic Corner
+
+Solution: should be able to enumerate this and find the solution
+using brute force.  The maximum brightness shift is an increase
+of 5 units at times of:
+
+    01:59:59 to 02:00:00
+    07:59:59 to 08:00:00
+    11:59:59 to 12:00:00
+    
+Of course this is for both AM and PM.
+
+The problem requests the *relative change in brightness* but I don't know
+if this is as a percent of the initial brightness or in terms of the absolute
+number of illuminated segments.  All of the time changes above have the same
+change in absolute brightness (5 LED segments).
+
+If we are concerned with a percent change in brightness then the largest
+change occurs from 11:59:59 to 12:00:00 (5/26 ~ 19.2% increase).
+
+
+```{r}
+# Mapping of digits 0-9 to number of segments
+# This is a proxy for brightness
+dig2seg = c(6,2,5,5,4,5,6,4,7,6)
+
+calc_brightness = function(h,m,s) {
+  b=0
+  d=trunc(h/10); b=b+dig2seg[d+1]
+  d=h%%10;       b=b+dig2seg[d+1]
+  d=trunc(m/10); b=b+dig2seg[d+1]
+  d=m%%10;       b=b+dig2seg[d+1]
+  d=trunc(s/10); b=b+dig2seg[d+1]
+  d=s%%10;       b=b+dig2seg[d+1]
+  return(b)
+}
+
+# Starting at 12:00:00 and going to 11:59:59
+# Enumerate the brightness.
+# Note there are 12*60*60 = 43200 values
+xxx=rep(0,43200)
+ttt=rep("00:00:00",43200)
+n=1
+for (h in c(12,1,2,3,4,5,6,7,8,9,10,11)) {
+  for (m in 0:59) {
+    for (s in 0:59) {
+      xxx[n]=calc_brightness(h,m,s)
+      ttt[n]=sprintf("%02d:%02d:%02d",h,m,s)
+      n=n+1
+    }
+  }
+}
+# Allow for wrap-around at noon (also end of day)
+xxx=c(xxx,xxx)
+ttt=c(ttt,ttt)
+# Check for brightness changes
+dx=diff(xxx)
+a=data.frame(t=ttt,Brightness=xxx)
+# Location of max brightness shift (lower value)
+k=which(dx==max(dx))
+# Give lower and higher values of time/brightness
+n=sort(c(k,k+1))
+# Dump the times/brightness levels
+a[n,]
+```
+
+## Problem 4
+
+    Solve this cryptic division, where
+    the right side is a repeating decimal.
+    As usual, the same letter is the same
+    digit throughout, different letters
+    are different digits, and base - 10 is
+    used: 
+
+        EVER/NNNNN=.ONAND ONAND. . . .
+
+    -- Thomas McNelly
+    via Technology Review
+
+Solved in the cryptic_arithmetic notebook
+
+    EVER = 7678
+    NNNNN = 33333
+    ONAND = 23034
+
+## Problem 5
+
+    An urn contains 10 balls labeled 0
+    through 9. You reach into the urn
+    and pick three balls (without
+    replacement) at random. What is the
+    probability that you can form a
+    three-digit prime number (leading
+    zero not allowed) from the three
+    balls?
+    -- H.G. McIlvried, PA Gamma'53
+
+Solution:
+
+There are 720 permutations that can be formed from 10 balls taken 3 at a time.
+There are 6 ways to arrange each permutation.
+
+There are 97 primes in the range 103-983 without allowing for repeated digits.
+
+Not sure how to put these together since the probability of each rearrangement
+is not an independent quantity.
+
+Test with Monte-Carlo:
+
+```{r}
+make_num = function(a,b,c) { return(100*a+10*b+c) }
+
+# Get a list of three digit primes (e.g. < 1000)
+# Eliminate values with leading zero (e.g. < 100)
+p=read.table('primes.txt')[,1]
+p=p[(p>99)&(p<1000)]
+
+t1=Sys.time()
+n_trials=10000000
+n=0
+for (i in 1:n_trials) {
+  # Select 3 digits at random
+  s=sample(0:9,3)
+  a=s[1]; b=s[2]; c=s[3]
+  success=0
+  # Build the 6 permutations and test them
+  if (make_num(a,b,c) %in% p) { success=1 }
+  if (make_num(a,c,b) %in% p) { success=1 }
+  if (make_num(b,a,c) %in% p) { success=1 }
+  if (make_num(b,c,a) %in% p) { success=1 }
+  if (make_num(c,a,b) %in% p) { success=1 }
+  if (make_num(c,b,a) %in% p) { success=1 }
+  n=n+success
+}
+t2=Sys.time()
+print(paste0('Num trials = ',n_trials))
+print(paste0('Num success = ',n))
+print(paste0('Probability = ',n/n_trials))
+print(paste0('Execution time = ',difftime(t2,t1,units="secs"),' seconds'))
+```
+
+The probability appears to be about 44.2%.
+
+
+## Bonus
+
+    In a uniform (direction and
+    magnitude) gravity field, the fastest
+    way for a frictionless particle to slide
+    from A to B in a vacuum is along a
+    cycloid. If A and B are 500 km apart
+    and at the same elevation, the
+    maximum depth of the cycloid is just
+    over 159 km. If, however, there is a
+    depth limitation of 50 km, describe
+    the fastest curve. Also, with g = 9.8
+    m/s/s, how long (in seconds) does it
+    take for a particle started at rest to
+    go from A to B?
+    -- David Gluss
+    via Technology Review
+
+TODO
+
+
+## Double Bonus
+
+    Devise a graphical
+    method of locating point P in the
+    plane of a given triangle ABC such
+    that triangles PAB, PBC, and PCA
+    have equal perimeters.
+    -- John Rule
+    via Technology Review
+
+TODO

@@ -1,0 +1,248 @@
+---
+title: "Bent Fall 2018"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2018
+
+
+## Problem 1
+
+    Solve this cryptic addition with
+    the usual rules: different letters
+    are different digits, same letter is
+    same digit, no leading zeros, base
+    10:
+
+        SIXTEEN + TWENTY +
+        TWENTY + TEN + TWO + TWO =
+        SEVENTY.
+
+    -- Journal of Recreational
+    Mathematics
+
+Solution: from the cryptic arithmetic notebook
+
+    Cryptic addition:
+
+      SIXTEEN + TWENTY + TWENTY + TEN + TWO + TWO = SEVENTY
+
+    a=make_crypt_df('sixteentwentytentwoseventy')
+    x1=make_num(a,'sixteen')+
+       make_num(a,'twenty')*2+
+       make_num(a,'ten')+
+       make_num(a,'two')
+    x2=make_num(a,'seventy')
+    k=(x1==x2)
+    k=k&(a$s!=0)&(a$t!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+            s i x t e n w y o v
+    1125065 3 0 9 2 6 5 7 8 1 4
+
+
+## Problem 2
+
+    Hook, Line, and Sinker returned from a day's
+    fishing, and each reported his catch
+    secretly, but accurately, to George Gaff,
+    landlord of The Complete Idiot. "Well,
+    Gents," George announced later.  "Hook caught
+    the most fish, and Sinker caught the fewest
+    (no ties). If you divide Hook's catch by
+    Sinker's catch, you get Line's catch." Upon
+    reflection, Hook remarked, "I know how many
+    fish each of us caught." Line then chimed in
+    with, "I also know how many each of us
+    caught." "But I don't know," Sinker
+    complained after a short pause.  "Never mind,
+    Old Chap," said George. "I'll give you a
+    clue. I've been fishing, too, and I caught
+    fewer fish than Hook. If you know how many I
+    caught, you can figure out how many fish Line
+    caught." Without further help, Sinker managed
+    to work out Line's catch. Sinker was proud of
+    himself and remarked that it had been a good
+    day, since his catch was twice what he had
+    caught the previous week. How many fish did
+    Hook, Line, and Sinker each catch?
+
+    -- A Tantalizer by Martin Hollis in New
+       Scientist
+
+TODO
+
+    meh
+
+
+## Problem 3
+
+    In how many different ways (order does not
+    matter) can one change a $100 bill using $1,
+    $2, $5, $10, $20, and $50 bills?
+
+    -- Challenging Mathematical Problems with
+    Elementary Solutions by A.M. & I.M. Yaglom
+
+Solution:
+
+    Brute force?
+    
+```{r}
+n=0
+solution=c()
+for (n1 in 0:100) {
+    for (n2 in 0:50) {
+        for (n5 in 0:20) {
+            for (n10 in 0:10) {
+                for (n20 in 0:5) {
+                    for (n50 in 0:2) {
+                        t=n1+2*n2+5*n5+10*n10+20*n20+50*n50
+                        if (t==100) { 
+                            n=n+1
+                            solution=append(solution,c(n1,n2,n5,n10,n20,n50))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+solution=matrix(solution,ncol=6,byrow=T)
+colnames(solution)=c("1","2","5","10","20","50")
+
+print(n)
+
+```
+
+    There are only 4562 ways to do it.
+    
+    If you really want -- see the solution matrix for all
+    the combinations.
+
+
+## Problem 4
+
+    What is the maximum number of queens that can
+    be placed on an 8x8 chessboard so that each
+    queen threatens (that is, could capture on
+    the next move) exactly two other queens? A
+    queen can move horizontally, vertically, or
+    diagonally as many squares as desired or
+    until another piece or the edge of the board
+    is encountered. Using Q's and -'s, provide an
+    8x8 grid that represents the chess board.
+
+    -- The Colossal Book of Mathematics by Martin
+       Gardner
+
+TODO
+
+    meh
+
+
+## Problem 5
+
+    The There'sAPillForEverything Pharmaceutical
+    Company received a shipment of 12 bottles of
+    pills, each bottle containing 1,000 pills.
+    The labels on the bottles indicated that each
+    pill weighed 100 mg. However, before any
+    pills had been sold, the pharmacist received
+    a notice from the supplier that the
+    manufacturer had some problems, and some of
+    the pills might weigh 110 mg. However, if a
+    110 mg pill was found in a bottle, all the
+    pills in that bottle would weigh 110 mg. The
+    pharmacist has an ordinary pan scale that is
+    accurate to 1 mg. What is the minimum number
+    of weighings of pills from the various
+    bottles required to determine which bottles,
+    if any, contain pills weighing 110 mg?
+    Explain how the weighings are to be carried
+    out. The pan on the scale can hold at most 24
+    pills at the same time. Pills on the scale
+    can be identified as to which bottle they
+    came from.
+
+    -- The Crucible
+
+TODO
+
+    Use binary encoding to weight 1+2+4+8
+    pills from each of four bottles.  The
+    result should be 1500 mg.  If it is not,
+    the size of the error will tell you which
+    bottle was wrong.
+    
+    Repeat for two more sets of four bottles.
+    
+    In total, maximum of 3 weighings required.
+
+
+## Bonus
+
+    Two positive integers with no common integer
+    factor (other than one) are selected. Their
+    sum is written on the forehead of logician A
+    and the sum of their squares is written on
+    the forehead of logician B.  The two
+    logicians are allowed to see the numbers on
+    each-other's foreheads.  The following
+    conversation takes place.
+
+    A (sees sum of squares): I don't
+    know my number.
+    B (sees sum): I don't know my
+    number.
+
+    A: I don't know my number.
+    B: I don't know my number.
+    A: I don't know my number.
+    B: I don't know my number.
+    A: I don't know my number.
+    B: I don't know my number.
+    A: I know my number.
+
+    What are the numbers on A's and B's
+    foreheads?
+
+    -- Richard I. Hess, CA B'62
+
+TODO
+
+    meh
+
+
+## Computer Bonus
+
+    Find five different positive integers such
+    that the sum of any two of them is a perfect
+    square.
+
+    -- Allan Gottlieb's Puzzle Corner in
+    Technology Review
+
+Solution:
+
+    Hmmmm ...
+    
+    Not even sure how to brute force this unless the
+    integers are pretty small.
+    
+    Here is the Bent solution without any explanation:
+    
+        7442, 28658, 148583, 177458, and 763442
+        are five different positive integers such
+        that the sum of any two of them is a
+        perfect square.
+
+    I can confirm this is true but I don't know how
+    they would have found them.

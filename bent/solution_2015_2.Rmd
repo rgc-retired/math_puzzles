@@ -1,0 +1,489 @@
+---
+title: "Bent Summer 2015"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2015
+
+
+## Problem 1
+
+    There was a young and adventur-
+    ous man who found among his great-
+    grandfather's papers a map on a
+    piece of parchment that revealed the
+    location of a hidden treasure. The
+    instructions read:
+
+    "Sail to ___ latitude and ___ longi-
+    tude where thou wilt find a deserted
+    island. [When this Tickler first ap-
+    peared in a 1955 Bent, the island's
+    location was given as 16 o N 16 o W,
+    but that is obviously incorrect, and
+    the true coordinates, which were
+    known to the young man at the time
+    he found the map, have since been
+    lost.] There lieth a large meadow,
+    not pent, on the north shore of the
+    island where standeth a lonely oak
+    and a lonely pine. There thou wilt
+    see also an old gallows on which we
+    once were wont to hang traitors.
+    Start thou from the gallows and
+    walk to the oak counting thy steps.
+    At the oak thou must turn right
+    by a right angle and take the same
+    number of steps. Put here a spike
+    in the ground. Now must thou re-
+    turn to the gallows and walk to the
+    pine counting thy steps. At the pine
+    thou must turn left by a right angle
+    and see that thou takest the same
+    number of steps, and put another
+    spike into the ground. Dig halfway
+    between the spikes; the buried trea-
+    sure is there."
+    The instructions were quite clear
+    and explicit, so our young man char-
+    tered a ship and set sail. He found
+    the island, the field, the oak and the
+    pine, but to his great sorrow the
+    gallows were gone. Too long a time
+    had passed since the document had
+    been written; rain and sun and wind
+    had disintegrated the wood and re-
+    turned it to the soil, leaving no trace
+    even of the place where it once had
+    stood. The young man, not having
+    been a Tau Bate, gave up in despair.
+    Perhaps YOU can find the gallows'
+    former location for him.
+
+    -- One, Two, Three...Infinity
+    by George Gamow
+
+TODO
+
+    I never tried this problem but there is apparently
+    a typo and they weren't really looking for the
+    location of the gallows.  They really wanted the
+    location of the treasure.
+
+
+## Problem 2
+
+    Consider five points arranged as
+    the vertices of a regular pentagon
+    and labeled A through E. Identical
+    resistors are used to connect each
+    of the following pairs of points: A-B,
+    A-C, A-D, B-C, B-D, B-E, C-D, C-E,
+    and D-E. Note that the pair A-E
+    is not connected. The resistance
+    between points A and E is 1 ohm.
+    When three of the nine resistors are
+    removed, the resistance between
+    points A and E remains 1 ohm.
+    Which resistors are removed, and
+    what is the value of one of the resis-
+    tors?
+
+    -- Hubert W. Hagadorn, PA E '59
+
+Solution:  If I can't solve this I should be forced to
+turn in my diploma.   Brave statement.  Fortunately, I
+succeeded.
+
+    ASCII Art below:
+  
+                C
+      +----------o--------------+
+      |         / \             |
+      |        /   \            R
+      |       R     R           |
+      |     A/       \  B       | E
+      R     o----R----o----R----o
+      |      \       /          |
+      |       R     R           |
+      |        \   /            R
+      |         \ /             |
+      +----------o--------------+
+                D
+
+    I could ground the E node and drive the A node with a 1 A source.
+    The voltage AE is the resistance.  This requires solving 4 equations
+    in 4 unknowns.  Maxima can do this easily or I could try some
+    manipulation of the resistors.  Especially Delta-Wye transformations.
+    
+    The equation approach:
+    
+    At node A: (Va-Vc)/R+(Va-Vb)/R+(Va-Vd)/R-1=0
+    At node B: (Vb-Vc)/R+(Vb-Va)/R+(Vb-Vd)/R+Vb/R=0
+    At node C: (Vc-Vd)/R+(Vc-Va)/R+(Vc-Vb)/R+Vc/R=0
+    At node D: (Vd-Vc)/R+(Vd-Va)/R+(Vd-Vb)/R+Vd/R=0
+    
+    Solve for Va, Vb, Vc, Vd.
+    
+    Set Va=1 -> solve for R.
+    
+    Va = 2/3*R = 1 --> R = 3/2 (First Solution).
+
+
+    Attempt at removing resistors (SUCCESS)
+    
+    Let us go back to the first circuit and look at the solutions:
+    
+    Va=2/3*R, Vb=R/3, Vc=R/3, Vd=R/3
+    
+    Since Vb=Vc=Vd we can remove resistors bridging these nodes:
+    
+                C
+                 o--------------+      (Second Solution)
+                /               |
+               /                R
+              R                 |
+            A/          B       | E
+            o----R----o----R----o
+             \                  |
+              R                 |
+               \                R
+                \               |
+                 o--------------+
+                D
+                
+    In this case we get:
+    
+    At node A: (Va-Vc)/R+(Va-Vd)/R+(Va-Vb)/R-1=0
+    At node B: (Vb-Va)/R+Vb/R=0
+    At node C: (Vc-Va)/R+Vc/R=0
+    At node D: (Vd-Va)/R+Vd/R=0
+    
+    Solving yields the same values as the original circuit.
+
+    Note that we can also solve this by inspection since there are
+    three parallel branches of 2*R between nodes A and E.  This
+    gives a total resistance of 2/3*R as desired.
+
+    The solution in the Bent is to visualize this as a three
+    dimensional surface with A and E at opposite ends.  The B,C, and D
+    note are around the middle.  There are resistors connecting
+    all the edges of the solid.  Clearly the loop B,C,D has no driving
+    force and is symmetrical wrt AE so these resistors carry no current
+    (same as my solution) and can be eliminated.
+    
+    This leaves three parallel branches connecting AE, each has a
+    resistance of 2*R so:
+    
+      Req = 2/3*R = 1 --> R=3/2.
+
+
+## Problem 3
+
+    A new theater, with exactly 200
+    seats, has just opened. Every night
+    200 people, each with an assigned
+    seat, line up. However, the first
+    person in line is an acoustic engi-
+    neer, who is interested in assessing
+    the sound quality throughout the
+    theater. The engineer picks a seat
+    at random, which may or may not
+    be his assigned seat. As the rest of
+    the people enter in order, if their as-
+    signed seat is vacant, they sit in it. If
+    not, they pick any unoccupied seat.
+    What is the exact probability that
+    the last person in line sits in their as-
+    signed seat?
+
+    -- The Everything Brain Strain
+    Book by Jake Olefsky
+
+Solution:
+
+    They make the argument that it is 50% regardless
+    of the size of theatre.  I couldn't really follow
+    their argument -- I will just try some Monte Carlo
+    to confirm.
+    
+```{r}
+ntrials=10000
+nseats=200
+
+set.seed(1)
+n=0
+for (trial in 1:ntrials) {
+    s=sample(nseats,nseats-1)
+    x=1:nseats
+    # Engineer can steal any seat he/she wants
+    engineer=sample(nseats,1)
+    x=x[-which(x==engineer)]
+    for (i in s[1:(nseats-2)]) {
+        # If seat is available then sit in it
+        if(i %in% x) {
+            k=which(x==i)
+        } else {
+            # Pick a random seat from those remaining
+            k=which(x==sample(x,1))
+        }
+        x=x[-k]
+    }
+    # If the last person has the correct seat
+    # available then consider that a success.
+    if (s[nseats-1] %in% x) { n=n+1 }
+}
+print(sprintf("Trials = %d,  Success = %d   Pr = %10.6f",ntrials,n,n/ntrials))
+```
+
+    Trials   Seed   Pr
+    ----------------------
+    10000    1      0.4987
+    10000    42     0.5023
+    10000    123    0.5065
+    10000    2020   0.4937
+
+    Mean = 0.5003  --> conclude that there is no reason to doubt the
+    Bent claim that the probability is 50%.
+    
+
+## Problem 4
+
+    The DryFroot Company makes
+    one pound (16 oz) boxes of Froot-
+    Mix. Each box is made to the same
+    recipe and has a positive integral
+    number of ounces of apples, bananas,
+    cranberries and dates. The com-
+    pany also makes one pound boxes of
+    MixedFroot, and although the recipe
+    is different, each box still contains
+    an integral number of ounces of the
+    same four fruits. Finally, DryFroot
+    produces giant boxes of TootyFroot-
+    ies by mixing four pounds of Froot-
+    Mix with three pounds of Mixed-
+    Froot. In each of the three products,
+    the weights of the four fruits are dif-
+    ferent. The respective boxes list the
+    ingredients in descending order by
+    weight as follows: FrootMix: dates,
+    cranberries, bananas, apples; Mixed-
+    Froot: apples, bananas, cranberries,
+    dates; TootyFrooties: bananas, cran-
+    berries, dates, apples. How many
+    ounces of each fruit are there in a
+    box of each product?
+
+    -- An Enigma by Keith Austin in
+    New Scientist
+
+TODO
+
+    meh
+    
+
+## Problem 5
+
+    Solve the following cryptic equa-
+    tion:
+    TBP = sqrt(PUZZLE + 1)
+    All the usual rules apply. There are
+    no leading zeros. Each letter repre-
+    sents a different digit, and the same
+    letter always represents the same
+    digit.
+
+    -- Adapted from Allan Gottlieb's
+    Puzzle Corner in Technology Review
+
+Solution: from the cryptic arithmetic notebook
+
+    Cryptic square root:
+
+      TBP = sqrt(PUZZLE + 1)
+
+    a=make_crypt_df('tbppuzzle')
+    k=(make_num(a,'tbp')^2 == (make_num(a,'puzzle')+1))
+    k=k&(a$t!=0)&(a$p!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+           t b p u z l e
+    550374 9 0 8 2 4 6 3
+
+
+## Bonus
+
+    A dozen POWs share a cell.
+    What is important to them is that
+    they escape as soon as possible.
+    They have found a way to remove
+    the bars on the window of their cell
+    so they can climb through and, once
+    on the ground, plan to head due
+    north, climb over the east-west fence
+    near the window, and disappear. But
+    they can only hope to escape unseen
+    if they do it in the dark, one man at a
+    time, and with each man having from
+    the time he starts, a clear two min-
+    utes with all four guards at least 200
+    meters away from a point directly
+    below their window.
+    The guards each walk an east-
+    west route, two inside the fence and
+    two outside. Robinson starts 300 me-
+    ters west of the prisoners' window,
+    marches to a point exactly outside
+    their window, and turns around and
+    marches back. Smith starts outside
+    their window, marches 400 meters to
+    the east, turns around, and marches
+    back.
+    Outside the fence, Phillips starts
+    500 meters west of their window,
+    marches 550 meters to his turn
+    around point, 50 meters east of their
+    window. Quinn starts at Phillips'
+    turn around point, marches 500 me-
+    ters east and turns around.
+    The guards march back and forth
+    on their beats at a uniform speed of
+    100 meters per minute. (Assume no
+    time is spent in turning.)
+    Because it is winter, the POWs
+    reckon that it is dark enough for
+    their purposes at 6 p.m. until 6 a.m.
+    The guards of one shift begin their
+    routes at the above indicated loca-
+    tions at precisely 6 p.m.
+    How many prisoners can success-
+    fully escape? At what time(s) should
+    they start their attempts? Express
+    your answer in minutes.
+
+    --Brain Puzzler's Delight
+    by E.R. Emmet
+
+TODO
+
+    Seems like ugly problem in modulo arithmetic
+    and looking for collisions in the times when
+    all the guards are in the proper position.
+
+
+## Computer Bonus
+
+    A k-digit automorphic, or circular, number
+    is a number whose square ends in the same k
+    digits as the number itself.  That is, N is a
+    k-digit automorphic number if N^2 = N (mod 10^k).
+    For example, 76 is a 2-digit automorphic
+    number because 76^2 = 5776. K-digit
+    automorphic numbers are known to come in
+    pairs. What is the leftmost (that is, most
+    significant) digit of each of the two
+    1,001-digit, base-10, automorphic numbers?
+
+    -- J.C. Rasbold, OH A'83
+
+Solution:
+
+    Brute force?  Seems like it will take forever.  And it practically will
+    if I don't find a better search strategy.
+    
+    OK - I gave up and looked at the solution.  It would have taken me forever.
+    There are two keys:
+    
+    1. For N digit circular number the last N-1 digits must be a circular number.
+       You can start with the 1 digit values: 1, 5, 6 and then try the 10 leading
+       digits with each (9 leading digits?) to find the only two digit values:
+       25 and 76.  Note the last digit is in the set {1,5,6}.  You can continue
+       to try leading digits until you build up a value of 1001 digits.  Not sure
+       if this is a tree or if you can just stick with one value and crank.  Note
+       that 1 is sort of special since it does not generate any larger circular
+       numbers.  The other values do: 5 -> 25, 6 -> 76.
+       
+    2. Apparently Wikipdedia has a page on this and has a generating equation
+       of (3*N^2 - 2*N^3) mod (10^(2*k)).  I don't think this generates all the
+       values but it should be sufficient.  Once you reach a number with more than
+       1001 digits the final 1001 digits must be circular (see #1 above).  As
+       noted above, 1 is a special value and is a fixed point for this function.
+    
+The original brute force code is included for posterity -- but don't run it.    
+
+```{r, eval=FALSE}
+library(gmp)
+
+is_circular = function(n) {
+    n1=as.bigz(n)
+    n2=as.character(n1*n1)
+    n1=as.character(n1)
+    num_digits=nchar(n1)
+    n2=substr(n2,num_digits+1,nchar(n2))
+    if (n1==n2) {
+        return(TRUE)
+    }
+    return(FALSE)
+}
+
+m=0
+n1=as.bigz(paste0("1",strrep("0",1000),collapse=""))
+while(TRUE) {
+    if (is_circular(n1)) {
+        print(n1)
+        break
+    }
+    n1=n1+1
+    m=m+1
+    if ((m%%1000000) == 0) { print(sprintf("Working, m/1e6 = %d",m/1000000)) }
+}
+```
+
+The revised code based on the generator from Wikipedia runs blindingly fast:
+
+```{r}
+library(gmp)
+
+gen_next = function(n) {
+  n1=as.bigz(n)
+  m=nchar(as.character(n1))
+  m2=as.bigz(10)^(2*m)
+  n2=(3*n1^2-2*n1^3)%%m2
+  return(n2)
+}
+
+n=5
+while (1) {
+  m=nchar(as.character(n))
+  if (m>1000) { break }
+  n=gen_next(n)
+}
+n25=substr(as.character(n),m-1000,m)
+
+print(sprintf("Using 5 as seed, result = %s ...",substr(n25,1,10)))
+
+n=6
+while (1) {
+  m=nchar(as.character(n))
+  if (m>1000) { break }
+  n=gen_next(n)
+}
+n76=substr(as.character(n),m-1000,m)
+
+print(sprintf("Using 6 as seed, result = %s ...",substr(n76,1,10)))
+
+```
+
+
+The resulting values start with:
+
+    Using 5 as seed, result = 3127812540 ...
+    Using 6 as seed, result = 6872187459 ...

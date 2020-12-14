@@ -1,0 +1,352 @@
+---
+title: "Bent Summer 2019"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2019
+
+
+## Problem 1
+
+    After a church service, a priest and a cantor
+    had a conversation.  The priest asked, "Do
+    you know the ages of the three visitors we
+    had today?" The cantor said, "I don't know."
+    The priest said, "What if I told you that the
+    product of their ages is 2652?" The cantor
+    did some calculations and then replied, "I
+    still don't know." The priest then leans in
+    and whispers another hint into the cantor's
+    ear. The cantor responded, "I still don't
+    have enough information." The priest said,
+    "By the way, thank you for that book of Brain
+    Ticklers you gave me for my birthday. I see
+    by the card you sent me that you know how old
+    I am. I wonder if those three visitors will
+    still enjoy challenging their minds when they
+    reach my age." The cantor then said, "Oh! Now
+    I know their ages and anyone listening to us
+    should still be able to determine your age."
+    Assuming that all ages are integral, how old
+    is the priest?
+
+    -- Grant L. Bilker, son of Scott L. Bilker,
+       NJ G'91
+
+Solution:  I still don't get this.
+
+    I have read (and reread) the Bent solution and it makes
+    no sense.  The key to their argument is what hint did
+    the Priest tell the Cantor and the fact that it still
+    lead to ambiguity.
+    
+    Since we don't know what was said it could just as
+    readily been something like: "The youngest visitor was 1".
+    There are 12 age combinations that meet this "hint".
+    
+    They make some magical pronouncement about a subset
+    with cardinality > 1 ... blah, blah, blah but it is
+    all nonsense.
+
+
+```{r}
+
+# Generate all feasible age combinations
+ages=c()
+for (i1 in 1:2652) {
+    for (i2 in i1:2652) {
+        if (2652 %% (i1*i2) == 0) {
+            i3=2652/(i1*i2)
+            if (i3 >= i2) {
+                ages=rbind(ages,c(i1,i2,i3))
+            }
+        }
+    }
+}
+ages=data.frame(unique(ages))
+colnames(ages)=c("Visitor1","Visitor2","Visitor3")
+ages$priest=apply(ages,1,function(x) {max(x)+1})
+
+print(sprintf("Number of possible age combinations = %d",nrow(ages)))
+
+print(as.matrix(ages))
+```
+
+    I submit that, as long as the priest can be very old,
+    that any of these combinations solves the problem.
+
+
+## Problem 2
+
+    You are playing a game where you toss a
+    circular disk randomly on a floor made up of
+    square tiles with sides of unit length. You
+    win if your disk lands so as to cover parts
+    of at least two tiles, as long as it doesn't
+    cover a corner of a tile. You get to pick the
+    diameter of the disk.  What is the maximum
+    probability of winning and what diameter disk
+    achieves this?
+
+    -- Brian Barwell and Richard Hess, CA B'62,
+       in Mental Gymnastics
+
+Solution:
+
+    I remember this problem -- need to dig up my solution.
+
+    See directory c:\rgc\test\play\bent\2019\2_summer
+    for files involving circular_disk and/or coin_flip.
+
+    The solution is:
+
+    d   = 4/(4+pi) ~ 0.56 units
+    Likelihood of a win is also 4/(pi+4) ~ 0.56
+
+    Given:
+
+    Disk of diameter=d, radius=r
+
+    Winning area is perimeter of unit square with area along each edge
+    excluding the corners.  The area along the edge is r*(1-2*r).  The area
+    in the corner is what is left of the square of r by r when a circular
+    arc of the quarter circle is subtracted (loss if you hit a corner).
+    This occurs along all four edges.  The result is:
+
+    winner  = 4*( r*(1-2*r) + (r*r - pi*r*r/4) )
+            = 4*r*(1-2*r)+4*r*r-pi*r*r
+            = r*(4*(1-2*r)+4*r-pi*r)
+            = r*(4 - 4*r - pi*r)
+
+    The value of winner is maximized when diff(winner,r)=0 is solved.
+
+    diff(winner,r) = 4-8*r-2*pi*r
+
+    so
+
+    4-8*r-2*pi*r = 0
+
+    or
+
+    r   = 4/(8+2*pi)
+        = 2/(4+pi)
+
+    thus, the best result is obtained with:
+        d   = 2*r = 4/(4+pi) ~ 0.56 units
+    Likelihood of a win is also 4/(pi+4) ~ 0.56
+
+    In other words, slightly more than half the tosses will result in a win.
+    
+    This diameter maximizes the likelihood of winning.  We know this is a
+    maximum since diff(diff(winner,r),r) = -8-2 pi < 0.
+
+    Note that this formula breaks down for r>0.5.
+
+
+## Problem 3
+
+    How many ways are there of walking up a
+    flight of 13 stairs if you take either 1 or 3
+    stairs with each step?
+
+    -- Eustice Solves a Problem
+
+Solution:
+
+    Let's try to work up to this:
+    
+    1 stair:  1 way
+        1
+    
+    2 stairs: 1 way
+        1+1
+    
+    3 stairs: 2 ways
+        1+1+1
+        3
+        
+    4 stairs: 3 ways
+        1+1+1+1
+        1+3
+        3+1
+
+    5 stairs: 4 ways
+        1+1+1+1+1
+        1+1+3
+        1+3+1
+        3+1+1
+        
+    6 stairs: 6 ways
+        1+1+1+1+1+1
+        1+1+1+3
+        1+1+3+1
+        1+3+1+1
+        3+1+1+1
+        3+3
+
+    For n stairs:
+        1+(solutions for n-1 stairs)
+        3+(solutions for n-3 stairs)
+
+    Let s(n) = number of solutions for n stairs
+    
+        s(n) = s(n-1)+s(n-3)
+        
+    s(1)=1, s(2)=1, s(3)=2, then
+    s(4)=s(3)+s(1)=3
+    s(5)=s(4)+s(2)
+    etc.
+    
+    Can also solve the recurrence relationship:
+    
+    1-z^-1-z^-3=0 --> z^3-z^2-1=0 but the roots are ugly
+    
+    Easier to do this numerically:
+    
+```{r}
+
+s=c(1,1,2)
+for (n in 4:13) {
+    m=s[3]+s[1]
+    print(c(n,m))
+    s[1]=s[2]
+    s[2]=s[3]
+    s[3]=m
+}
+```
+    
+The solution for 13 stairs is 88 ways.    
+
+
+## Problem 4
+
+    Jan has 27 wooden 1-inch cubes whose faces
+    have been painted with red, white, and blue
+    paint. Using these, she can assemble a 3-inch
+    cube that is red on all sides. She can
+    rearrange them to form a 3-inch cube that is
+    white on all sides. She can also arrange them
+    to form a 3-inch cube that is blue on all
+    sides.  How many of the 1-inch cubes have 2
+    red sides, 2 white sides, and 2 blue sides?
+
+    -- Tom Stluka, brother of Frederick Stluka,
+       PA Delta'82
+
+TODO
+
+    meh
+
+
+## Problem 5
+
+    In the poker game of showdown, each player is
+    dealt one card face up from a well shuffled
+    standard deck of 52 cards and the highest
+    card wins. If there are five players, exactly
+    which card would give a player just over a
+    50% chance of winning the pot? Assume the
+    hierarchy of suits in descending order is
+    spades, hearts, diamonds and clubs.
+
+    -- Don Dechman, TX A'57
+
+Solution:
+
+    This also seems familiar.  I recall doing this
+    with Monte Carlo.
+
+    The Bent does it with Combinatorics.
+    
+    Pick the Nth ranked card such that the probability
+    there are 4 cards lower is greater than 50%.
+    
+    If you get card number N there are N-1 cards below
+    it and there are 51 total cards to draw from.  The
+    four other cards drawn should satisfy:
+    
+        C(N-1,4)/C(51,4) > 0.5
+        
+    40   0.329136
+    41   0.365706
+    42   0.405242
+    43   0.447899
+    44   0.493838
+    45   0.543221 <- Smallest N for p>0.5
+    46   0.596218
+    47   0.653001
+    48   0.713745
+    49   0.778631
+    50   0.847843
+    
+    The card rankings are:
+        1-4 = 2
+        5-8 = 3
+        etc.
+        37-40 = J
+        41-44 = Q
+        45-48 = K
+        49-52 = A
+
+    So the card ranked 45 is the lowest K = K of clubs.
+
+
+## Bonus
+
+    Three logicians, A, B, and C, each wears a
+    hat with a positive integer on it. Each
+    logician sees the numbers on the other hats,
+    but not their own. Each knows the numbers are
+    positive integers and that one is the sum of
+    the other two. They take turns in order,
+    starting with A, to identify their number, or
+    pass if they can not. A, B, and C all pass on
+    their turn in each of the first two rounds.
+    In the third round, A and B pass, but C
+    correctly asserts her number is 89. What are
+    the other two numbers? Provide a quick
+    outline of C's logic used to determine her
+    number was 89.
+
+    -- Donald Aucamp, Puzzle Corner in Technology
+       Review
+
+TODO
+
+    I remember this but I don't recall the trick.
+    After reading the solution I still don't understand
+    the trick.
+
+
+## Computer Bonus
+
+    Consider the sequence of rational fractions,
+    3/1, 13/4, 16/5, 19/6, 22/7, 179/57, 201/64,
+    223/71, 245/78, 267/85, 289/92, 311/99,
+    333/106, 355/113, 52163/16604,...  Pi/Qi...,
+    of successively closer approximations to p.
+    In this sequence, each entry has a smaller
+    error than any other entry with a smaller
+    value of Qi. A ratio Pi/Qi is a member of the
+    sequence if, and only if, it meets this
+    criterion.  Thus, this sequence includes all
+    the convergents resulting from expressing p
+    as a continued fraction, but many other
+    values as well. Find the smallest Pi such
+    that its units digit is 0, the units digit of
+    Pi+1 is 1, the units digit of Pi+2 is 2, etc.
+    up to the units digit of Pi+7 is 7. Present
+    your answer as the first value of this
+    series.
+
+    -- Timothy J. Slegel, PA A'80
+
+TODO
+
+    Still don't understand this.

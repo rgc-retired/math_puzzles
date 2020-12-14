@@ -1,0 +1,349 @@
+---
+title: "Bent Summer 2008"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2008
+
+
+## Problem 1
+
+    Peter, Quentin, Ralph, Sam, and
+    Thomas went on a photography
+    safari for 10 days. A different pair
+    did the picture taking each day-not
+    always successfully, but the expedition
+    came home with photos of five
+    animals, each snapped on different
+    days. Thomas had no hand in
+    snapping the antelope, but Quentin
+    was one of the pair who got the
+    elephant. No one was on teams that
+    snapped both the antelope and the
+    dromedary, but one proud chap can
+    now brag that he snapped both the
+    crocodile and the elephant. Someone
+    snapped a baboon and also the
+    animal that he snapped while out
+    with Sam. Peter and Quentin had a
+    successful day together, but Ralph
+    and Thomas drew blank. Each man
+    had a hand in photographing two
+    animals, and Quentin, Sam, and
+    Thomas a hand in all five among the
+    three of them. Which pair accounted
+    for each photograph?
+
+    -- Martin Hollis
+
+TODO
+
+    Not sure I care about these logic puzzles.
+
+
+## Problem 2
+
+    Find three different integers, P,
+    Q, R, such that P+Q, P+R, Q+R,
+    P-Q, P-R, and Q-R are all squares
+    of integers. The three integers may
+    be positive, negative, or zero. Find
+    the set {P, Q, R} with the smallest
+    P+Q+R.
+
+    -- Stephen Ainley
+
+Solution:
+
+    WARNING: this was logically wrong.  Q+R=0 is a
+    valid solution so the arguments below should
+    really be >= instead of > for R < 0.
+
+    If the sum and differences are squares then
+    they must be positive so:
+    
+        P>=Q>=R
+
+    The only value that could be negative would
+    be R, otherwise Q+R would be negative and
+    that could not be a square.  Furthermore:
+    
+        Q+R>=0 --> Q >= -R
+        
+    So, if R is negative then P > Q >= abs(R)
+
+    I had a logic error in my program that required Q > abs(R) but in reality
+    you could have Q=abs(R) which is a key.
+    
+    Once the bug was fixed the solution is found quickly.
+    
+```{r}
+is_square = function(n) {
+    if (n<0) {
+        return(FALSE)
+    }
+    m=round(sqrt(n))
+    return( m*m == n )
+}
+
+check_solution = function(nmax) {
+    for (r in seq(-nmax,nmax)) {
+        for (q in ((r+1):nmax)) {
+            for (p in ((q+1):nmax)) {
+                if (is_square(p+q)) {
+                    if (is_square(p-q)) {
+                        if (is_square(p+r)) {
+                            if (is_square(p-r)) {
+                                if (is_square(q+r)) {
+                                    if (is_square(q-r)) {
+                                        print(c(p,q,r))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return(c())
+}
+
+check_solution(100)
+```
+ 
+The smallest P+Q+R is (17,8,-8)
+
+
+## Problem 3
+
+    In a stud poker game with no
+    ante, on the first face-up round, high
+    card made a bet with two coins.
+    Each of the other players called
+    without raising, e.g., made the same
+    bet. Only standard U.S. coins, up to
+    and including silver dollars, were
+    used in the game. Second hand put
+    in three coins; 3rd hand put in two
+    coins and took out one in change;
+    4th hand put in three coins and took
+    out one in change; 5th (last) hand put
+    in one coin and took out in change all
+    but three of the coins then in the pot.
+    Whenever coins are removed from
+    the pot, they have different values
+    than coins put in the pot. How much
+    did 1st hand bet?
+
+    -- Math. Puzzles for Beginners and
+    Enthusiasts, Geoffrey Mott-Smith
+
+Solution:
+
+    I don't understand this problem.  The Bent claims
+    the bet is 0.60.  I don't understand how the fourth
+    or fifth hand make change.
+    
+    The coins are:
+    
+    P =   1 = penny
+    N =   5 = nickel
+    D =  10 = dime
+    Q =  25 = quarter
+    H =  50 = half-dollar
+    S = 100 = silver-dollar
+
+    First bet   = T = two coins
+    Second hand = T = three coins
+    Third hand  = T = two coins in and one coin out
+    Fourth hand = T = three coins in and one coin out
+    Fifth  hand = T = one coin in and removed all but three
+        I think this means there were four in the pot
+        at the end of the game.  There are 8 in the pot
+        before the fifth hand so this means 5 were taken
+        out in change.  It might also mean that they took
+        out 6 coins and left 3 -- not sure.
+
+    Since all the bets are the same we know that there is a total, T,
+    that can be achieved with two coins or three coins or two in/one out
+    or three in/one out or one coin in and five out.
+    
+    The fifth hand constrains the total to something less than 100.
+    When fifth hand makes bet there are 8 coins in the pot.
+    They put in one and pull out five.
+    The fifth hand also says that 5T < 400 -> T < 80.
+    
+    First Hand = Possibilities for the sum of two coins (< 100):
+        2   6  10  11  15  20  26  30  35  50  51  55  60  75
+    
+    Second Hand = Possibilities for the sum of three coins (<100):
+        3  7 11 12 15 16 20 21 25 27 30 31 35 36 40 45 51 52 55 56 60 61 65 70 75 76 80 85
+
+    Common totals:
+        11 15 20 30 35 51 55 60 75
+
+    Third Hand = Possibilties for two in/one out (0-100):
+
+        11 = NOT POSSIBLE
+        15 = D+D-N
+        20 = Q+N-D
+        30 = Q+D-N
+        35 = NOT POSSIBLE 
+        51 = NOT POSSIBLE
+        55 = H+D-N
+        60 = S+D-H
+        75 = H+H-Q
+        
+    Remaining totals:
+        15 20 30 55 60 75
+        
+    Fourth Hand = Possibilities for three in/one out:
+
+        15 = NOT POSSIBLE
+        20 = NOT POSSIBLE
+        30 = NOT POSSIBLE
+        55 = Q+Q+D-N
+        60 = S+N+N-H
+        75 = NOT POSSIBLE
+
+    Common totals:
+        55 60
+
+    So the first bet must be either 55 or 60.
+
+    Assume the bet is 55:
+    
+    First Hand:  H+N
+    Second Hand: Q+Q+N
+    Third Hand:  H+D-N
+    Fourth Hand: Q+Q+D-N  -> Pot = H+Q+Q+H+D+Q+Q+D (220)
+    Fifth Hand:  ???
+    
+    Assume the bet is 60:
+    
+    First Hand:  H+D
+    Second Hand: Q+Q+D
+    Third Hand:  S+D-H
+    Fourth Hand: S+N+N-H  -> Pot = D+Q+Q+D+S+D+S+N+N-H
+        This is not possible -- there are no H coins
+        to extract
+    Fifth Hand:  ???
+
+
+## Problem 4
+
+    Find all integral solutions of (x+1)**y
+    = x**(y+1) + 1. Assume 0**0 is 1.
+
+    -- Meyl, 1876
+
+TODO
+
+
+## Problem 5
+
+    Four people each flip a fair coin
+    five times.What is the exact probability
+    that they each get the same
+    number of heads?
+
+    -- Adapted from Duelling Idiots and
+    other Probability Puzzlers by Paul
+    J. Nahin
+
+Solution:
+
+    If you flip a fair coin five times you can
+    get 0, 1, 2, 3, 4, or 5 heads.  There are 2^5=32
+    ways for these to happen and there are the
+    following probabilities:
+    
+    P(0 Heads) = 1/32
+    P(1 Head)  = 5/32
+    P(2 Heads) = 10/32
+    P(3 Heads) = 10/32
+    P(4 Heads) = 5/32
+    P(5 Heads) = 1/32
+    
+    The probability of all four people getting the
+    same total is P^4.  Summing these over the 6 possible
+    combinations yields:
+    
+    P = 5313/262144 ~ 2.03%
+
+
+## Bonus
+
+    Five beads are strung on
+    a horizontal insulated wire in the
+    shape of a unit square, with the holes
+    in the beads being large enough so
+    that the beads can move to any location
+    on the wire (that is, they can go
+    around the corners of the square).
+    If each bead is given exactly the
+    same negative electrical charge
+    and the system is allowed to come
+    to equilibrium, what are the coordinates
+    of the five beads (with the
+    non-symetric bead at the origin and
+    an edge of the square on the x-axis)?
+    We want both solutions.
+
+    -- Daryl Cooper
+
+TODO
+
+
+## Computer Bonus
+
+    Consider the integer
+    7. Its cube is 343. The integer
+    divisors of 343 are 1, 7, 49, and 343.
+    Those divisors sum to 400, which is
+    the square of the integer 20. Find the
+    next larger integer such that the sum
+    of the integer divisors of its cube is
+    the square of an integer.
+
+    -- Fermat, 1657
+
+Solution:
+
+    I punted and went back to sympy.  Solution time was ~3 minutes:
+
+    Solution =  751530    Time =  184 seconds
+    
+    This is the only solution below 1e6
+
+    This is very similar to Bent 2000_1 Computer Bonus.
+    That was also from Fermat and asks for the smallest
+    integer greater than 1 where the sum of the divisors
+    of the square is a perfect cube.
+    
+    Here we want the sum of the divisors of a cube is a
+    perfect square.
+    
+    The original problem used sympy but we will try gmp here:
+    
+```{r}
+library(gmp)
+
+```
+
+Solution is n=???? --- having problems with gmp
+Can't use sqrt with bigz numbers and non-bigz numbers
+are hitting overflow.
+
+May need to drop back to sympy.
+Maybe exhaustive search is the wrong way to go.
+
+Should I look at the prime factorization of the original
+number and the square and then figure out the cube???

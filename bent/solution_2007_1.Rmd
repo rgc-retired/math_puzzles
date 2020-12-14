@@ -1,0 +1,349 @@
+---
+title: "Bent Spring 2007"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2007
+
+
+## Problem 1
+
+    Find a primitive Pythagorean
+    right triangle whose area is an
+    integer consisting of repetitions
+    (more than one digit long) of the
+    same digit. An example of such an
+    integer is 77,777.
+
+    -- The Penguin
+    Dictionary of Curious and
+    Interesting Numbers by David Wells
+
+Solution:
+
+    Need:  a^2+b^2 = c^2 where a,b,c are integers
+
+    Need:  1/2*a*b = d*(111...) - unknown number of 1s, unknown d
+    
+    We could try exhaustive search, a=1:1000, b=1:1000?
+    
+```{r}
+for (a in 1:10000) {
+    for (b in 1:1000) {
+        c=round(sqrt(a^2+b^2))
+        if (c^2 == (a^2+b^2)) {
+            area = a*b/2
+            if ((area>9) & (length(unique(strsplit(as.character(area),'')[[1]]))==1)) {
+                print(c(a,b,c,area))
+            }
+        }
+    }
+}
+```
+    
+Needed to expand range on a to find:
+
+    a = 1924
+    b = 693
+    c = 2045
+    area = 666666
+
+
+## Problem 2
+
+    After grading the advanced-math
+    test but before handing it back,
+    the teacher asked the five students
+    in the class to predict how well
+    other members of the class (but not
+    themselves) did on the test. The
+    teacher received the following five
+    pairs of statements, each pair being
+    made by a different student:
+
+    i. Bill did better than Ed;
+    Chuck did better than Bill.
+    ii. Debbie did better than Chuck;
+    Art did better than Debbie.
+    iii. Ed did better than Art;
+    Chuck did better than Ed.
+    iv. Bill did better than Ed;
+    Debbie did better than Bill.
+    v. Chuck did better than Bill;
+    Art did better than Chuck.
+
+    The student with the highest grade
+    was completely correct; the boy who
+    came in last was completely wrong;
+    and the other students had one
+    correct prediction and one incorrect
+    prediction. Rank the students from
+    highest to lowest grade. There were
+    no ties.
+
+    -- Martin Hollis in New Scientist
+
+Solution:
+
+    The only feasible highest score is Debbie with order: D>A>E>C>B
+
+
+    Art
+    Bill
+    Chuck
+    Debbie (not the lowest - unless it is a boy named Debbie)
+    Ed
+
+    (i)   C>B>E    either Art or Debbie said this -- ART SAID THIS
+    (ii)  A>D>C    either Bill or Ed said this    -- ED SAID THIS
+    (iii) C>E>A    either Bill or Debbie said this -- BILL SAID THIS
+    (iv)  D>B>E    either Art or Chuck said this  -- CHUCK SAID THIS
+    (v)   A>C>B    either Debbie or Ed said this  -- DEBBIE SAID THIS
+
+    One of these 5 statements is complely correct
+    One of these is completely wrong
+    The other three are half right/half wrong
+    
+
+Observations:
+
+    D is not the lowest
+    B,E not the two lowest -- if so then (i) and (iv) both completely true
+    
+    Chuck said statement (iv) -- it is the only possiblity for Chuck
+    Art said statement (i) -- only remaining possiblity for Art
+    
+    
+Assume:
+
+
+    E is highest and (ii) A>D>C
+        E>B>A>D>C - two false
+        E>A>B>D>C - two false
+        E>A>D>B>C - feasible <----- ART should be lowest - contradiction
+        E>A>D>C>B - two true
+    
+    D is highest and (v) A>C>B
+        D>E>A>C>B - no false
+        D>A>E>C>B - feasible <----- BILL should be lowest - feasible
+        D>A>C>E>B - no false
+        D>A>C>B>E - two true
+
+
+    A is highest and (i) C>B>E then
+        A>D>C>B>E - not allowed
+        A>C>D>B>E - not allowed
+        A>C>B>D>E --- can't be true becaue if it is then (v) is true
+        A>C>B>E>D - not allowed
+
+    Conclude: A is not the highest
+
+    C is highest and (iv) D>B>E
+        C>A>D>B>E -- not allowed
+        C>D>A>B>E -- not allowed
+        C>D>B>A>E -- can't be true since (i) would also be true
+        C>D>B>E>A -- can't be true since (i) would also be true
+
+    Conclude: C is not the highest
+        
+    B is highest and (iii) C>E>A
+        B>D>C>E>A - feasible <----- DEBBIE should be lowest - contradiction
+        B>C>D>E>A - two false statements
+        B>C>E>D>A - two false statements
+        B>C>E>A>D - not allowed
+    
+    
+I overwrote/erased some of the intermediate results used to identify who
+made which statements between Bill, Ed, and Debbie.
+
+## Problem 3
+
+    The game of Quod, invented
+    by Keith Still, is played on an 11 x
+    11 grid of cells (like an oversized
+    chessboard) minus the four corner
+    squares. Players take turns placing
+    markers on the cells, with the first
+    player to form a square being the
+    winner. As long as a player's four
+    markers form the corners of a
+    square, it is valid. Its sides do not
+    have to be parallel to the sides of the
+    board. How many different squares
+    are possible?
+
+    -- How to Cut a Cake and
+    Other Mathematical Conundrums
+    by Ian Stewart
+
+TODO
+
+    Another one where I am not sure I care.
+    
+    The Bent claims there are 1173 squares but they only
+    consider squares that are parallel to the sides of the
+    "chess board" and the problem specifically says the
+    sides do NOT need to be parallel to the sides so I
+    don't know if I believe the answer.
+    
+
+
+## Problem 4
+
+    Let S = 1(1!) + 2(2!) + 3(3!) + ...
+    + 222(222!). What is the remainder
+    when S is divided by 2007?
+
+    -- adapted from Mathematics Teacher
+
+Solution:
+
+    Brute force using gmp
+    
+    Remainder = 2006
+    
+    The Bent argument:
+    
+    Let N = 1(1!) + 2(2!) + ... + 222(222!)
+    Let S = 1! + 2! + ... + 222!
+    
+    N+S-S = (1+1)(1!) + (2+1)(2!) + ... + (222+1)(222!) - S
+          = 2! + 3! + ... + 223! - S
+          = 223! - 1
+          
+    But 2007 = 3*3*223 so
+    
+    N/2007 = (223!-1)/(3*3*223)
+    
+    So: 223!/(3*3*223) = integer with no remainder.
+    
+    for a numerator of 223!-1 the remainder must be 2006
+
+
+## Problem 5
+
+    A fruit basket contains:
+
+    - MELONS
+    - PLUMS
+    - APPLES
+    - LEMONS
+    - and a BANANA.
+
+    If 2 MELONS are greater than 35
+    PLUMS but less than 3 APPLES,
+    and 99 LEMONS are greater than 16
+    APPLES but less than 210 PLUMS,
+    what is the size of a BANANA? The
+    usual rules for cryptics apply. That
+    is, the same letter always represents
+    the same digit, and different letters
+    represent different digits.
+
+    -- Albert Haddad in New Scientist
+
+Solution: solved in the cryptic arithmetic notbook
+
+    > a[k,]
+            m e l o n s p u a
+    3266023 9 0 1 2 3 8 5 4 6
+    
+    By inspection, b=7 since it is the only missing digit:
+    
+    > banana=763636
+
+
+## Bonus
+
+    A bag of marbles is prepared
+    by putting six black marbles in the
+    bag. Then, a die is thrown, and a
+    number of white marbles is added
+    equal to the number shown on the
+    die. You are given the bag. You know
+    the procedure used to fill the bag
+    but not the number of white balls
+    in the bag. You draw three marbles
+    without replacement, and they are
+    all white. What is the probability
+    that the next marble you draw will
+    be black?
+
+    -- from an old exam at
+    Jesus College, Cambridge
+
+Solution:  enumerate the possibilities?
+
+    Given: 6B, ?W - draw three W in a row
+    Find: P(next marble is black)
+
+    My initial (naive) estimate assumed that the die
+    must have been 3, 4, 5, or 6 and that each of
+    these occurred with 25% probability.  While that
+    may be true -- I was ignoring the draw of 3 consecutive
+    W marbles -- this greatly increases the likelihood
+    that the number of marbles put in the bag was
+    one of the higher amounts.  Once we figure out
+    the probability for each scenario then the final
+    draw is simply:
+
+    6B, 3W - 3W -> next marble black, for sure
+    6B, 4W - 3W -> P=6/7
+    6B, 5W - 3W -> P=6/8
+    6B, 6W - 3W -> P=6/9
+
+    Let's calculate the likelihood of each scenario:
+    
+    6B, 3W - Draw 3W:  P = choose(3,3)/choose(9,3) = 1/84
+    6B, 4W - Draw 3W:  P = choose(4,3)/choose(10,3) = 1/30
+    6B, 5W - Draw 3W:  P = choose(5,3)/choose(11,3) = 2/33
+    6B, 6W - Draw 3W:  P = choose(6,3)/choose(12,3) = 1/11
+    Ptotal = 303/1540
+    
+    So each scenario has the following likelihood:
+    
+    6B, 3W - Draw 3W: 55/909
+    6B, 4W - Draw 3W: 154/909
+    6B, 5W - Draw 3W: 280/909
+    6B, 6W - Draw 3W: 420/909
+    
+    The probability that the next marble is black is then:
+    
+    P=55/909 + 6/7*154/909 + 6/8*280/909 + 6/9*420/909
+     = 677/909
+     ~ 0.7448
+
+
+## Double Bonus
+
+    Given a consecutive
+    run of positive integers from 1
+    through N, divide them into four
+    sets such that for each set, no two
+    numbers of that set have a sum that
+    equals a third member of the same
+    set. What is the maximum value of
+    N, and what are the members of the
+    four sets?
+
+    -- Doctor Ecco's Cyberpuzzles
+    by Dennis E. Shasta
+
+TODO
+
+    The Bent says the best they can do is N=66 but there is no
+    proof of the upper limit.  They claim there are *thousands*
+    of solution with N=66 and present one example.
+    
+    Basically, add numbers to set 1 until you can't then add
+    to set 2.  Go back to set 1 when able and start adding again.
+    Keep repeating until there is no place to put the next number.
+
+    Well - almost.  Don't really understand where they put 7.
+    

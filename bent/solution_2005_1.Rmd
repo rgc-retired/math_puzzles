@@ -1,0 +1,628 @@
+---
+title: "Bent Spring 2005"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2005
+
+
+## Problem 1
+
+    A large flower bed in front of our
+    courthouse is laid out in the form of a
+    regular polygon of N sides. A walk,
+    composed of N identical stone slabs
+    in the shape of isosceles trapezoids,
+    surrounds the flower bed. The radius
+    of the inscribed circle tangent to the
+    inner edges of the walk is 19 feet,
+    and the radius of the circumscribed
+    circle through the outer vertices of
+    the walk is 22 feet. The ratio of the
+    area of the flower bed (not including
+    the walk) to the area of the walk is
+    almost exactly three (off by less than
+    0.001). What is the value of N?
+
+    -- Adapted from Technology Review
+
+Solution:
+
+A garden with 42 sides provides the requested ratio.
+
+This seems fairly straightforward if I understand the definition
+of an isosceles trapezoid.  I assume they mean this.
+
+
+      <-a->
+      -----   -
+     /     \  h
+     -------  -
+     <--b-->
+     
+     Area = a*h+(b-a)/2*h
+          = a*h/2 + b*h/2
+          = h/2 * (a+b)
+          
+    The small side (a) is toward the center of the flower bed.
+    The long side (b) is outward.  Each trapezoid lines up with
+    a pizza slice of the polygon.
+    
+    For a regular polygon with N sides the central angle of each
+    pizza slice is 2*pi/N.
+    
+    For an inscribed circle:
+    
+    The distance from the center to the center of the edge is R.
+    The length of a side is L=R*tan(pi/N).
+    
+    For a circumscribed circle:
+    
+    The distance from the center to the vertex is R.
+    The length of a side is 
+    
+    For the inside circle:  R = 19
+    For the outside circle: R = 22
+    
+    Using the given data we can tabulate the areas and ratios as
+    a function of N.
+    
+```{r}
+n=5:50               # range of polygon sides
+theta=pi/n           # Angle for half a pizza slice
+r1=19                # Radius of the inscribed circle
+s1=2*r1*tan(theta)   # Length of inside walkway segment
+a1=n*0.5*s1*r1       # Area of the garden
+r2=22                # Radius of the circumscribed circle
+s2=2*r2*sin(theta)   # Length of outside walkway segment
+h =r2*cos(theta)-r1  # width of walkway (height of trapezoid)
+a2=n*0.5*h*(s1+s2)   # Area of the walkway
+
+a=data.frame(N=n,garden=a1,walkway=a2,ratio=a1/a2)
+a
+```
+
+A garden with 42 sides provides the requested ratio.
+
+    N = 42
+    Garden area = 1136.235
+    Walkway area = 378.631
+    Ratio = 3.000905
+    
+    Each walkway trapezoid has dimensions of:
+       Inside edge = 2.847706
+       Outside edge = 3.288124
+       Width of walkway = 2.938484
+       area = 9.015018
+
+
+## Problem 2
+
+    At a certain gambling establishment,
+    the game of Lucky 10 is played
+    as follows. The house provides a pot
+    of $10. The player then tosses two
+    coins simultaneously. If two heads
+    appear, the player takes $1 from the
+    pot; if two tails, he adds $1 to the pot.
+    If he gets a head and a tail, it is a
+    draw, and he neither adds to nor
+    withdraws from the pot. After 10
+    two-coin tosses (including draws), if
+    there is exactly $10 in the pot, the
+    player takes it. Otherwise, the house
+    gets whatever is in the pot. How
+    much should the player pay the
+    house (to the nearest penny) to make
+    this a fair game?
+
+    -- Adapted from
+    Joseph-Louis Lagrange (1770)
+
+Solution: start with Monte-Carlo and then try analytics.
+
+```{r}
+ntrials=1000000
+winnings=0
+
+for (i in 1:ntrials) {
+    p=10
+    for (j in 1:10) {
+        d=sample(c(0,1),2,replace=T)
+        if (sum(d)==2) {
+            p=p-1
+        }
+        if (sum(d)==0) {
+            p=p+1
+        }
+    }
+    if (p==10) {
+        winnings=winnings+10
+    } else {
+        winnings=winnings+(10-p)
+    }
+}
+
+print(paste0("Average winnings = ",winnings/ntrials,collapse=""))
+```
+
+For 1e6 trials the average winnings are 1.76
+
+Note tha the analytical result below yields 1.761971 as a result of
+184756 pots won out of total of 1048546 pots.
+
+
+We can try this analytically but it gets difficult due to the draws.  There must be
+some clever way to look at this problem that limits the number of combinations
+that you need to consider.
+
+Let's just try brute force:
+
+    Round 1:  P(Win)=1/4 P(Loss)=1/4 P(Draw)=1/2, Pot = 9, 10*2, 11
+    Round 2:  Same win probabilities so pot should change by -1,0*2,+1
+
+        Pot = 8,9,9,10, 9,10,10,11, 9,10,10,11, 10,11,11,12
+            = 8,9*4,10*6,11*4,12
+            
+    Round 3:
+    
+        Pot = 7,8*4,9*6,10*4,11, 8*2,9*8,10*12,11*8,12*2, 9,10*4,11*6,12*4,13
+            = 7,8*6,9*15,10*20,11*15,12*6,13
+    
+    Showing this as a matrix:
+    
+    
+                                          1  1  1  1  1  1  1  1  1  1  2
+    Round   0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8  9  0
+      0     0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+      1     0  0  0  0  0  0  0  0  0  1  2  1  0  0  0  0  0  0  0  0  0
+      2     0  0  0  0  0  0  0  0  1  4  6  4  1  0  0  0  0  0  0  0  0
+      3     0  0  0  0  0  0  0  1  6  15 20 15 6  1  0  0  0  0  0  0  0
+      ...
+      
+      In general, the entry at round m, pot value n is a recurrence of the
+      form:
+                x(m,n)=x(m-1,n-1)+2*x(m-1,n)+x(m-1,n+1), n=[10-m,10+m]
+                
+      We might be able to solve this closed form but we can likely code
+      this more easily:
+      
+```{r}
+# Unfortunately, R is 1-based so need to shift everything by 1
+# This means the pot where the player wins (10) is actually at index 11.
+a=rep(0,21); a[10]=1; a[11]=2; a[12]=1
+
+zzz=a
+for (r in 2:10) {
+    b=a*0
+    for (j in (11-r):(11+r)) {
+        if (j==1) {
+            b[j]=0+2*a[j]+a[j+1]
+        } else if (j==21) {
+            b[j]=a[j-1]+2*a[j]+0
+        } else {
+            b[j]=a[j-1]+2*a[j]+a[j+1]
+        }
+    }
+    zzz=rbind(zzz,b)
+    a=b
+}
+rownames(zzz)=1:nrow(zzz)
+
+# By symmetry the only pot that pays off is when pot=10.
+# All the other pots cancel out (e.g. wins=losses).  The
+# payout for the pot is 10 and the mean gain is then:
+print(10*zzz[10,11]/sum(zzz[10,]))
+print(paste0("Pots that win = ",zzz[10,11]))
+print(paste0("Total pots    = ",sum(zzz[10,])))
+
+```
+
+This matches the Monte-Carlo simulation.  Not sure if there is
+a simple function to generate the pot counts as a function of
+round number:
+
+     2
+     6
+     20
+     70
+     252
+     924
+     3432
+     12870
+     48620
+     184756 
+
+It appears that this can be directly calculated as choose(2*m,m) where
+m is the round number.  The total number of pots is just 4^m = 2^(2*m).
+
+For the case of m=10 we get:
+
+    Payout = choose(20,10)/2^20 = 1.761971
+    
+
+## Problem 3
+
+    One morning, Ann left home and
+    cycled north at a steady speed. At
+    the same time, Bill left the same
+    home and cycled south at a steady
+    speed 1 mph faster than Ann's. An
+    hour later, their mother realized that
+    they had both left without their
+    lunches, so she set out at a steady
+    speed of 10 mph and cycled after
+    Ann, gave her her lunch, then turned
+    and cycled after Bill, give him his
+    lunch, and finally reached home
+    exactly 5 hours after she started.
+    How long would it have taken her if
+    she had cycled to Bill first and then to
+    Ann?
+
+    -- Susan Denham in New Scientist
+
+Solution:
+
+End result -- doesn't matter -- takes 5 hours either way.
+
+Since the mother cycled for 5 hours @ 10 mph she travelled 50 miles.
+
+    Let a = ann's speed
+        b = a+1 = bill's speed
+        m = 10  = mom's speed
+        
+    For the first leg: 0<t<t1
+    
+    For the first hour ann runs away from mommy: d = a
+    After this the mother is catching up.  Eventually they
+    meet at t=t1:
+    
+        Ann's distance = d1 = t1*a
+        Mom's distance = d1 = (t1-1)*m
+        
+        So: t1*a = (t1-1)*10 --> t1=10/(10-a)
+
+    Mom turns around and heads back home.  It takes her (t1-1)
+    to get there.  So at t=t1+t1-1= 2*t1-1:
+
+    Bill has been running away south.
+    At t=2*t1-1 bill has a headstart of:
+    
+        d2 = (a+1)*(2*t1-1)
+        
+    So -- bill is far from mom.  It takes a while for mom to overcome
+    the headstart -- assume it takes a time of t2:
+    
+        mom's distance = bill's distance + bill's headstart
+    
+        10*t2 = (a+1)*t2 + (a+1)*(2*t1-1)
+        (10-a-1)*t2 = (a+1)*(2*t1-1)
+                 t2 = (2*t1-1)*(a+1)/(9-a)
+                 
+    Once Mom catches Bill she can go back home.  This takes the same
+    amount of time and distance so:
+    
+        t3=t2
+        
+    Total time = 6 = 2*t1-1 + 2*t2 = 2*t1-1 + 2*(2*t1-1)*(a+1)/(9-a)
+    
+    and, from the first leg: t1=10/(10-a)
+    
+    so: 6 = 2*10/(10-a)-1+2*(2*10/(10-a)-1)*(a+1)/(9-a)
+    
+    solving for a = -sqrt(385)/2 + 27/2
+                  ~ 3.68929156482571
+
+    Sanity check:
+    
+        t1 = 1.584 --> Mom catches up in 0.584 hours
+        Mom back home at time = 2*t1-1 = 2.169 hours
+        
+        Meanwhile Bill has headstart of: 4.689*2.169 = 10.170
+        
+        To catch him:
+        
+        10*t = 4.689*t+10.170 --> t = 10.170/(10-4.689) ~ 1.915 hours
+        
+        Back home = 1.915 hours
+        
+        Total travel time = (1.584-1)*2+2*1.915 = 4.998 hours
+        
+    So -- we know the speeds.  Unfortunately that was not the question.  The
+    question is how long does it take if she goes after Bill first?  I am going
+    to guess that it is faster since you want to catch the fastest one first.
+    But I could be completely wrong (I suspect it doesn't matter):
+    
+    bill has 1 hour head start.  Once Mom gets going:
+    
+        10*dt = b*(dt+1) --> dt = b/(10-b) = 0.882988
+        
+    Mom needs to get back home in same amount of time.  Total head start for
+    ann is:
+    
+        t = 1+2*0.882988 = 2.766 --> headstart = 10.20449
+        
+    Now catch ann:
+    
+        10*dt = a*dt + 10.20449 --> dt = 10.20449/(10-a) = 1.617 hours
+        
+    Time to get back home is the same = 1.617 hours.
+    
+    Mom's travel time = 2*0.883 + 2*1.617 = 5 hours.
+        
+    Takes the same amount of time!
+
+
+## Problem 4
+
+    Consider a four-digit integer M
+    with all different nonzero digits. Generate
+    two other four-digit integers, A
+    and D, by rearranging the digits of M
+    so that A has the digits arranged in
+    ascending order and D has the digits
+    arranged in descending order.
+    If D - A = M, what is the value of M?
+
+    -- nearly impossible Brain Bafflers by
+    Tim Sole and Rod Marshall
+
+Solution:  We could generate all the candidate numbers
+    and then check for compliance with these constraints.
+    
+    all permutations of 9 digits taken 4 at a time = 3024 possibilities
+    
+    take each row as M and then construct A, D.
+    
+```{r}
+library(gtools)
+
+check_m = function(m) {
+    n=sum(m*c(1000,100,10,1))
+    a=sum(m[order(m)]*c(1000,100,10,1))
+    d=sum(rev(m[order(m)])*c(1000,100,10,1))
+    return( (d-a)==n )
+}
+
+a=permutations(9,4,1:9)
+
+s=apply(a,1,check_m)
+a[s,]
+```
+
+The only 4 digit combination that works is:
+
+    m = 6174
+    a = 1467
+    d = 7641
+    
+
+## Problem 5
+
+    In 2004, the largest known prime
+    was 2^(24,036,583) - 1. If this number were
+    written in base 10, how many digits
+    would it contain, and what would be its
+    leftmost and rightmost three digits?
+
+    -- Adapted from Technology Review
+
+Solution:
+
+    Number of digits ~ 7235733 (need to round up)
+    Left-most  = 299...
+    Right-most = ...407
+
+
+    The number of digits can be approximated with log (base-10).
+    
+    num_digits ~ log10(2^(24036583))
+               ~ 24036583 * log10(2)
+               ~ 7,235,732.476
+               
+    How do we calculate the left/right-most digits?
+    
+    We can guess at the left-most digits by throwing away the exponent and just
+    inverting the mantissa.
+    
+        Number starts with 2994...
+    
+    For the least significant digits:
+    
+    If we add 1 then this is a power of 2.
+    The powers of 2 follow a pattern.  The right-most digit is:
+    
+    2, 4, 6, or 8 depending on the modulus of the exponent.
+    
+    For 2^n  if n%%4==0,1,2,3 --> last digit = 6,2,4,8
+    
+    For the given problem: n=24036583 so n%%4 = 3 --> last digit is 8.
+    
+    For the given prime: 2^n-1 --> last digit is 7
+ 
+    Looking only at terms that are +3, modulo-4 we find that the final
+    three digits of the powers of 2 repeat every 25 values (e.g. every 2^100).
+    I found this looking at bigz values of 2^n for a wide range of n.  The
+    solution in the Bent uses a theorem from Euler.
+    
+    Starting with 2^7, 2^11, 2^15, ... we have:
+ 
+    128,  48, 768, 288, 608,
+    728, 648, 368, 888, 208,
+    328, 248, 968, 488, 808,
+    928, 848, 568,  88, 408,
+    528, 448, 168, 688,   8
+    
+    Starting at 2^107 this pattern repeats
+    
+    For given n this is many, many of the patterns.
+    
+    We have 4*i+3 = n --> i=6009145
+    
+    Modulo-25 this is 20 -- so we need the 20th pattern (1 based) = 408
+    
+    So -- the final 3 digits of 2^n are: 408
+    
+    After subtracting the 1 --> final digits of the prime are 407
+    
+
+## Bonus
+
+    Consider an infinite plane
+    ruled with parallel lines one meter
+    apart. An ellipse with a major axis of
+    0.75 m and a minor axis of 0.50 m is
+    thrown down at random on the plane.
+    What is the probability that the ellipse
+    will fall on one of the lines?
+
+    -- Joseph Whitworth (1803-87)
+
+Solution:
+
+    By Monte-Carlo: Pr ~ 0.643
+    
+    Needs more work -- Bent has closed form solution that is 0.631.
+
+    I think the axis specifications imply a=0.75/2 and b=0.50/2.
+    Assume the parallel lines are horizontal.
+    
+    We need to consider the random location of the center of ellipse
+    and the angle of rotation of the ellipse.  The entire problem
+    repeats every +/- 0.5 units along the y-axis so we only need to
+    analyze this range.
+    
+    When the center is in the range [-0.25,+0.25] the ellipse will
+    land on one of the lines
+
+    When the center of ellipse is more than 0.75/2 = 0.375 units from
+    the origin then the ellipse can not fall on a line.
+    
+    In the intermediate area [0.25 to 0.375] the likelihood of falling
+    on a line will depend on the rotation angle of the ellipse.  Again,
+    due to symmetry we only need consider one quadrant of rotation.
+
+        (x/a)^2 + (y/b)^2 = 1
+        
+    The critical angle of rotation will occur when the distance from
+    the center of the ellipse to the point on the ellipse where it
+    crosses one of the lines, d:
+    
+        x^2 = a^2 * (1 - (y/b)^2)
+
+        d^2 = x^2 + y^2 = a^2 * (1-(y/b)^2) + y^2
+            = a^2 - y^2*(a/b)^2 + y^2
+            = a^2 + (1 - (a/b)^2) * y^2
+            
+        y = sqrt((d^2 - a^2)/(1-(a/b)^2))
+
+    The rotation angle that makes the ellipse hit the line will be:
+    
+        theta = asin(y/d)
+        
+    The actual rotation must be at least this large so the likelihood that
+    the ellipse will cross a line is:
+    
+        Probability = (pi/2-theta)/(pi/2) = 1 - 2*theta/pi
+    
+    Not sure I can do this symbolically but I can do Monte-Carlo.
+    
+```{r}
+a=0.75/2
+b=0.50/2
+
+ntrials=1000000
+nhits=0
+for (i in 1:ntrials) {
+    d=runif(1)/2
+    if (d<=b) {
+        nhits=nhits+1
+    } else if (d<a) {
+        y0=sqrt((d^2-a^2)/(1-(a/b)^2))
+        theta=asin(y0/d)
+        p=1-2*theta/pi
+        nhits=nhits+p
+    }
+}
+
+print(paste0("Pr(hit a line) = ",nhits/ntrials))
+```
+
+The initial simulation suggests Pr = 0.538 but this seems way too low.
+The central region alone provides Pr = 0.5 so I would expect more
+contribution from the range 0.25 to 0.375.
+
+I think I was miscalculating the Pr hitting a line by a factor of 2.
+Mental error used pi/4 instead of pi/2 for 90 degrees.
+
+After modifying the code: Pr ~ 0.643 which seems reasonable.
+
+Need to look at this some more.
+
+The Bent solution derives this "closed form" in terms of Elliptic
+integrals and gets Pr ~ 0.63127.  They say the general problem is
+just the radio of the perimeter of the ellipse and the perimeter of
+a circle that just touches the horizontal lines.
+
+
+## Computer Bonus
+
+    Some ways to
+    express a power of 10 as the product of
+    two factors without using any zeros
+    are 10 = 2 x 5, 10^2 = 4 x 25, and 10^3 = 8
+    x 125. What is the largest power of 10
+    which can be so expressed?
+
+    -- The Mathematics Teacher
+
+Solution:  isn't the answer just 1e7?
+
+    Searching up through 10^10000 I agree with the Bent
+    solution that the only powers are:
+    
+    ... 6, 7, 9, 18, and 33.
+
+    My first attempt at this completely missed the question.
+    See below.
+    
+    Need to do this again.  They weren't asking for
+    the smallest power of 10 that requires a zero.
+    They were asking for the highest power that
+    CAN be expressed without a zero.
+
+    For example, in the table 10^8 requires a zero but
+    10^9 does not.
+
+    In general, the prime factors of 10 = 2 * 5
+    Any power of 10^n = 2^n * 5^n
+    
+    Thus, any factors of 10^n must be some combination
+    of 2^m and 5^k.  If we mix the 2 and 5 terms we
+    immediately get 2*5 = 10 --> a zero.
+    
+    Conclude, must keep 2^n and 5^n separate such that
+    10^n = (2^n) * (5^n)
+    
+    The powers are given as:
+    
+    N   2^N   5^N
+    1   2     5
+    2   4     25
+    3   8     125
+    4   16    625
+    5   32    3125
+    6   64    15625
+    7   128   78125
+    8   256   390625   <- Zero is unavoidable in 5^8
+    9   512   1953125
+    10  1024  9765625
+
+    Final conclusion: need to limit to 10^7 = 2^7 * 5^7 = 128 * 78125

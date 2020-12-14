@@ -1,0 +1,301 @@
+---
+title: "Bent Summer 2006"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2006
+
+
+## Problem 1
+
+    Although there are an infinite number
+    of primes, we can find sequences
+    of integers of any desired length,
+    none of which are prime. Give an expression,
+    in terms of N, for the first
+    number of a string of at least N consecutive
+    composite integers. This expression
+    does not have to identify the
+    smallest such number.
+
+    -- Daryl Cooper
+
+TODO
+
+    I had to look at the solution.
+    
+    They used (N+1)! + i which is divisible
+    by i = 2 to N+1 which is N terms.
+
+
+## Problem 2
+
+    An archivist, baker, clergyman,
+    and doctor played three rubbers of
+    bridge (bridge is a four-person game
+    with two partners on one side versus
+    two partners on the other side). By
+    coincidence, the score of each rubber
+    was an exact multiple of 100. Each
+    partnered each other once, and, at a
+    penny a point, the doctor emerged $5
+    up. The clergyman and his brother
+    lost the largest rubber by 800. They
+    are a bit vague about other details,
+    but the scoresheet shows that Peter
+    finished $19 down, having fared better
+    with Ronnie for partner than with
+    Quentin. It shows too that Quentin did
+    better overall than his father's only
+    brother and that Sam did worse overall
+    than the baker. The doctor, by the
+    way, sent a greetings telegram when
+    the archivist was born. And, also by
+    the way, when Peter was Sam's current
+    age, he could open beer bottles
+    with his teeth. Who does what for a
+    living?
+
+    -- Martin Hollis
+
+TODO
+
+    meh
+
+
+## Problem 3
+
+    Solve the following cryptic multiplication:
+    WIT * WILL = THIRST
+    with different letters representing
+    different digits.
+
+    -- New Scientist
+
+Solution: from the cryptic arithmetic notebook
+
+Standard cryptic multiplication:
+
+    WIT * WILL = THIRST
+    
+```{r}
+source('rgc_lib.R')
+
+a=make_crypt_df('witwillthirst')
+x_wit=make_num(a,'wit')
+x_will=make_num(a,'will')
+x_thirst=make_num(a,'thirst')
+k=(x_wit*x_will == x_thirst)
+k=k & (a$w != 0) & (a$t != 0)
+print(paste0('Number of solutions = ',sum(k)))
+print(t(a[k,]))
+print_num(a,'wit',k)
+print_num(a,'will',k)
+print_num(a,'thirst',k)
+```
+
+    [1] "Number of solutions = 1"
+      137063
+    w      2
+    i      3
+    t      5
+    l      1
+    h      4
+    r      0
+    s      8
+    [1] "wit = 235"
+    [1] "will = 2311"
+    [1] "thirst = 543085"
+
+
+## Problem 4
+
+    A point P lies in the same plane as
+    a unit square. Let the vertices of the
+    square, taken counterclockwise, be A,
+    B, C, D. Also, let the distances from P
+    to A, B, and C, be u, v, w, respectively.
+    What is the greatest distance that P
+    can be from D if u^2 + v^2 = w^2?
+
+    -- 34th Annual High-School Mathematics Examination
+
+Solution:
+
+    I need a picture.  Maybe I can draw it with ASCII Art
+    I have (incorrectly) solved this twice so I will adopt
+    the same convention as the Bent so we can all follow along:
+
+    C (0,1                          B (1,1)
+    +-------------------------------+
+    |                               |
+    |                               |
+    |                               |
+    |                   o           |
+    |                   P (x,y)     |
+    |                               |
+    |                               |
+    |                               |
+    |                               |
+    |                               |
+    |                               |
+    |                               |
+    |                               |
+    |                               |
+    +-------------------------------+
+    D (0,0)                         A (1,0)
+
+    Using equations:
+    
+    Assume P=(x,y) then
+    
+    PA = u: u^2 = (x-1)^2 + y^2
+    PB = v: v^2 = (x-1)^2 + (y-1)^2
+    PC = w: w^2 = x^2 + (y-1)^2
+    
+    PD = z: z^2 = x^2 + y^2
+    
+    Given: u^2 + v^2 = w^2, so
+ 
+        (x-1)^2 + y^2 + (x-1)^2 + (y-1)^2 = x^2 + (y-1)^2
+        
+        2*(x-1)^2 - x^2 + y^2 = 0
+        
+        y^2 = x^2 - 2*(x-1)^2 = -x^2 + 4*x - 2
+
+    The distance we are looking for is:
+    
+        z^2 = x^2 + y^2
+        
+            = 4*x - 2
+
+    The distance is maximized as x increases.
+    
+    The other constraint is that y^2 = -x^2 + 4*x-2 >= 0
+    
+    Solving for the critical value of x: y = 0 when x=2+/-sqrt(2)
+    
+    Since we want to maximize x we pick x=2+sqrt(2)
+    
+    Final solution:  point is on the +x axis at y=0
+    
+        x = 2+sqrt(2)
+        y = 0
+        
+        Distance to origin = x = 2+sqrt(2)
+
+        Distance PA = 1+sqrt(2)
+        Distance PB = sqrt(4+2*sqrt(2))
+        Distance PC = sqrt(7+4*sqrt(2))
+
+
+## Problem 5
+
+    Every pair of communities in a
+    county is linked directly by exactly
+    one mode of transportation: bus,
+    train, or airplane. All three modes of
+    transportation are used in the county
+    with no community being serviced by
+    all three modes and no three communities
+    being linked pairwise (e.g., in a
+    triangle) by the same mode. What is
+    the maximum number of communities
+    in the county? What is the maximum
+    if only two modes of transportation
+    are used and a community can be
+    served by both modes? Besides the
+    numbers, provide a labeled sketch of
+    the networks.
+
+    -- Tenth U.S.A. Mathematical Olympiad
+
+TODO
+
+    meh
+
+
+## Bonus
+
+    A hotel has rooms with cipher
+    locks that open (indicated by a green
+    LED) when the last four digits of
+    any sequence keyed provide the correct
+    combination. Thus, keying 01234
+    (five key strokes) tests both 0123 and
+    1234. If the combination is not known,
+    what is the minimum number of keystrokes
+    to guarantee that the lock can
+    be opened?
+
+    -- Technology Review
+
+Solution:
+
+    I think this is just a grey code so it
+    should only take 3 presses + 1 for each
+    code thereafter.  If there are 10000 codes
+    then the length should be 10003.
+
+    They called it a de Bruijn sequence in the Bent.
+
+
+## Double Bonus
+
+    Let a(0) + b(0) + c(0) = 1 with 
+    0 <= a(0), b(0), c(0) < 1 and
+    
+    a(n+1) = a(n)^2 + 2b(n)c(n) with corresponding
+    equations for b(n+1) and
+    c(n+1). What is the limit of a(n) as n
+    
+    approaches infinity? Prove.
+
+    -- G. R. Wachtell
+
+Solution:
+
+    The Bent says the solution is 1/3 but the proof
+    was omitted due to space constraints.
+
+    A simple numerical investigation supports the 1/3 fixed point.
+   
+```{r}
+
+a=1/29; b=1/4; c=1-(a+b)
+
+for (n in 1:10) {
+    anew = a^2 + 2*b*c
+    bnew = b^2 + 2*a*c
+    cnew = c^2 + 2*a*b
+    a=anew; b=bnew; c=cnew
+}
+
+c(a,b,c)
+
+```
+
+    Even a few iterations appears to be enough.
+    
+    We can assume the equation has a fixed point and then
+    solve for it.  If there is a fixed point then a(n+1) = a(n).
+    
+    So:
+    
+    a(n+1) = a(n) = a and
+    
+    a = a^2 + 2*b*c
+    b = b^2 + 2*a*c
+    c = c^2 + 2*a*b
+    
+    maxima finds 8 solutions but the only one with all solutions positive
+    and results less than 1 are:
+    
+    [a,b,c] = [1/3, 1/3, 1/3]
+

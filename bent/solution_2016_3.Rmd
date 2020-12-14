@@ -1,0 +1,325 @@
+---
+title: "Bent Fall 2016"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2016
+
+
+## Problem 1
+
+    Solve: ONE / FIVE = .TWO with TWO being even.
+    Different letters are different digits and
+    there are no leading zeros.
+
+    -- Journal of Recreational Mathematics
+
+Solution: solved in the cryptic arithmetic notebook
+
+    Cryptic fraction:
+
+      ONE / FIVE = . TWO
+
+      with TWO being even.
+      Note the decimal point in the equation!
+
+    a=make_crypt_df('onefivetwo')
+    k=(make_num(a,'one')*1000 == make_num(a,'five')*make_num(a,'two'))
+    k=k&(a$o!=0)&(a$f!=0)&(a$t!=0)
+    sum(k)
+    [1] 2
+    make_num(a,'two')[k,]
+    [1] 264 375
+    a[k,]
+           o n e f i v t w
+    897834 4 9 5 1 8 7 2 6
+    963122 5 2 8 1 4 0 3 7
+
+    Note the first solution has TWO = 264 (even) as requested.
+
+
+## Problem 2
+
+    John is shopping for a used car and has found
+    one being offered by Alice for $12,000, based
+    on $2,000 down and a $10,000 balance to be
+    paid to Alice over 36 months at 6% (annual)
+    simple interest paid monthly on the unpaid
+    balance (John's monthly payments would be
+    $10,000/36 + unpaid balance x 0.06/12).
+    However, if he pays cash, he can get a
+    reduction of D dollars so the cash payment
+    would be $12,000 - D. Although Alice will
+    finance the car at 6%, she believes she can
+    better invest her money at 10% elsewhere. If
+    the 36 monthly payments are discounted to the
+    present at a rate of 10%, how big a reduction
+    in the cash price (to the nearest dollar) can
+    Alice afford to give John so that buying the
+    car for a single cash payment and the net
+    present value of financing over 36 months
+    (plus $2,000 added to account for the down
+    payment), are equivalent propositions? Assume
+    all months have 30 days, and a year is 360
+    days.
+
+    -- John W. Langhaar, PA A'33
+
+TODO
+
+    Some kind of sinking fund at the difference in
+    interest rates.
+    
+    They made a spreadsheet with 36 rows.  The start
+    of the spreadsheet is shown here:
+    
+    Month Loan       Int.  Princ.  Payment Factor       DCF
+    --------------------------------------------------------
+    0     10000.00  6.0%  2000.00  2000.00 10.0%     2000.00
+    1      9722.22 50.00   277.78   327.78 1.0083     325.07
+    2      9444.44 48.61   277.78   326.39 1.0167     321.02
+    ...
+    35      277.70  2.78   277.78   280.56 1.3370    209.84
+    36        0.00  1.39   277.70   279.09 1.3482    207.01
+    Totals:       925.00 12000.00 12925.00         11443.45
+
+    The first value in the Int. column is just the interest rate.
+    The first value in the Factor column is the investment return rate.
+    
+    The loan is 10000 with 6% interest compounded annually so the
+    interest for the next month is the product of the principal*(1+0.06/12).
+    The principal payment is just 10000/36.  The total payment is the sum
+    of the principal and interest payments.  The loan column is then reduced
+    by the amount of the principal payment.  The "factor" column is the
+    net present value assuming she can get 10% on her investment.
+    Specifically, the Factor column = (1+0.1/12)^month.
+    
+    The final column (DCF) is the discounted value of the payment in
+    terms of today's money (e.g. the NPV of the payment).
+    
+    The final conclusion is that a fair reduction in price is the difference
+    between the original purchase price (12000) and the NPV of the cash
+    flow that she is anticipating(11443.35).  This difference is
+    just:
+    
+        12000-11443.35 = 556.55
+        
+    I am not sure I agree that this is "fair" but it is the answer they
+    were looking for.
+    
+
+## Problem 3
+
+    Algernon, Basil and Clarence are either
+    English or Irish, either Conservative or
+    Liberal, and either Protestant or Catholic.
+    In each case there is, as they all know, at
+    least one of each.  None of them know which
+    the others are, but Algernon and Basil have
+    both been told that if Clarence is an Irish
+    Catholic he cannot be a Liberal.  Basil asks
+    Algernon whether he is a Conservative or a
+    Liberal, and whether he is English or Irish.
+    Algernon tells him.  After a pause for
+    reflection, Basil is able to announce
+    correctly the full particulars (English or
+    Irish, Protestant or Catholic, Conservative
+    or Liberal) of both Algernon and Clarence.
+    What are the particulars for the three men?
+
+    -- Brain Puzzler's Delight by E.R. Emmet
+
+TODO
+
+    meh
+
+
+## Problem 4
+
+    Our library has several copies of
+    Boremaster's commentary on Hegel. It is not
+    exactly a jolly read, as you well know if you
+    have ever waded through its 36 chapters, but
+    is much in demand on the grounds that it is
+    less painful than Hegel himself. Even so, I
+    was surprised to see my friend Jones leaving
+    the library with three copies under his arm.
+    "Steady on, old bean," I exclaimed, "there
+    are other readers to think of." "The other
+    copies are all on the shelf," he replied
+    airily, "but I had to take three to get a
+    complete text. Some rotter has snipped whole
+    chapters out of every copy." "Well, surely
+    two copies would have done." "No, no two
+    copies would yield a full text." "Do you mean
+    that I shall have to check every copy if I
+    want to be sure of a full text?" "Oh no. Just
+    take any three at random, as I did. You are
+    bound to get a full text, even though no
+    chapter is present in all copies. For each
+    pair of chapters there is at least one copy
+    with only one of them." For this to be true,
+    what is the minimum number of copies that the
+    library have in total? Also, provide an N row
+    by 36 column matrix, where each row
+    represents a copy of the book, each column
+    represents a chapter, and each element of the
+    matrix is either 1 if the chapter is present
+    in the indicated copy or 0 if the chapter is
+    absent.
+
+    -- a Tantalizer by Martin Hollis in New
+    Scientist
+
+TODO
+
+    This reminds me of the locks at the bank.
+    Like that problem -- I don't care.
+
+
+## Problem 5
+
+    A hexagon inscribed in a circle has side
+    lengths of 2, 2, 2, 11, 11, and 11. What is
+    the exact radius of the circle?
+    
+    -- Puzzle Corner in Technology Review
+    
+Solution:
+
+    I am fairly certain I can solve this numerically.
+    Assume a circle of radius=1 and have two unknown
+    for the sides (or central angles).  The contraints
+    are:
+    
+        r = 1
+        a/b = 11/2
+        a/2 = r*sin(alpha) --> alpha = asin(a/(2*r))
+        b/2 = r*sin(beta)  --> beta  = asin(b/(2*r))
+        
+        3*2*alpha+3*2*beta = 2*pi
+
+    I don't know that this will be exact since it is numeric
+    but I will try it anyhow.
+    
+```{r}
+
+foo = function(x) {
+    b=x
+    a=b*11/2
+    alpha=asin(a/2)   # Half-angle of the wide pie slice
+    beta =asin(b/2)   # Half-angle of the narrow pie slice
+    return(abs(6*(alpha+beta)-2*pi))
+}
+
+optimize(foo,c(0.01,4/11))
+
+```
+
+The numerical solution yields:
+
+    b = 0.2857004
+
+In the original problem statement, however, b=2 so the circle must
+be scaled up by the same factor:
+
+    r = 2/0.2857004 = 7.00034
+    
+I suspect the "exact" radius is 7.
+
+The Bent did this analytically but they get the same answer.
+My solution was actually much easier, albeit less exact.
+
+
+## Bonus
+
+    Sally's Spa has installed a security system
+    consisting of a row of N switches wired so
+    that, unless the following rules are
+    followed, an alarm will go off: (1) the
+    switch at the far right can be turned on or
+    off at any time and (2) any other switch may
+    be turned on or off only if the switch to its
+    immediate right is on and all other switches
+    (if any) to its right are off. If all N
+    switches are initially on, what is the least
+    number of moves required to deactivate (all
+    switches off) the alarm system? A move
+    consists of turning a switch on or off.
+    Express your answer without using recursion
+    or summation. You can use (N mod 2) or (-1)^N
+    as a way to find even versus odd.
+
+    -- Problem Solving Through Recreational
+    Mathematics by Bonnie Averbach and Orin Chein
+
+TODO
+
+    meh
+
+
+## Computer Bonus
+
+    Let f(N) be the smallest positive integer
+    whose prime factorization contains the N
+    digits 1 to N each exactly once. So,
+    f(3)=26=2x13. Find f(N) and its prime
+    factorization, for N equal to 4 through 9,
+    inclusive.
+
+    -- Adapted from Puzzle Corner in Technology
+       Review
+
+TODO
+
+    Let's try exhaustive search and see how we do.
+    Up to N=8 this works very well.  Not so good for
+    the case N=9 but it eventually gets to the solution.
+
+```{r}
+library(gmp)
+
+needs=c(4,5,6,7,8,9)
+
+n=10
+while (T) {
+    m=sort(strsplit(paste0(as.numeric(factorize(n)),collapse=""),"")[[1]])
+    if (length(m) == length(unique(m))) {
+        m=as.numeric(m)
+        if (m[1]==1 & all(diff(m)==1)) {
+            if (length(m) %in% needs) {
+                print(paste0(sprintf("%d  ",c(length(m),n,as.numeric(factorize(n)))),collapse=""))
+                k=which(length(m) %in% needs)
+                needs=needs[-k]
+                if (length(needs)==0) {
+                    break
+                }
+            }
+        }
+    }
+    n=n+1
+}
+```
+
+Solution:
+
+    N    f(N)         factors
+    -----------------------------------------------------
+    4    246          2   3           41
+    5    1230         2   3   5       41
+    6    13830        2   3   5            461
+    7    60710        2       5    13        467
+    8    446010       2   3   5                    14867
+    9    2992890      2   3   5         67      1489
+
+I don't really see any obvious patterns other than the preponderance
+of 2, 3, and 5.  After that the solutions seem scattered.
+
+The Bent solution does not offer any insight.  It does match this
+solution.

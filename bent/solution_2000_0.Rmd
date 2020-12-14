@@ -1,0 +1,329 @@
+---
+title: "Bent Winter 2000"
+author: "R. G. Cronce"
+date: "12/17/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(reticulate)
+```
+
+# Bent, Winter 2000
+
+Brain Ticklers from the Bent of Tau Beta Pi.
+
+
+## Problem 1
+
+VCR counter proportional to number of rotations of the take-up reel.  When the counter reads 1000
+it is increasing at a rate of 1 count per second.  At 2000 seconds, the counter is increasing at
+a rate of 2/3 count per second.  Express time, t, as a function of the number of counts, c.
+
+-- Greg A. Qualls, KS B'80
+
+TODO
+
+## Problem 2
+
+George's new office has a combination lock.  Each digit is unique.  He wrote down a subset of
+the numbers on a piece of paper along with the security combination.  Multiplying the two
+numbers together yields 7 digit number, all of the same digit.  What is the combination?
+
+-- Adapted from *New Scientist*
+
+The 7 digit number must be n*1111111 where n = 1, 2, ..., 9.  Let us factor 1111111 to see
+what we have to deal with:
+
+```{python}
+import sympy
+
+sympy.factorint(1111111)
+```
+
+So, the factors are 239*4649.  The second number can not be the combination since it does
+not contain unique digits.  The first can't be the combination since the second is not a
+subset of the digits.  We conclude that the product is not 1111111.  Let's look
+at the other possibilites:
+
+```{python}
+for i in range(1,10):
+  print(i*1111111,sympy.factorint(i*1111111))
+```
+
+We can look at all the factors of each of the numbers to check for the following conditions:
+
+1. Combination must have unique digits, subset must have unique digits
+2. Subset must be a subset of the combination
+3. Product of the combination subset must be `n*1111111`
+
+Combinations:
+
+    1111111: 239, 4649               - not feasible (repeated digits)
+    2222222: 2*239=478, 4649         - not feasible (repeated digits)
+             239, 2*4649=9298        - not feasible (repeated digits)
+    3333333: 3*239=717, 4649         - not feasible (repeated digits)
+             239, 3*4649=13947       - not feasible (239 not a subset of 13947)
+    4444444: 239, 4*4249=16996       - not feasible (repeated digits)
+             239*2=478, 2*4249=9298  - not feasible (repeated digits)
+             239*4=956, 4249         - not feasible (repeated digits)
+    5555555: 239, 5*4649=23245       - not feasible (repeated digits)
+             5*239=1195, 4649        - not feasible (repeated digits)
+    6666666: 239, 6*4649=27894       - not feasible (239 not a subset of 27894)
+             239*2=478, 3*4649=13947 - not feasible (478 not a subset of 13947)
+             239*3=717, 2*4649=9298  - not feasible (repeated digits)
+             239*6=1434, 4649        - not feasible (repeated digits)
+    7777777: 7*239=1673,4649         - not feasible (repeated digits)
+             239, 7*4649=32543       - not feasible (repeated digits)
+    8888888: 239, 8*4649=37192       - feasible
+             2*239=478,4*4649=18596  - not feasible (478 not a subset of 18596)
+             4*239=956,2*4649=9298   - not feasible (repeated digits)
+             8*239=1912,4649         - not feasible (repeated digits)
+    9999999  239, 9*4649=41841       - not feasible (repeated digits)
+             3*239=717,3*4649=13947  - not feasible (repeated digits)
+             9*239=2151,4649         - not feasible (repeated digits)
+
+Only a multiplier of 8 works - so we conclude:
+
+    Security code = 8*4649 = 37192
+    Subset of digits = 239
+    
+    Product = 37192*239 = 8888888
+
+
+## Problem 3
+
+Some friends are golfing and like to celebrate at the end of the round.  There are 32 people.
+They want to celebrate a birthday but one month there are no birthdays.
+
+For a group of 32 people, what are the odds that there is at least one month during the year that
+has no birthdays?  Assume all months are equiprobable.
+
+-- John W. Langhaar, PA A'33
+
+```{r}
+# Let's use Monte-Carlo
+
+n_trials=1000000
+n=0
+for (i in 1:n_trials) {
+  n=n+(length(unique(sample(12,32,replace=T)))<12)
+}
+n/n_trials
+```
+
+A somewhat surprising result -- more than half the time there is one or more months without
+any birthdays in a group of 32 people.
+
+
+## Problem 4
+
+Ladder of length L - one end in contact with floor and the other with the wall.  As ladder
+slides from vertical to horizontal, what is the equation of the area swept out by the
+ladder?
+
+-- *Technology Review*
+
+TODO
+
+```{r}
+# Let's make a plot to visualize the situation
+# Let the ladder length be normalized to 1.0
+# Let the angle of the ladder vary from 0 to pi/2 wrt the floor
+
+num_lines=101
+theta=seq(0,pi/2,length=num_lines)
+x=(1-cos(theta))
+y=sin(theta)
+
+# Plot the first line and set the limits
+plot(c(0,1),c(0,0),col='red',lwd=3,
+     xlim=c(0,1),
+     ylim=c(0,1),
+     xlab="Distance on Floor",
+     ylab="Height on Wall",
+     asp=1,
+     type='l')
+title('Ladder too shallow')
+lines(c(1,1),c(0,1),col='red',lwd=3)
+for (i in seq_along(theta)) {
+  lines(c(x[i],1),c(0,y[i]))
+}
+# Target X-value
+lines(c(0.7,0.7),c(0,1),col='green',lwd=3,lty=2)
+# Example position(s) of the ladder
+lines(c(x[trunc(0.3*num_lines)],1),c(0,y[trunc(0.3*num_lines)]),col='red',lwd=3)
+# lines(c(x[trunc(0.5*num_lines)],1),c(0,y[trunc(0.5*num_lines)]),col='green',lwd=3)
+# lines(c(x[trunc(0.7*num_lines)],1),c(0,y[trunc(0.7*num_lines)]),col='green',lwd=3)
+grid()
+
+```
+
+The situation is shown above.  The green dashed line shows the target value of X.  We want
+to find the angle of the ladder that maximizes Y for this value of X.  Clearly, the
+position of the ladder shown above is too shallow.  Need to increase the angle (and,
+therefore, move the ladder).  By trial and error we can get the answer as shown below.
+
+```{r}
+# Let's make a plot to visualize the situation
+# Let the ladder length be normalized to 1.0
+# Let the angle of the ladder vary from 0 to pi/2 wrt the floor
+
+num_lines=101
+theta=seq(0,pi/2,length=num_lines)
+x=(1-cos(theta))
+y=sin(theta)
+
+# Plot the first line and set the limits
+plot(c(0,1),c(0,0),col='red',lwd=3,
+     xlim=c(0,1),
+     ylim=c(0,1),
+     xlab="Distance on Floor",
+     ylab="Height on Wall",
+     asp=1,
+     type='l')
+title('Ladder Optimal')
+lines(c(1,1),c(0,1),col='red',lwd=3)
+for (i in seq_along(theta)) {
+  lines(c(x[i],1),c(0,y[i]))
+}
+# Target X-value
+lines(c(0.7,0.7),c(0,1),col='green',lwd=3,lty=2)
+# Example position(s) of the ladder
+lines(c(x[trunc(0.53*num_lines)],1),c(0,y[trunc(0.53*num_lines)]),col='red',lwd=3)
+# lines(c(x[trunc(0.5*num_lines)],1),c(0,y[trunc(0.5*num_lines)]),col='green',lwd=3)
+# lines(c(x[trunc(0.7*num_lines)],1),c(0,y[trunc(0.7*num_lines)]),col='green',lwd=3)
+grid()
+
+```
+
+This shows the ladder in the optimal position with an angle of (approx.) 0.82 Radians.  Note
+that if you increase the angle even further, the height at the target X value decreases:
+
+```{r}
+# Let's make a plot to visualize the situation
+# Let the ladder length be normalized to 1.0
+# Let the angle of the ladder vary from 0 to pi/2 wrt the floor
+
+num_lines=101
+theta=seq(0,pi/2,length=num_lines)
+x=(1-cos(theta))
+y=sin(theta)
+
+# Plot the first line and set the limits
+plot(c(0,1),c(0,0),col='red',lwd=3,
+     xlim=c(0,1),
+     ylim=c(0,1),
+     xlab="Distance on Floor",
+     ylab="Height on Wall",
+     asp=1,
+     type='l')
+title('Ladder too steep')
+lines(c(1,1),c(0,1),col='red',lwd=3)
+for (i in seq_along(theta)) {
+  lines(c(x[i],1),c(0,y[i]))
+}
+# Target X-value
+lines(c(0.7,0.7),c(0,1),col='green',lwd=3,lty=2)
+# Example position(s) of the ladder
+lines(c(x[trunc(0.7*num_lines)],1),c(0,y[trunc(0.7*num_lines)]),col='red',lwd=3)
+# lines(c(x[trunc(0.5*num_lines)],1),c(0,y[trunc(0.5*num_lines)]),col='green',lwd=3)
+# lines(c(x[trunc(0.7*num_lines)],1),c(0,y[trunc(0.7*num_lines)]),col='green',lwd=3)
+grid()
+
+```
+
+We can parameterize the height at a particular target X value in terms of the ladder
+angle (or position) and then maximize the height:
+
+```{python}
+from sympy import * 
+y=symbols('y')     # Height of ladder at the target X value
+x=symbols('x')     # Target X value
+theta=symbols('theta')   # Angle of the ladder
+
+# Distance between target X and the ladder at the floor
+base=x-(1-cos(theta))
+height=y
+y=(x-(1-cos(theta)))*tan(theta)
+# Convert the result to degrees
+print(N(solve(simplify(diff(y,theta)),theta)[0]*180/pi))
+print(N(solve(simplify(diff(y,theta)),theta)[1]*180/pi))
+```
+
+This says the solution is +/- 60 degrees --- which is clearly wrong --- so needs more work.
+
+@@@
+-----
+
+
+## Problem 5
+
+A candle in the shape of a truncated right circular cone is 45 cm high.  It burns to extinction
+in 9 hours.  The bottom 3 cm takes 20 minutes longer to burn than the top 3 cm.  How many minutes
+does it take for the top 3 cm to burn?  Assume the candle volume decreases at a constant rate.
+
+-- Marcello J. Carrabes, MA E'50
+
+```{python}
+import sympy
+from sympy import *
+
+r1=symbols('r1')    # Radius at bottom of candle
+r2=symbols('r2')    # Radius at top of candle (smaller than r1)
+y=symbols('y')      # Height above base
+r=r1-(r1-r2)*y/45   # Radius of candle as a function of height
+H=45                # Height of candle
+V=integrate(pi*r**2,(y,0,H))   # Total volume of candle
+T=9*60              # Burning time of total candle in minutes
+K=V/T               # Burn rate
+
+t_low = integrate(pi*r**2,(y,0,3))/K      # Time to burn bottom 3 cm
+t_high = integrate(pi*r**2,(y,42,45))/K   # Time to burn top 3 cm
+R1 = solve(t_low-t_high-20,r1)[0]         # Bottom takes 20 mins longer to burn
+
+print("Symbolically:")
+print('Burn time for top 3 cm    = ',simplify(t_high.subs(r1,R1)))
+print('Burn time for bottom 3 cm = ',simplify(t_low.subs(r1,R1)))
+
+print("Numerically:")
+print('Burn time for top 3 cm    = ',N(simplify(t_high.subs(r1,R1))))
+print('Burn time for bottom 3 cm = ',N(simplify(t_low.subs(r1,R1))))
+
+```
+
+
+## Bonus
+
+There are two integers, A and B, which are greater than 1 and less than 101.  Neither Sam nor
+Pete knows what they are but Sam knows the sum and Pete knows the product.  The following
+conversation takes place:
+
+    Pete: "I don't know what the numbers are."
+    Sam:  "I knew that you didn't"
+    Pete: "Now I know what they are"
+    Sam:  "Then so do I"
+    
+What are the numbers A and B?
+
+-- *Don Holden*
+
+TODO
+
+## Double Bonus
+
+A good approximation of pi using the digits 1 through 9 each once is:
+
+    pi ~ 3 + (16 - 8**(-5))/(97+2**4)
+    
+Find a better approximation using each digit once with the operations limited to
+addition, subtraction, multiplication, division, exponentiation, decimal points,
+and parentheses.
+
+-- Richard I. Hess, CA B'62
+
+TODO

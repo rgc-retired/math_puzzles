@@ -1,0 +1,337 @@
+---
+title: "Bent Summer 2012"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2012
+
+
+## Problem 1
+
+    Bingchester is an important junction where
+    train lines cross thus: In addition, roads
+    parallel the train tracks. A, C, D, and E
+    represent stations on the lines whose
+    distances from Bingchester by road are: A, 4
+    miles; C, 7 miles; D, 10 miles; and E, 7
+    miles. The areas between A, C, D, and E are
+    covered by impenetrable woods so it is
+    impossible for anyone to get from one of
+    these places to another without passing
+    through Bingchester either by road or by
+    train.  An extract from the timetable reads
+    thus:
+
+    A dep: 9:15 C dep: 9:10
+    B arr: 9:23 B arr: 9:27
+    B dep: 9:25 B dep: 9:30
+    C arr: 9:44 A arr: 9:38
+    D dep: 8:55 E dep: 8:58
+    B arr: 9:26 B arr: 9:22
+    B dep: 9:29 B dep: 9:25
+    E arr: 9:53 D arr: 9:56
+
+    Trains run every 15 minutes, precisely on
+    time, so that the time of a previous or
+    following train can be determined by
+    subtracting or adding 15 minutes.  The most
+    famous attraction in Bingchester is the
+    Moaning Lisa, hung in the train station.
+    Unfortunately, someone has defaced the
+    picture by adding a beard and mustache. The
+    picture was seen unadorned by several people
+    at 9:25:30, and the damage was discovered at
+    9:28:30.  Five men are suspected of the
+    desecration, and one is certainly guilty. The
+    five suspects make the following true
+    statements:
+
+    Paul: I saw Ron in A at 9:14 and I was in E at 9:52.
+    Quentin: I was in E at 9:01, and in C at 9:58.
+    Ron: I was in D at 10:09. I left my bicycle at A.
+    Sam: I was in C at 8:56, and in D at 10:03.
+    Ted: I was in A at 9:40, and in E at 8:59.
+
+    They all have bicycles which they can peddle
+    at a steady speed of 15 m.p.h. They can take
+    their bicycles on the train, but no one rides
+    anybody else's bicycle. Two of their bicycles
+    were found at Bingchester after the defacing.
+    Whose bicycles were they? What were the exact
+    movements of all five suspects? Who defaced
+    the Moaning Lisa?
+
+    -- Brain Puzzler's Delight by E. R. Emmet
+
+TODO
+
+    TLDR
+    
+
+## Problem 2
+
+    Solve the following cryptic multiplication,
+    where each different letter represents a
+    different digit: 
+
+    ABCDEF = BCDEFA x M.
+
+    -- The Crucible
+
+Solution: solved in the cryptic arithmetic notebook
+
+  Cryptic multiplication:
+
+      ABCDEF = BCDEFA * M
+
+    a=make_crypt_df('abcdefm')
+    x_abcdef=make_num(a,'abcdef')
+    x_bcdefa=make_num(a,'bcdefa')
+    x_m=make_num(a,'m')
+    k=(x_abcdef == x_bcdefa * x_m)
+    k=k & (a$a != 0) & (a$b != 0) & (a$m != 0)
+    sum(k)
+    [1] 1
+    > a[k,]
+           a b c d e f m
+    559534 9 2 3 0 7 6 4
+
+      ABCDEF = BCDEFA * M
+      923076 = 230769 * 4
+
+
+## Problem 3
+
+    On an analog watch, in less than half a
+    second after the precise time that the second
+    hand passes one of the twelve hourly marks,
+    the minute hand passes over the hourly hand.
+    If this occurs before noon, at what time do
+    the minute hand and hour hand coincide?
+
+    -- Source Unknown
+
+Solution:
+
+    The hour hand moves 30 degrees per hour.
+    The minute hand moves 360 degrees per hour.
+    
+    Let t = hours after midnight
+        H = angle of the hour hand
+        M = angle of the minute hand
+        n = number of times minute hand has lapped hour hand
+
+    H = t*30
+    M = t*360 - 360*n
+    
+    These angles are the same for the following times:
+    
+    t = 360/330 * (1:10)
+    
+    We can convert these to seconds and then human readable times.
+    We want the time that is just after an integer number of 5 seconds
+    
+```{r}
+library(hms)
+
+t=(360/330*(1:10))*3600
+print(hms(t))
+```
+
+The times where the hour and minute hand coincide are:
+
+    01:05:27.272727
+    02:10:54.545455
+    03:16:21.818182
+    04:21:49.090909
+    05:27:16.363636
+    06:32:43.636364
+    07:38:10.909091
+    08:43:38.181818
+    09:49:05.454545  <-- within 0.5 seconds
+    10:54:32.727273
+
+The only time within 0.5 seconds of the second hand reaching
+one of the hour marks is 09:49:05.454545.
+
+
+## Problem 4
+
+    What is the minimum number of people, born on
+    random days in 1981, that need to be in a
+    room to have at least 50% probability that
+    either there are (at least) two pairs of
+    persons who have the same birthday or there
+    are three (or more) people who share a common
+    birthday or both?
+
+    -- D.A. Dechman, TX A'57
+
+Solution:
+
+    Sounds like Monte-Carlo is easier than analytics.
+    We use a 365 day year.
+    
+    After a couple of quick runs we will make 100K trials
+    at each group size in the region of the solution:
+    
+```{r}
+ntrials=100000
+set.seed(42)
+
+x=c()
+y=c()
+t1=Sys.time()
+for (group_size in 30:40) {
+    n=0
+    for (trial in 1:ntrials) {
+        s=sample(365,group_size,replace=T)
+        t=rev(sort(table(s)))
+        if ((t[1]>2) | (t[2]>1)) {
+            n=n+1
+        }
+    }
+    x=append(x,group_size)
+    y=append(y,n/ntrials)
+}
+t2=Sys.time()
+plot(x,y,type='b',
+     xlab="Group Size",
+     ylab="Probability",
+     main="Birthday Party: Triple or Multiple Pairs")
+abline(h=0.5,col='red')
+grid()
+print(t2-t1)
+a=data.frame(n=x,pr=y)
+m=lm(pr~n,a)
+n_min=(0.5-m$coefficients[1])/m$coefficients[2]
+print(paste0("Min group size for Pr=0.5 is ",n_min))
+a
+```
+
+Using the results of the simulation and a linear regression we can
+predict the required number as:
+
+    n = (0.5 + 1)/0.01277 ~ 117.4 people
+
+Well -- the Bent says it is 36 so this isn't even close.  Did
+I misunderstand the problem?  Yup.  I was solving for groups larger
+than 3 and larger than pairs.  The value above is for a single
+group of 4 (or more) or two (or more) groups of 3 or both.
+
+Repeating with the correct logic
+
+    n = (0.5 + 0.5939)/0.03067 ~ 35.7 people
+
+
+
+## Problem 5
+
+    What is the minimum number of knights that
+    can be placed on a standard 8x8 chess board,
+    so that every square (including those
+    occupied by knights) is threatened by a
+    knight and what is such a configuration? A
+    square is threatened if a knight can move to
+    that square on its next move. A knight moves
+    two squares in one direction and one square
+    in another direction (perpendicular to first
+    direction) to end up on a square of opposite
+    color. The move can occur even if intervening
+    squares are occupied. Present your answer as
+    an 8x8 grid with "o" representing an
+    unoccupied square and "N" representing a
+    square occupied by a knight. Hint: the
+    minimum is less than 16.
+
+    -- Amusements in Mathematics by H. E. Dudney
+
+TODO
+
+    Didn't do it but would probably just try
+    exhaustive search with increasing numbers
+    of Knights.
+    
+    Bent claims you need 14 in one of three
+    fundamental configurations.
+
+
+## Bonus
+
+    A rigid, uniform rod one meter long is held
+    leaning against a frictionless, vertical wall
+    at a 30 degree angle to the horizontal by a
+    peg at point A (where the stick touches the
+    ground) on a frictionless, horizontal
+    surface. If the peg is suddenly removed, what
+    is the horizontal speed of the center point
+    of the rod as it passes point A?
+
+    -- Allan Gottlieb's Puzzle Corner in Technology Review
+
+Solution:
+
+    It should be possible to determine the energy
+    balance -- just not sure if the wall does work
+    on the rod or if it is just a conversion of potential
+    to kinetic energy.
+    
+    The Bent solution is rather long -- I will try
+    to see if it can be simplified.  The final answer
+    should be 36.9 cm/sec.
+    
+    use:  m = mass/unit length
+          g = 980 cm/s^2
+
+    As the rod slides down the wall it loses potential
+    energy and gains kinetic energy.  If we ignore the
+    work done by the wall we have:
+    
+    PE = L*m*g*(1/2*L*1/2) = L^2*m*g/4
+    
+    KE = 1/2*(m*L)*v^2
+    
+    Equating we have: ... a mess that doesn't work ...
+    
+    I am breaking down and looking at the Bent solution.
+    I want to work through this because this seems like the
+    kind of problem I should be able to solve but it has been
+    a very long time since I took Dynamics...
+    
+    ... I should try to solve this one of these days ...
+    
+
+## Computer Bonus
+
+    In how many ways (order matters) can 14
+    married couples be seated in chairs numbered
+    consecutively 1 to 28 about a round table in
+    such a manner that there is always one man
+    between two women and none of them is ever
+    next to his own wife?
+
+    -- 100 Great Problems of
+    Elementary Mathematics
+    by Heinrich Dorrie
+
+TODO
+
+    I looked at the solution.  They make the observation
+    that there are 14! ways to seat the women in the even
+    numbered chairs and 14! ways in the odd.  Pick one of
+    the arrangement.
+    
+    For any particular arrangement - they used a computer
+    program to calculate 10,927,434,464 ways to arrange the
+    men for each configuration of women.
+    
+    The total = 2*14!*10927434464 = 1905270127543015833600
+        ~ 1.90527e21
+
+

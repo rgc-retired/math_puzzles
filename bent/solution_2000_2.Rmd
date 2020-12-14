@@ -1,0 +1,438 @@
+---
+title: "Bent Summer 2000"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2000
+
+## Problem 1
+
+    Mr. Meek is pleased with his new
+    extension phone number because it
+    has four digits, the middle two of which
+    are identical. "Like my name," he explains.
+    The repeated digit is also the
+    first digit of Mr. Humble's new four-digit
+    number. Moreover, Meek's first
+    digit is the same as the first digit of
+    Mr. Lowly's new four-digit number.
+    If you interchange the first and last
+    digits of Lowly's number, you get
+    Humble's. If you subtract Lowly's number
+    from Humble's, you get Meek's. So,
+    what is Meek's new number?
+    
+    -- New Scientist
+
+Manual Solution:  try to solve this by hand first
+
+    meek   = n m m *
+    humble = m a b n
+    lowly  = n a b m
+
+      m a b n
+    - n a b m
+      -------
+      n m m *
+
+    If we assume all phone numbers are unique, then m and n must be different.
+    
+    Since phone numbers are not negative we can conclude that the number
+    for lowly is larger than the number for humble.  In particular, we know
+    the first digit in lowly (m) must exceed the first digit in humble (n).
+    They can't be the same from the previous observation.  Thus m >= 1.
+    
+    In the subtraction, we have the last digit to consider.  We know
+    that m > n so this must result in a borrow.  The second to last digit
+    computation is then:
+    
+        (b-1) - b = m + 10 --> m = 9
+        
+    The second digit is the same calculation so there is a borrow out of the
+    left-most digit.  This means:
+    
+        (m-1) - n = n --> n = 4
+        
+    From the right-most digit -- we now know:
+    
+        meek right-most digit = n - m --> 5 with a borrow of 1
+    
+    Making these substitutions:
+    
+    meek   = 4 9 9 5
+    humble = 9 a b 4
+    lowly  = 4 a b 9
+
+    I do not see any way to reduce this further.  It appears a, b may be any
+    digit (even the same one).  If we did an exhaustive search I suspect we
+    would find 100 solution sets.
+
+Computer Solution: seems like exhaustive search based on cryptic arithmetic.
+Represent the digits with dx where the patterns are defined by the problem definition.  
+
+    meek   = d1 d2 d2 d3
+    humble = d2 d4 d5 d1
+    lowly  = d1 d4 d5 d2
+    
+    meek   = humble - lowly
+    
+There are no uniqueness constraints on the digits - so we can use nested loops.
+
+I am getting way too many solutions -- need to check this again.  There is an
+implication that phone numbers are unique so I will add this.
+
+Now I always get a unique solution for Meek but many possibilities for Humble
+and Lowly.  I guess this is reasonable:
+
+```{r}
+solution_set=data.frame(meek=NA,humble=NA,lowly=NA)
+for (d1 in 0:9) {
+  for (d2 in 0:9) {
+    for (d3 in 0:9) {
+      for (d4 in 0:9) {
+        for (d5 in 0:9) {
+          meek   = d1*1000+d2*100+d2*10+d3
+          humble = d2*1000+d4*100+d5*10+d1
+          lowly  = d1*1000+d4*100+d5*10+d2
+          if ((meek != humble) & (meek != lowly) & (humble != lowly)) {
+            if (meek == (humble-lowly)) {
+              solution_set=rbind(solution_set,c(meek,humble,lowly))
+            }
+          }
+        }
+      }
+    }
+  }
+}
+solution_set=na.omit(solution_set)
+print(paste0("Number of solutions = ",nrow(solution_set)))
+print(paste0("Unique solution for meek = ",unique(solution_set$meek)))
+```
+
+## Problem 2
+
+    I know that the lifetime batting averages
+    of Mike and John are 0.200 and
+    0.300, but I forget which is which.
+    However, in Mike's first 10 times at bat
+    this year he had three hits, and in
+    John's first 10 times at bat this year
+    he had two. What is the probability
+    that Mike's lifetime batting average is
+    0.300? (Assume that the probability
+    that a batter will get a hit is equal to
+    his lifetime batting average, which is
+    the ratio of number of hits to number
+    of times at bat.)
+    
+    -- Byron R. Adams, TX A'58
+
+Solution: this smacks of Bayes Theorem.
+
+I confess that I looked at the solution before I did this but the
+calculations are given below:
+
+```{r}
+## P(200 hitter gets 2 hits in 10 at bats)
+p200_2 = choose(10,2)*(0.2^2)*(0.8^8)
+## P(200 hitter gets 3 hits in 10 at bats)
+p200_3 = choose(10,3)*(0.2^3)*(0.8^7)
+## P(300 hitter gets 2 hits in 10 at bats)
+p300_2 = choose(10,2)*(0.3^2)*(0.7^8)
+## P(300 hitter gets 3 hits in 10 at bats)
+p300_3 = choose(10,3)*(0.3^3)*(0.7^7)
+
+## Scenario 1: 200 hitter gets 2 hits, 300 hitter gets 3 hits - Mike is 300 hitter
+p1 = p200_2*p300_3
+## Scenario 2: 300 hitter gets 2 hits, 200 hitter gets 3 hits
+p2 = p300_2*p200_3
+
+print(c(p1,p2,p1/(p1+p2)))
+
+```
+
+Conclude: there is a 63.16% probability that Mike is a 300 hitter.
+
+Still think Bayes theorem could be used here but not sure how.
+
+
+## Problem 3
+
+    Solve this cryptic addition:
+    
+      OLD
+     SALT
+     TOLD
+     TALL
+    -----
+    TALES
+    
+    -- Challenging Mathematical Teasers
+    by J.A.H. Hunter
+
+Solved in the cryptic_arithmetic notebook.
+
+Solution:
+
+    OLD   =   394
+    SALT  =  8091
+    TOLD  =  1394
+    TALL  =  1099
+    TALES = 10978
+
+
+## Problem 4
+
+    Sue has opened her piggy bank,
+    which contains a mixture of pennies,
+    nickels, dimes, and quarters. She
+    quickly notes that she has at least four
+    of each kind. Upon careful counting,
+    she finds that she has exactly 100 coins
+    with a face value of $2.73. How many
+    of each kind does she have?
+    
+    -- Don A. Dechman, TX A'57
+
+Solution: exhaustive search -- maybe sampling?
+Let's try manual first.
+
+Assume the following distribution of coins:
+
+    Quarters: 4  --> 1.00
+    Dimes:    4  --> 0.40
+    Nickels:  4  --> 0.20
+    Pennies:  4  --> 0.04
+    ---------------------
+    Total    16      1.64
+    
+    Need to add 84 coins that add up to 2.73-1.64=1.09.
+    Can add a bunch of pennies as long as it leaves a
+    balance that is divisible by 0.05.  Arbitrarily use a
+    margin of 0.25 to allow for a quarter.  This gives
+    the correct total value and then we can adjust the
+    coins to get the correct total number of coins.
+    
+    Trade 5 pennies for 1 nickel         --> reduction of 4 coins
+    Trade 2 nickels for 1 dime           --> reduction of 1 coin
+    Trade 1 dime for 2 nickels           --> increase of 1 coin
+    Trade 1 quarter for 2 dimes+1 nickel --> increase of 2 coins
+    Trade 1 quarter for 1 dimes+3 nickels -->increase of 3 coins
+
+    Whether or not the trade is allowed depends on maintaining the
+    minimum count of 4 coins of each denomination.
+    
+    First attempt:
+
+    1.09 - 0.25 = 0.84  --> 84 pennies, 1 quarter --> 101 coins
+    
+    Now have 5 quarters, 88 pennies, 4 dimes, and 4 nickels.
+    
+    Need to reduce the number of coins by 1
+    
+    Can't directly trade 2 nickels for a dime since we only have
+    four nickels to begin with.  Instead we will drop some
+    pennies to get another nickel and then adjust as needed:
+    
+    Drop 5 pennies and add one nickel --> 97 coins
+    Drop 1 quarter and add one dime and 3 nickels --> 100 coins
+    
+    Final total:
+    
+    Quarters: 4  --> 1.00
+    Dimes:    5  --> 0.50
+    Nickels:  8  --> 0.40
+    Pennies:  83 --> 0.83
+    ---------------------
+    Total     100    2.73
+
+For grins, let's try exhaustive search:
+
+```{r}
+t1=Sys.time()
+for (q in 4:trunc(273/25)) {
+  for (d in 4:trunc(273/10)) {
+    for (n in 4:trunc(273/5)) {
+      for (p in 4:273) {
+        v=q*25+d*10+n*5+p
+        nc=q+d+n+p
+        if (v==273 & nc==100) {
+          print(c(q,d,n,p))
+        }
+      }
+    }
+  }
+}
+t2=Sys.time()
+t2-t1
+```
+
+It only takes about a second to exhaustively search for a solution and we find
+the same unique solution we found by hand.
+
+## Problem 5
+
+    One good way to estimate the height
+    of an object is to take a known height,
+    sight along a ruler until the known
+    object subtends an easy length to work
+    with, and then take the proportional
+    height subtended by the unknown object.
+    If the ruler is parallel to both
+    objects, the result will be exact.
+    Recently I attempted to measure
+    the height of a bridge this way. There
+    is a plaque on the side of the vertical
+    bridge tower marking the water level
+    from the last flood -- three meters
+    from the ground. I backed off and held
+    my ruler so that the plaque's height
+    appeared to be three centimeters. The
+    height of the roadway then appeared
+    to be 12 cm and that of the supporting
+    tower 30 cm.
+    Hence, I estimated that the roadway
+    is 12 m above ground and that the
+    tower is 30 m high. Later I found that
+    the roadway is actually 13 m above the
+    ground. Clearly, the discrepancy arose
+    because I did not hold the ruler precisely
+    vertical. What, then, is the correct
+    height of the tower?
+    
+    -- Adapted from Technology Review
+
+Solution: need to draw a diagram.
+
+From the point of the eye there will be
+a nearly vertical ruler with points along the ruler at 3, 12, 30 cm.
+At some (far away) distance there is a vertical lines with points at
+3, 13, and and unknown height.
+
+There is a common point at the eye that must be on a straight line
+connecting 3 cm on the ruler with 3 m on the wall as well as another
+straight line connecting 12 cm on the
+ruler with 13 m on the wall.
+
+Should be able to use this to calculate the location of the eye/angle of ruler.
+
+Once that is known should be able to calculate the unknown height for the tower.
+
+
+TODO
+
+
+## Bonus
+
+    As I was jogging in the predawn
+    darkness, Venus was the brightest
+    object in the eastern sky, and I
+    wondered if it were ever brighter. I
+    found that Venus and the Earth are in
+    nearly circular coplanar orbits, with an
+    orbital radii ratio of 0.723. Assume
+    that the sunlight reflected by Venus
+    towards Earth is proportional to the
+    illuminated fraction of the Venus disk
+    as seen from Earth. Then, at what
+    value of the Earth-Sun-Venus angle
+    does Venus appear brightest? Give
+    your answer accurate to the nearest
+    0.1 degree.
+    
+    -- James L. Griggs Jr., OH A'56
+
+Solution:
+
+We can assume circular orbits with a ratio of 0.723 for Venus and Earth.
+The hard part is figuring out what fraction of Venus is illuminated based
+on the angle between the Sun, Venus, and Earth.  I guess we assume the
+diameter of Venus is negligible?  The real brightness will depend on the angle
+and the distance (inverse square?) but the problem says only the fraction
+illuminated by the sun.
+
+I need a diagram!!!
+
+1. When Venus is directly between the Earth and the Sun there is no part visible.
+   This is clearly the minimum brightness.
+   
+2. When Venus is on the opposite side of the sun from Earth the fraction would be
+   maximum but the Sun would be in the way.
+   
+3. The maximum fraction will be when Venus is just about to go behind the Sun.
+
+This problem makes no sense without dimensions for the Sun/Venus/Earth and a
+consideration of the distance between the Earth and Venus unless I
+am mis-interpreting something.
+
+TODO
+
+I peaked at the solution.  There is an inverse square law in the solution but everything
+is normalized to Earth/Sun distance = 1.0.  Need to look at the diagram and verify
+these equations.
+
+## Computer Bonus
+
+    Find the smallest
+    and largest hexadecimal integers such
+    that each of their squares contains
+    each of the 16 hexadecimal digits (0
+    through 9 and A through F) once and
+    only once. A leading zero is not allowed.
+    
+    -- Howard G. McIlvried III, PA Gamma'53
+
+Solution: seems like exhaustive search
+
+The integers in R seem very limited -- will switch to Python.
+
+Need the decimal package to calculate sqrt() of the 16 digit hex numbers.
+Unfortunately, can't communicate the results back to R since the interface
+appears to use 64 bit signed integers.  These are big enough to handle the
+lower end of the range below (e.g. n1 and nmin) but not the upper end
+of the range(e.g. n2 and nmax get converted to -1).
+
+Fortunately the solutions are near the ends of the search range so it is
+quite feasible to linearly search up/down from the ends of the range:
+
+```{r}
+library(reticulate)
+```
+
+```{python}
+import decimal
+import numpy as np
+
+n1=int(decimal.Decimal(0x1023456789abcdef).sqrt())
+n2=int(decimal.Decimal(0xfedcba9876543210).sqrt())
+print('Smallest = ',n1)
+print('Largest  = ',n2)
+print('Range  (billions)  = ',(n2-n1)*1e-9)
+
+print('Searching for solution')
+n=n1
+for i in range(1000000):
+    digits = [i for i in hex(n**2)[2:]]
+    if len(digits)==16 and len(np.unique(digits))==16:
+        print("Smallest solution = ",hex(n)," squared = ",hex(n*n))
+        print('Number of items searched = ',n-n1)
+        nmin=n
+        break
+    n=n+1
+n=n2
+for i in range(1000000):
+    digits = [i for i in hex(n**2)[2:]]
+    if len(digits)==16 and len(np.unique(digits))==16:
+        print("Largest solution  = ",hex(n)," squared = ",hex(n*n))
+        print('Number of items searched = ',n2-n)
+        nmax=n
+        break
+    n=n-1
+
+```

@@ -1,0 +1,557 @@
+---
+title: "Bent Fall 2012"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2012
+
+
+## Problem 1
+
+    Two small rockets, one with a mass of 2 kg
+    and the other with a mass of 26 kg, are
+    traveling through space with no forces acting
+    on them. The velocity of each is a positive
+    integral number of meters per second such
+    that the difference in their kinetic energies
+    is 1 J. Each rocket then fires a short burst
+    of its ion engine, after which each again has
+    a velocity of an integral number of meters,
+    and the difference in their kinetic energies
+    is still 1 J. What are the smallest positive
+    velocities which the two rockets can have
+    before and after they fire their engines?
+    Assume that the masses of the rockets do not
+    change when firing the engines.
+
+    -- Adapted from Theodore J. Stadnik, OH A'05
+
+Solution:
+
+    Initial state:
+    
+    E1 = 1/2*m1*v1^2, m1=2 kg
+    E2 = 1/2*m2*v2^2, m2=26 kg
+    
+    E1-E2 = 1 or E2-E1 = 1
+    
+    v1=integer>0, v2=integer>0
+
+    After engine burn -- essentially the same but need new solution set.
+
+    I don't know how to find just integer solutions so I will make an assumption
+    about v2 and then calculate required v1 and see if it is an integer.
+    
+```{r}
+vmax=1000
+m1=2
+m2=26
+
+for (v2 in 1:vmax) {
+    e2=1/2*m2*v2^2
+    v1a=sqrt(2*(e2+1)/m1)
+    v1b=sqrt(2*(e2-1)/m1)
+    if (v1a == round(v1a)) {
+        print(paste0("v2 = ",v2," v1 = ",v1a))
+    }
+    if (v1b == round(v1b)) {
+        print(paste0("v2 = ",v2," v1 = ",v1b))
+    }
+}
+
+```
+
+Initial state:
+
+    v2 = 5, v1 = 18
+
+Final state:
+
+    v2 = 180, v1 = 649
+
+The Bent notes that this is something called a Pell equation
+which has the propery that if you know one solution the others
+can be generated from it.  I just did the exhaustive search and
+it ran very quickly.
+
+
+## Problem 2
+
+    Find a six-digit number with the following
+    properties: a) the first (leftmost) digit is
+    four more than the second digit, b) the third
+    digit is one less than the second digit, c)
+    the product of the first two digits equals
+    the two-digit number formed by the third and
+    fourth digits, d) the fifth digit equals the
+    sum the first and third digits, and e) the
+    sixth digit equals the sum of the fourth and
+    fifth digits.
+
+    -- Mark A. Noblett, P.E., NY N'70
+
+Solution:
+
+    We will use exhaustive search with baseOf() from gtools.
+    
+```{r}
+library(gtools)
+
+a=baseOf(100000:999999)
+k1=(a[,1] == (a[,2]+4))
+k2=(a[,3] == (a[,2]-1))
+k3=((a[,1]*a[,2])==(10*a[,3]+a[,4]))
+k4=(a[,5] == (a[,1]+a[,3]))
+k5=(a[,6] == (a[,4]+a[,5]))
+k=(k1 & k2 & k3 & k4 & k5)
+
+print(paste0("Number of solutions = ",sum(k)))
+a[k,]
+```
+
+The only solution is: 621279
+
+
+## Problem 3
+
+    A band of pirates has stolen a small chest
+    containing nine identical bottles of gold
+    dust that each weigh exactly the same. They
+    decide to wait until the next day to divide
+    the loot. During the night, one pirate
+    surreptitiously opens one of the bottles and
+    removes a small amount of gold. Later he
+    starts to worry that, if he gets caught, he
+    will have to walk the plank, so he sneaks
+    back, grabs a bottle at random and replaces
+    the gold he took. Using only a simple two-pan
+    balance scale, what is the minimum number of
+    weighings required to assure either that the
+    bottles all have the same weight or to
+    determine the light and heavy bottles?
+
+    -- You'd Better Be Really Smart Brain Bafflers by
+    Tim Sole and Rod Marshall
+
+TODO
+
+    meh.  My head hurts.
+    
+
+## Problem 4
+
+    Alice and Beth each toss n fair coins. What
+    is the probability that they throw the same
+    number of heads?
+
+    -- adapted from Problems in
+    Probability Theory, Mathematical Statistics
+    and Theory of Random Functions by A.A.
+    Sveshnikov
+
+Solution:
+
+    Let us try some induction:
+    
+    Case 1: n = 1
+    
+    Alice   Beth   Result
+    ---------------------
+    T       T      1
+    T       H      0
+    H       T      0
+    H       H      1
+    
+    Pr = 1/2
+    
+    Case 2: n = 2
+    
+    Alice   Beth   Result
+    ---------------------
+    T T     T T    1
+    T T     T H    0
+    T T     H T    0
+    T T     H H    0
+    T H     T T    0
+    T H     T H    1
+    T H     H T    1
+    T H     H H    0
+    H T     T T    0
+    H T     T H    1
+    H T     H T    1
+    H T     H H    0
+    H H     T T    0
+    H H     T H    0
+    H H     H T    0
+    H H     H H    1
+    
+    Pr = 6/16 = 3/8
+    
+
+    After playing with this a bit -- it generalizes to:
+    
+    sum((choose(n,0:n)*0.5^n)^2)
+
+    This can probably be algebraically reduced to something
+    a lot prettier.  They do this in the Bent.  Apparently
+    the summation can be replaced with choose(2*n,n) and then
+    they factored out the 1/4^n.
+
+    This function is nice and linear on log-log scale:
+    
+```{r}
+
+x=1:100
+y=sapply(x,function(n) {sum((choose(n,0:n)*0.5^n)^2)})
+
+plot(x,y,type='b',log="xy",xlab="Number of Coins",ylab="Pr(Match Heads)")
+grid()
+
+```
+
+## Problem 5
+
+    A Tau Bate is standing 5 meters away from a
+    long, tall, vertical wall. She holds a garden
+    hose in her hand. The nozzle is 1 meter above
+    the ground and water emerges from the nozzle
+    at a velocity of 10 m/s. Using only her wrist
+    to vary the horizontal and vertical angles at
+    which water leaves the nozzle, what is the
+    maximum area of the wall that she can wet
+    down? Use 9.81 m/s2 for the acceleration due
+    to gravity and report the answer to 3
+    significant digits.
+
+    -- John L. Bradshaw, PA A'82
+
+Solution:
+
+    This was fun.  Spent a lot of time on this and
+    got a good chance to play with Maxima for the
+    symbolic calculations.
+
+    We will assume simple ballistic motion for the
+    droplets of water.  We need to consider two
+    parts of the geometry - the angle of elevation
+    (aka the vertical angle) and the angle of the
+    trajectory wrt the wall (aka the horizontal
+    angle).
+    
+    The given data:
+    
+        V0 = 10 m/s
+        x0 = 5 m
+        g  = 9.81 m/s^2
+        
+    Let:
+    
+        theta = vertical angle
+        phi   = horizontal angle
+        
+    Then - the water droplet trajectory is defined
+    by:
+    
+        y = y0 + v0*sin(theta)*t - 1/2*g*t^2
+        x = x0 + v0*cos(theta)*t
+
+    Where:
+
+        x0 = 0, y0 = 1, v0=10
+
+    Solving and maximimizing this value symbolically, however, gets
+    very ugly.  BTW: The Bent did this symbolically so I worked it
+    through at the end of this problem.
+    
+    For now, let us try a numerical approach:
+    
+    Consider a plan view.  If we measure phi wrt the perpindicular
+    to the wall where phi=0 then we can calculate the distance from
+    the hose to the wall as:
+    
+        distance = 5/cos(phi)
+        
+    The time for the water to cover this distance in the x-direction
+    depends on the launch angle and is given by:
+    
+        x = 5/cos(phi) = 10*cos(theta)*t
+        
+        t = (5/cos(phi))/(10*cos(theta))
+        
+    The height of the water at this time is calculated from:
+    
+        y = y0 + v0*sin(theta)*t - 1/2*g*t^2
+        
+    If this height is <0 then the water failed to reach the wall
+    since it hit the ground first.
+    
+    For each value of phi we want to calculate the max value of y.
+    We can do this with numerical optimization.
+    
+    So the strategy is this:
+    
+    1. Sweep phi over a range of angles from 0 to phi_max.  Recognize
+       the there is a max value of phi where the water will never
+       reach the wall.  A quick calculation shows this is ~ 1.1 radians.
+    2. For each value of phi, calculate required x distance
+    3. For each x distance calculate maximum y
+    4. Integrate this mess to get an area.  Note the integration
+       delta along the wall will change as sin(phi) so we will have
+       numerical vectors for x,y with uneven spacing in x that needs
+       a numerical summation.  If we take enough steps then rectangles
+       should be good enough.
+    
+    
+```{r}
+
+# Calculate intersection of wall and water stream
+# Given the distance the water flows in the x-plane
+# Our control variable is the launch angle (theta) so
+# that is the input parameter to the optimization.
+# The important result, however, is the height of
+# the water on the wall -- this is called $objective
+# in the syntax of the optimize result.
+max_y = function(x_distance) {
+    ym=optimize(
+        function(theta) {
+            tx=x_distance/(10*cos(theta))
+            y=1+10*sin(theta)*tx-1/2*9.81*tx^2
+            return(y)
+        },
+        c(0,pi/2),
+        maximum=TRUE)
+    return(ym$objective)
+}
+
+phi=seq(0,1.2,length=10000)   # Horizontal angle
+distance=5/cos(phi)           # Distance to wall
+y=sapply(distance,max_y)      # Find max y for each distance
+y=ifelse(y<0,0,y)             # if y<0 then can not reach wall
+x=5*tan(phi)                  # distance along wall where stream intersects
+dx=diff(x)                    # width of differential rectangles
+area=sum(y[1:length(y)-1]*dx)*2    # Area (double for +/- phi)
+
+print(paste0("Area = ",area))
+plot(x,y,type='b',xlab="Distance along wall",ylab="Height on Wall")
+
+```
+
+Solution with many divisions:
+
+    Num div   Area
+    1e6       64.7130947940944
+    100K      64.7138801451422
+    10K       64.7217361967214
+    1K        64.8005330493871
+
+I guess I will take 64.713 as the answer.
+
+Guess I didn't need all those extra divisions to get the digits since
+they only requested three significant digits.
+
+They actually have a closed form solution in the Bent:
+
+    Area = (2^2.5*v / ((3*g^0.5 )*(y0 + v^2/(2*g) - g*xo^2/(2*v^2)))
+    
+    They only solve as 64.7
+    
+    I can not get the answer from their closed form solution.
+    
+    Need to look at this some more...
+
+    Took a couple of hours but I found it -- they have a type setting error.
+    They dropped a 3/2 power on the final parenthesized expression.  When
+    shown properly it should look like this:
+    
+                                  5/2                  2     2       3/2
+                             v0  2   ( y0 - g/2 (x0/v0)  + v0 /(2g) )
+    (%o64)                 ----------------------------------------------
+                                                  1/2
+                                               3 g
+    
+    They have the same expression without the 3/2 power!!!  All of their
+    other results and equations seem to be correct.
+
+    Before I found their error I worked through their equations and came up
+    with a closed form solution that yields:
+    
+    Area = 64.71300758305074
+    
+    My closed form solution was:
+    
+                    2       2   2     4 3/2
+           2 (2 g v0  y0 - g  x0  + v0 )
+    Area = --------------------------------
+                       2   2
+                    3 g  v0
+
+    Note that in these solutions the value of x0=5 (x when phi=0).
+    In the Bent they use z as the variable of distance along the
+    wall.  The zmax value and formula seem correct but the Area
+    formula is wrong as noted above.
+
+    Some interesting results:
+    
+    You can express ymax=y(x) instead of y(t) if x0=0:
+    
+        ymax = y0 - g*x^2/(2*v0^2) + v0^2/(2*g)
+        
+    If we make x0=0 in my original equation then we can solve for
+    t = f(theta) and substitute this into the equation for y:
+    
+                                     2         2
+                                g sec (theta) x
+    (%o108)            y = y0 - ---------------- + tan(theta) x
+                                         2
+                                     2 v0
+
+    We can diff wrt theta and set = 0 and find optimal angle:
+    
+                                                  2
+                                                v0
+    (%o110)                       [tan(theta) = ---]
+                                                g x
+
+    If we let sec^2 = 1+tan^2 and sub tan(theta) back into equation
+    above we get ymax = f(x).
+    
+    Finally, need to switch to coordinates along the wall using:
+    
+        z^2 + x0^2 = x^2
+        
+    Where x0 = shortest value of x to wall (e.g. for phi=0).
+    
+    Substituing back in yields:
+    
+                                       2     2            2
+                                   g (z  + x0 )         v0
+    (%o133)                 y = (- ------------) + y0 + ---
+                                          2             2 g
+                                      2 v0
+
+    Finally, need to calculate max limits on z and integrate this along
+    the z-wall to get total area.
+    
+    Note that xmax/zmax occurs when y finally drops to zero.  We can solve
+    above for zmax with y=0 as:
+    
+                                         2       2   2     4
+                              sqrt(2 g v0  y0 - g  x0  + v0 )
+    (%o163)            zmax = -------------------------------
+                                             g
+    
+    With: g=9.81, v0=10, x0=5 we get z = 9.964861771079583.
+    
+    This means the water can never reach more than +/-9.965m along the wall.
+    
+    So we need the following integral:
+    
+                          zmax
+                         /             2     2            2
+                         [         g (z  + x0 )         v0
+    (%o172)            2 I     ((- ------------) + y0 + ---) dz
+                         ]                2             2 g
+                         /            2 v0
+                          0
+
+    Evaluating yields:
+    
+                   g  zmax  + ((- 6 g v0  y0) + 3 g  x0  - 3 v0 ) zmax
+    (%o173)      - ---------------------------------------------------
+                                               2
+                                         3 g v0
+
+    Numerically with g=9.81, zmax=9.964861771079583, v0=10, y0=1, x0=5:
+    
+        Area = 64.71300758305074
+
+    An alternate formula for area without using zmax was given above in
+    this derivation.
+
+
+## Bonus
+
+    A plane takes off from an airport on the
+    equator and heads due northeast. If it always
+    maintains a true northeast heading, what is
+    the exact latitude at which it will cross its
+    starting longitude for the first time? Assume
+    that the earth is a perfect sphere and that
+    the plane can be refueled while in flight.
+
+    -- Technology Review
+
+TODO
+
+    Huh?
+
+    Seems like the plane will spiral into the north pole but I don't
+    know about calculating this on a globe.  Seems hard.  I would
+    only guess that it is nearly to the north pole.
+
+
+## Double Bonus
+
+    This cryptogram is in honor of Jim Froula and
+    his many years of service to Tau Beta Pi; he
+    was named Secretary-Treasurer in 1982 and
+    served as Executive Director until his
+    retirement in 2011.
+
+    J*FROULA = RETIRE*S
+
+    Of course, we want Jim to enjoy maximum REST.
+    The symbol * stands for multiplication. The
+    problem is in base 12, and all the usual
+    rules apply.
+
+    -- Howard G. McIlvried, III, PA Gamma'53
+
+Solution: in the cryptic arithmetic notebook
+
+    Cryptic in Base 12 with constraint
+
+      J * FROULA = RETIRE * S
+
+      REST should have maximum value
+
+
+    I switched to Python to use itertools for this since I didn't want to try
+    creating a dataframe with 480e6 rows.  I am just dumping the solutions and
+    then I will maximize REST by inspection.
+    
+    The run-time is not fast (~ 1500-2000 seconds) but it should at least finish.
+
+      j   f   r   o   u   l   a   e   t   i   s      rest (base-12)
+    ( 2, 10,  7,  1,  5,  4,  6,  0,  8, 11,  3) --> 7038
+    ( 2, 10,  7,  5,  8,  4,  6,  0, 11,  9,  3) --> 703b
+    ( 3,  2,  0,  4,  1,  5, 10,  6,  7,  8, 11) --> 06b7, also r=0
+    ( 3,  2,  0,  4,  5,  1, 10,  6,  7,  9, 11) --> 06b7, also r=0
+    ( 3,  2,  0,  5,  7,  9, 10,  6,  8,  1, 11) --> 06b8, also r=0
+    ( 5,  1,  0,  6, 10,  3,  4,  8, 11,  9,  7) --> 087b, also r=0
+    ( 5,  3,  9, 10,  1, 11,  0,  6,  7,  4,  2) --> 9627
+    ( 6,  2,  1,  3,  7,  8,  0,  4, 10,  5,  9) --> 149a
+    ( 7,  2,  5,  6,  1, 11,  0,  8, 10,  4,  3) --> 583a
+    (11,  0,  2,  5, 10,  6,  9,  3,  4,  8,  1) --> 2xxx, also f=0
+    (11,  0,  2,  6, 10,  5,  8,  4,  3,  7,  1) --> 2xxx, also f=0
+    (11,  0,  2,  8,  6,  4,  7,  5,  9, 10,  1) --> 2xxx, also f=0
+    (11,  0,  4, 10,  8,  2,  7,  5,  9,  6,  1) --> 4xxx, also f=0
+    (11,  1, 10,  4,  5,  9,  6,  3,  0,  7,  2) --> a320 (maximum REST)
+    
+    Solution:
+    
+    Maximum REST = a320 (base-12) = 17736 (base-10)
+
+      j  f  r  o  u  l  a  e  t  i  s
+      2 10  7  1  5  4  6  0  8 11  3
+      2 10  7  5  8  4  6  0 11  9  3
+      5  3  9 10  1 11  0  6  7  4  2
+      6  2  1  3  7  8  0  4 10  5  9
+      7  2  5  6  1 11  0  8 10  4  3
+     11  1 10  4  5  9  6  3  0  7  2  --> REST = a320 (base-12)

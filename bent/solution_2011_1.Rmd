@@ -1,0 +1,483 @@
+---
+title: "Bent Spring 2011"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2011
+
+
+## Problem 1
+
+    Solve the following cryptic multiplication,
+    where each different letter
+    stands for a different digit, the same
+    letter always stands for the same digit,
+    and there are no leading zeros. An
+    * can stand for any digit.
+
+            RNAGEL
+           *******
+           -------
+            RNAGEL
+           LRNAGE
+          ELRNAG
+         GELRNA
+        AGELRN
+       NAGELR
+      RNAGEL
+      ------------
+      R**N*AG**E*L
+
+    What is the value of RNAGEL?
+
+    -- 150 Puzzles in Crypt-
+    Arithmetic by Maxey Brooke
+
+Solution: done in cryptic arithmetic notebook
+
+    Cryptic multiplication with unknowns
+
+                  R N A G E L
+                * * * * * * *
+                ---------------
+                  R N A G E L
+                L R N A G E
+              E L R N A G
+            G E L R N A
+          A G E L R N
+        N A G E L R
+      R N A G E L
+      -----------------------
+      R * * N * A G * * E * L 
+
+      The asterisks are wildcards.  There are no leading zeros.
+      What is the value of RNAGEL?
+
+    1. Create all the values of RNAGEL and then check for multiplication
+       by a single digit to generate the cyclic shifts and non-zero leading
+       digits.  There are only two feasible solutions:
+
+    > a[k,]
+          r n a g e l
+    20534 1 4 2 8 5 7
+    22423 1 5 3 8 4 6
+
+    2. Based on the final sum we conclude that N must be less than 5
+       since there is no carry out to affect the most-significant digit.
+
+    Conclude that the first solution is valid:
+
+    > a[k,]
+          r n a g e l
+    20534 1 4 2 8 5 7
+
+    Working the problem backwards we can fill in all the wild-cards:
+
+                  R N A G E L
+                1 3 2 6 4 5 1
+                ---------------
+                  R N A G E L
+                L R N A G E
+              E L R N A G
+            G E L R N A
+          A G E L R N
+        N A G E L R
+      R N A G E L
+      -----------------------
+      R 8 9 N 9 A G 1 0 E 0 L 
+      1 8 9 4 9 2 8 1 0 5 0 7
+
+
+## Problem 2
+
+    A spider is chasing an ant. The spider
+    is crawling counterclockwise at a
+    speed of 701 cm/min on the circumference
+    of a circle with a diameter of 100
+    cm. The ant is crawling at a speed of
+    700 cm/min, also counterclockwise, on
+    a semicircle consisting of the upper
+    half of the spider's circle plus a diameter.
+    At the start of the chase, the ant
+    is at the left end of the diameter and
+    about to crawl along it, and the spider
+    is at the other end of the diameter and
+    ready to start crawling along the circumference
+    of the circle (to which it is
+    restricted). They commence crawling
+    at the same instant. How many complete
+    circuits of the circle must the
+    spider make before it catches the ant?
+    Idealize the problem by treating the
+    spider and the ant as points.
+
+    -- John H. Cook
+
+Solution:
+
+    The spider can only catch the ant under a very
+    narrow range of conditions on the upper half of
+    the circle.  The ant must start the upper half
+    of the circle when the spider is nearly at the
+    upper half of the circle.  In the distance of
+    the upper half circle the excess speed of the
+    spider must be sufficient to catch the ant.
+    
+    L = length of upper half circle = pi*D/2 = 50*pi
+    Speed of ant = Sa = 700 cm/min
+    Speed of spider = Ss = 701 cm/min
+    
+    Time for ant to crawl upper half circle = pi*D/(2*Sa)
+    Distance travelled by spider during this time = pi*D/2*Ss/Sa
+    
+    So - at the time the ant starts the upper half circle if the
+    spider is beyond 2*pi*D/2 - pi*D/2*Ss/Sa but less than pi*D/2
+    from the start -- it should catch the ant.
+    
+    The ant starts the upper half circle at times of:
+    
+    t = D/Sa+(pi*D/2+D)/Sa*N, N = 0, 1, ...
+    
+    The location of the spider at these times is:
+    
+    t*Ss
+    
+    Need this value (modulo 2*pi*D/2) to be in the capture
+    interval.
+    
+```{r}
+D=100
+Sa=700
+Ss=701
+
+xlow=2*pi*D/2+pi*D/2*(1-Ss/Sa)
+
+print(paste0("Lower target = ",xlow))
+
+t=D/Sa
+for (n in 1:2000) {
+  xs=(t*Ss) %% (2*pi*D/2)
+  if ( (xs >= xlow) ) {
+    print(paste0("Captured for n(ant) = ",n))
+    print(paste0("t = ",t))
+    print(paste0("xs = ",xs))
+    print(paste0("n(spider) = ",(t*Ss)/(2*pi*D/2)))
+    break
+  } else {
+    # print(paste0("n = ",n))
+    # print(paste0("t = ",t))
+    # print(paste0("xs = ",xs))
+  }
+  t = D/Sa+(pi*D/2+D)/Sa*n
+}
+```
+
+    The spider has nearly completed 1005 circuits when the
+    ant starts the upper half circle.  The spider will catch
+    the ant on cycle 1006.
+    
+    Alternately, we can look at the spider position as the reference
+    and calculate where the ant will be located at the start of
+    each circuit:
+
+    
+```{r}
+D=100
+Sa=700
+Ss=701
+
+# Required headstart for ant to avoid capture.
+# Time for spider to cover upper half circuit
+tupper = pi*D/2/Ss
+# Distance ant travels in this time
+dant = tupper*Sa
+# headstart required for ant to avoid capture
+headstart = pi*D/2 - dant
+
+print(paste0("Required ant headstart = ",headstart))
+
+for (n in 0:2000) {
+  d = 2*pi*D/2*n   # distance travelled by spider
+  t = d/Ss                # time for start of the circuit
+  xa= (t*Sa) %% (D + pi*D/2)  # position of the ant
+  # print(paste0("n = ",n,"  t = ",t,"  d = ",d,"  xa = ",xa))
+  if (xa<D) {
+    # ant is safe -- it is on the diameter
+    # print(paste0("Ant is on the diameter"))
+  } else {
+    if (xa>(D+headstart)) {
+      # ant is safe -- it has a big enough head start
+      # print(paste0("Ant position = ",xa))
+    } else {
+      # ant is captured
+      print(paste0("Captured for n = ",n))
+      print(paste0("t = ",t))
+      print(paste0("d = ",d))
+      print(paste0("xa = ",xa))
+      break
+    }
+  }
+}
+
+```
+
+Which is the same result as above.  The spider completes 1005 circuits
+and captures the ant on the next loop.
+
+
+## Problem 3
+
+    Doris, the librarian, wishing to fill
+    an empty bookshelf, asked her assistants
+    how many books it would
+    take to fill the shelf exactly. Al said
+    it would take 2 catalogs, 3 dictionaries,
+    and 3 encyclopedias; Bob said it
+    would take 4 catalogs, 3 dictionaries,
+    and 2 encyclopedias; and Connie said
+    it would take 4 catalogs, 4 dictionaries,
+    and 3 encyclopedias. As it turned
+    out, only two of these estimates were
+    correct. Desiring to fill the shelf with
+    only one kind of book, Doris found
+    that only one of the three types would
+    exactly fill the shelf and that 15 of
+    that type were required. Which type
+    of book did Doris use? All the catalogs
+    are the same width, all the dictionaries
+    are the same width, and all the encyclopedias
+    are the same width.
+
+    -- Logical Deduction Puzzles
+    by George J. Summers
+
+Solution:
+
+    It appears that 15 catalogs fills one shelf.
+    
+
+    Make assumption about who is telling the truth
+    and then see if the equations work.
+    
+    C = width of catalogs
+    D = width of dictionaries
+    E = width of encyclopedias
+    
+    Al says:     2*C+3*D+3*E = 1
+    Bob says:    4*C+3*D+2*E = 1
+    Connie says: 4*C+4*D+3*E = 1
+
+    Assume Al and Bob tell truth
+
+      2*C+3*D+3*E = 1
+      4*C+3*D+2*E = 1
+      ---------------
+      2*C - E = 0 -> E = 2*C
+      
+
+    Assume Al and Connie tell truth
+    
+      2*C+3*D+3*E = 1
+      4*C+4*D+3*E = 1
+      ---------------
+      2*C+D = 0 -> Impossible
+    
+    Assume Bob and Connie tell truth
+
+      4*C+3*D+2*E = 1
+      4*C+4*D+3*E = 1
+      ---------------
+            D+E   = 0 -> Impossible
+      
+    Conclude that Connie is not correct.  So we know
+    
+    2*C+3*D+3*E = 1 \ 2*C - E = 0 --> E = 2*C
+    4*C+3*D+2*E = 1 /
+    
+    15*C = 1, or 15*D = 1, or 15*E = 1
+    
+    Since 15*E = 30*C and only one kind of book would
+    fill the shelf it could not be encylopedias.
+    
+    If it is catalogs then 15*C = 1 so: 3*D = 1-8/15 = 7/45
+    
+    so - an integer number of dictionaries will not fill shelf.
+    
+    If it is dictionaries then 15*D = 1 so: 8*C +3/15 = 1
+    thus:
+    
+        C = 1/8*(1-3/15) = 1/8*12/15 = 1/2*3/15 = 1/10
+        
+    In this case 10 catalogs would fill the shelf which contradicts
+    the given information that only one type of book works.
+
+
+## Problem 4
+
+    Take the aces, kings, queens, and
+    jacks from a deck of cards and arrange
+    the 16 cards in a four-by-four
+    square array such that no two cards
+    of the same rank or same suit are in
+    the same row, the same column, or
+    the same major diagonal. How many
+    such arrangements are possible, if rotations
+    and reflections are considered
+    to be the same arrangement?
+
+    -- A Gardner's Workout
+    by Martin Gardner
+
+TODO
+
+    Still don't understand reflections, rotations, et. al.
+    
+
+## Problem 5
+
+    In the town of Isobar, every rainy day is
+    followed by a sunny day. Every sunny day is
+    followed by either a rainy day or a sunny day
+    with equal probability. To the nearest day,
+    what is the expected number of sunny days in a
+    365-day year? On a rainy day, it rains all
+    day; on a sunny day, it is sunny all day.
+
+    -- The Surprise Attack in Mathematical Problems by
+    L.A. Graham
+
+Solution:
+
+    Number of Sunny days = S
+    Number of Rainy days = R
+    
+    S = R + 1/2*S --> S = 2*R
+    
+    S+R = 365 --> R = 121.7, S = 243.3
+    
+    This seems too easy.
+
+
+## Bonus
+
+    Suppose that, instead of being a sphere, the
+    Earth were a right circular cylinder (with a
+    diameter equal to its height) of the same
+    total volume and mass. What would be the
+    gravitational acceleration on a person
+    standing in the center of one of the circular
+    faces? Assume the earth is a perfect sphere
+    with a radius of 6,370 km and a uniform
+    specific gravity of 5.518. Use a value of
+    6.674E-11 m3/s2 kg for G, the universal
+    gravitational constant.
+
+    -- Howard G. McIlvried III, PA Gamma'53
+
+Solution:
+
+    Used this as a test vehicle to dust off Maxima.
+    I had a lot of trouble doing this problem when
+    I started -- I was trying to derive g for a
+    spherical earth using polar coordinates with
+    a differential volume elemnt and I
+    never did get that to work.  My integral
+    kept coming out negative.  Somehow I don't
+    think the signs on the trig functions were
+    quite right.
+    
+    Switching to a circular ring and cartesian
+    coordinates worked much better.
+
+    In the end, the result is:
+    
+    integrate(integrate(2*%pi*r*rho*G*h/(sqrt(h^2+r^2)^3),r,0,R),h,0,H);
+    
+    To make the cylindrical earth match the parameters of the
+    problem we need R=H/2 and H=(16/3)^(1/3)*Radius of spherical earth
+    
+    Making these substitutions yields:
+    
+    g(cylinder) = 9.83659584535665
+    
+    Using a similar approach for the spherical earth yields:
+    
+    a: R-y;
+    d: sqrt(r^2+a^2);
+    assume(y<R);
+    assume(R>0);
+    integrate(integrate(G*rho*2*%pi*r*a/d^3,r,0,sqrt(R^2-y^2)),y,-R,R);
+    
+    g(sphere) = 9.826433967748834
+    
+    Amazingly close:
+    
+    Ratio = 1.001034136864011
+
+
+## Computer Bonus
+
+    Within the set of prime numbers is a subset of
+    primes, the sums of whose digits are also
+    primes; we will call such numbers double
+    primes. For example, 23 is a double prime
+    because it is a prime number whose digits sum
+    to 5, which is also prime; while 13 is not a
+    double prime since it is a prime whose digits
+    sum to 4, which is not prime. Let PN be the
+    Nth smallest prime, and let DN equal the
+    number of double primes less than or equal to
+    PN. For N = 1, 2, 3, 4, and 5, DN/N = 1.
+    However, as more primes are considered, DN/N
+    generally (although not continuously)
+    decreases.  For example, when N = 9, DN/N =
+    2/3. Determine the value of N such that DN/N <
+    1/e for the first time, where e is the base
+    for the natural logarithms.
+
+    -- Samuel L. SanGregory, OH M'88
+
+Solution:
+
+    We shall try exhaustive search.  Not sure what else
+    to try:
+
+Sample R code -- runs for several hours to get solution:
+
+  xxx ```{r}
+    library(gtools)
+    library(gmp)
+    
+    n=0
+    dn=0
+    m=1
+    while (TRUE) {
+      m=nextprime(m)
+      n=n+1
+      if (isprime(sum(baseOf(m)))) { dn = dn+1 }
+      if (dn/n < 1/exp(1)) {
+        print("Done")
+        print(paste0("m = ",m))
+        print(paste0("n = ",n))
+        print(paste0("dn = ",dn))
+        print(paste0("dn/n = ",dn/n))
+        break
+      }
+      if (n%%10000 == 0) {
+            print(paste0("Trying n = ",n,"   Ratio = ",dn/n))
+      }
+    }
+  xxx ```
+
+Solution takes a **LONG** time (several hours):
+
+    m = 967718839
+    n = 49288471
+    dn = 18132215
+    dn/n = 0.367879437769534

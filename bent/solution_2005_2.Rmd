@@ -1,0 +1,421 @@
+---
+title: "Bent Summer 2005"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2005
+
+
+## Problem 1
+
+    Five chess fanatics always manage
+    to fit in a round-robin before their train
+    reaches Waterloo. Yesterday there
+    were no ties in the final order (2 points
+    for win, 1 for draw, 0 for loss). Alapin
+    won his game against the only person
+    who took a game off Bird. Catalan was
+    the only person to lose a game against
+    the financier, who was the only person
+    to lose a game to Dunst. Alapin finished
+    below the ghost-writer. The interpreter
+    scored only 1 point total. The
+    journalist fared worse than the hairdresser.
+    As for Evans, you can work
+    that out for yourself. What is each
+    person's score and occupation?
+
+    -- New Scientist
+
+Solution:
+
+    People: Alapin, Bird, Catalan, Dunst, Evans
+    Jobs:   financier, ghost-writer, interpreter, journalist, hairdresser
+    
+    Each match is Win (2), Draw (1), or Loss (0)
+    
+    Round-robin --> each person plays all other people
+    Possible scores for individual = 0-8
+    In each match there are exactly 2 points awarded
+    Must be an even number of draws
+    Number of wins = number of losses
+    
+    Bird has 1 Loss.  Whoever beat him lost to Alapin.
+        Bird score >= 3
+        Alapin score >= 2
+    financier has 1 Win, he beat Catalan
+        Catalan is not the financier
+        financier score <= 5
+    Dunst has 1 Win, he beat financier
+        Dunst is not the financier
+        Dunst score <= 5
+    Alapin < ghost-writer
+        Alapin is not the ghost-writer
+    interpreter = 1 (e.g. no wins)
+        Dunst is not the interpreter
+        Alapin is not the interpreter
+    journalist < hairdresser
+
+    Yuck -- this is supposed to be fun?
+
+The Bent provides the answer but no explanations.
+
+
+## Problem 2
+
+    Consider a set of N distinct positive
+    integers of your choice, the sum of any
+    K of which is prime. What is the maximum
+    possible value of N for K = 2, 3,
+    4, and 5?
+
+    -- Technology Review
+
+TODO
+
+I have no idea.  Even after reading the solution in the Bent
+this is not much fun and they even admit they don't know the
+anwer for 5 but 7 is the most they can find.
+
+
+## Problem 3
+
+    Frances was trying to remember
+    how to arrange the numbers 1 to 9 in a
+    magic square. She tried:
+
+        7 8 9
+        6 1 2
+        5 4 3
+
+    This was her first shot, and, as you can
+    see, rather than getting the three columns,
+    three rows, and two diagonals
+    to all add to the same total, they all
+    summed to different totals. "Look,"
+    she said, "I have invented an antimagic
+    square." What is the smallest
+    anti-magic square, consisting of nine
+    positive, not necessarily all different,
+    integers? In judging smallest, the first
+    criterion is to minimize the largest integer
+    used, the second criterion is to
+    minimize the total of all nine integers,
+    and the third criterion is to minimize
+    the sum of the first row.
+
+    -- Anti-Magic Square
+    by Stephen Ainley
+
+TODO
+
+I have no idea.
+
+No real explanation in the Bent -- jut a proposed anti-magic square.
+
+
+## Problem 4
+
+    If N is a positive integer, what rational
+    values may be assumed by R =
+    sqrt((N/7)^2 + 5,036)?
+
+    -- American Mathematical Monthly
+
+Solution:
+
+    R = sqrt( (N/7)^2 + 5036)
+      = sqrt( N^2 + 7^2*5036)/7
+      
+    The only was this is rational is if N^2 + 49*5036 is a square.
+    
+    This equation can not have a solution when N is "big enough"
+    since the separation between adjacent integer squares will
+    exceed 49*5036 = 246764:
+    
+    (n+1)^2 - n^2 > 246764
+    2*n+1 > 246764
+    n > 123381
+    
+    So we only need to consider values of n in the range [1,123381].
+    
+    We can find this with exhaustive search:
+
+```{r}
+for (n in 1:123381) {
+    m=n^2+49*5036
+    k=round(sqrt(m))
+    if (k*k == m) { print(n) }
+}
+```
+
+The only solutions are for n = 1210, 8806, 61690
+
+The values for R = 1308/7, 8820/7=1260, and 61692/2
+
+
+## Problem 5
+
+    The Parliament of Puevigi plans to
+    divide the population into 10 income
+    groups and to average the wealth between
+    each pair of neighboring groups.
+    The averaging will be done as nine distinct
+    steps done in order: starting with
+    the two lowest (poorest) groups, then
+    groups two and three, ending with the
+    top two groups. An amendment to this
+    plan proposes to work from the top
+    down. Which plan, if either, should the
+    richest groups prefer? The poorest
+    groups prefer?
+
+    -- Litton Industries
+    "Problematical Recreations"
+
+Solution: I'm not sure I understand the problem but I will
+try it anyhow.  Lets assume the groups have the following
+income levels: v1, v2, v3, ..., v10 where group 1 is
+the poorest and group 10 is the richest.
+
+Going from low to high:
+
+    After one round: (v1+v2)/2, (v1+v2)/2, v3, ..., v10
+    After two: (v1+v2)/2, ((v1+v2)/2+v3)/2, ((v1+v2)/2+v3)/2, ... v10
+    at the end, the final (hightest) group will get:
+    
+    (v1+v2)/2^9 + v3/2^8 + v4/2^7 + ... + v10/2
+    
+Going from high to low:
+
+    After one round: v1, v2, ..., v8, (v9+v10)/2, (v9+v10)/2
+    After two: v1,v2, ..., v8/2+(v9+v10)/2^2, (v9+v10)/2
+    and the end, the final (lowest) group will get:
+    
+    v1/2 + v2/2^2 + ... , (v9+v10)/2^9
+
+For the poorest group:
+
+    Low to High --> (v1+v2)/2
+    High to Low --> (v1+v2)/2 - v2/4 + ....
+    
+For the richest group:
+
+    Low to High --> (v9+v10)/2 - v9/4 + ....
+    High to Low --> (v9+v10)/2
+
+The relative merit will depend on the magnitude of group 2 or group 9 versus the
+other groups (not including group 1 or group 10).  If there is a large gap in
+income near the top/bottom of the range the second group from the end will
+suffer the precise opposite of all the other income groups.
+
+If we assume integer values for the groups as they do in the Bent:
+
+```{r}
+n=1:10
+for (i in 1:9) {
+    t=(n[i]+n[i+1])/2
+    n[i]=t
+    n[i+1]=t
+}
+print('Bottom-Up')
+n
+```
+
+```{r}
+n=1:10
+for (i in 9:1) {
+    t=(n[i]+n[i+1])/2
+    n[i+1]=t
+    n[i]=t
+}
+print("Top-Down")
+n
+```
+
+Under this distribution the top and bottom groups benefit from top-down.  The other groups,
+however, have a more complex behavior.  In the calculations above, 8 of the 10 income
+groups do BETTER WITH BOTTOM UP.  Only the top/bottom groups benefit from top-down.
+
+
+What if we assume something other than simple integers -- e.g. a big gap 1-2, 8-9, or 9-10:
+
+```{r}
+n=c(1,1002,1003,1004,1005,1006,1007,1008,1009,1010)
+for (i in 1:9) {
+    t=(n[i]+n[i+1])/2
+    n[i]=t
+    n[i+1]=t
+}
+print('Bottom-Up')
+n
+```
+
+```{r}
+n=c(1,1002,1003,1004,1005,1006,1007,1008,1009,1010)
+for (i in 9:1) {
+    t=(n[i]+n[i+1])/2
+    n[i]=t
+    n[i+1]=t
+}
+print('Top-Down')
+n
+```
+
+Playing with various scenarios moves the pain around in the central 8 groups.
+
+The Bent solution only considers the extreme two groups.
+
+
+## Bonus
+
+    At a summer camp, three campers
+    show up at the mess hall for their
+    share of the lemonade. One camper has
+    a 10 Liter container, the second has a 6
+    L container, and the third has a pail of
+    unknown capacity, but greater than 2 L.
+    The mess-hall attendant has a 15 L container
+    full of lemonade, and she needs
+    to distribute exactly 8 L to the 10 L container,
+    exactly 5 L to the 6 L container,
+    and exactly 2 L to the pail. If no other
+    containers are available, how does she
+    accomplish this? Present your answer
+    as a table with four columns labeled 15L,
+    10L, 6L, and Pail, with each row giving
+    the contents of the containers after each
+    transfer. For example, the first row is
+    (15, 0, 0, 0); now if the 10 L container is
+    filled, the second row would be (5, 10, 0,
+    0), etc. Containers cannot be tipped at
+    an angle to provide half or any other
+    fraction of their volume. We want the
+    shortest sequence of exchanges that will
+    work.
+
+    -- Dr. Richard I. Hess, CA B'62
+
+Solution:
+
+This is harder than you might think!
+
+    0        8    5   2  <-- Target
+
+    Kitchen  10L  6L  Pail
+    ----------------------
+    15       0    0   0
+    5        10   0   0
+
+What if we built a program to make random transfers until
+the proper totals were achieved?
+
+Even with 1e6 random pours this does not find the solution!  Multiple runs
+do not even find any two containers with 8 and 5.
+
+The solution from the Bent is given here:
+
+    15L 10L 6L Pail
+    15  0   0   0 => START
+    9   0   6   0
+    9   6   0   0
+    3   6   6   0
+    3   10  2   0
+    13  0   2   0 also: (3, 10, 0, 2)
+    13  0   0   2 also: (3, 4, 6, 2)
+    7   0   6   2
+    7   6   0   2
+    1   6   6   2
+    1   10  2   2
+    11  0   2   2
+    11  2   0   2
+    5   2   6   2
+    5   8   0   2
+    0   8   5   2 => END
+
+
+```{r}
+
+q = c(15,0,0,0)     # Quantity in each container
+cap = c(0,10,6,2)   # maximum capacity of each container, cap[1]=X
+
+max_pours=1000000
+num_pours=0
+num_8=0
+num_5=0
+num_2=0
+while(T) {
+    source=sample(1:4,1)   # Source container
+    dest=sample(1:4,1)     # Destination container
+    
+    if (source != dest) {      # Transfer might take place
+        if (q[source] != 0) {  # There is fluid to transfer
+            if (dest == 1) {   # Put full amount back in the kitchen
+                q[dest] = q[dest]+q[source]
+                q[source]=0
+            } else if ((dest == 2) || (dest==3)) {
+                space=cap[dest]-q[dest]
+                if (space>0) {  # There is room for some fluid
+                    if (q[source]>space) { # Partial trasfer from source to dest
+                        q[dest]=q[dest]+space
+                        q[source]=q[source]-space
+                    } else {               # Complete transfer from source to dest
+                        q[dest]=q[dest]+q[source]
+                        q[source]=0
+                    }
+                }
+            } else {
+                if (q[source]<=cap[dest]) {  # Container can't measure - just accept
+                    q[dest]=q[source]
+                    q[source]=0
+                }
+            }
+            s=sprintf("(%d,%d): %2d %2d %2d %2d",source,dest,q[1],q[2],q[3],q[4])
+            num_pours=num_pours+1
+            if (num_pours>max_pours) {
+                print("Target not achieved")
+                break
+            }
+            if (any(q==8) && any(q==5)) {
+                print(s)
+            }
+            if (any(q==8)) { num_8 = num_8 + 1 }
+            if (any(q==5)) { num_5 = num_5 + 1 }
+            if (any(q==2)) { num_2 = num_2 + 1 }
+            if (all(q == c(0,8,5,2))) {
+                print(s)
+                break
+            }
+        }
+    }
+}
+print(paste0("Number of times 2 achieved = ",num_2,collapse=""))
+print(paste0("Number of times 5 achieved = ",num_5,collapse=""))
+print(paste0("Number of times 8 achieved = ",num_8,collapse=""))
+```
+
+
+
+## Double Bonus
+
+    Given three circles,
+    each with a different radius, externally
+    tangent to each other. For each pair of
+    circles, construct the two lines that are
+    tangent to both circles, but not the tangent
+    line where the two circles meet.
+    Each of these pairs of lines will meet
+    at a point. Prove that the three meeting
+    points lie on a straight line.
+
+    -- Daryl Cooper
+
+TODO
+
+This seems like fun.  Need paper/pen for this.

@@ -1,0 +1,332 @@
+---
+title: "Bent Fall 2003"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2003
+
+
+## Problem 1
+
+    It was Mycroft's wont to send
+    Sherlock little problems by telegram
+    from time to time. This morning's
+    read: "Anstey, Buchan, Collins, and
+    Doyle played a 3-round singles tournament
+    (2 matches per round). They
+    finished in alphabetical order by
+    name. Scoring was win 2, draw 1, loss
+    0. Lion tamer won, and Musician drew
+    in the first round. Neurologist won in
+    last round. Total number of draws
+    was. What is name and final score of
+    Ornithologist?"
+    "But Holmes," I protested, "he has
+    omitted the total number of draws."
+    "Or else the post office has," remarked
+    my friend with a flash of his
+    piercing intellect.
+    "So the problem must be unsolvable."
+    "By no means, my good Watson.
+    He plainly intended to put it in. Or, if
+    he did not, he plainly intended us to
+    think he intended to put it in. And, as
+    miserliness restrains him from
+    telegraphing needless data, whereas
+    pride prevents him sending insufficient
+    data, it is as if he had sent it."
+    What is the answer to Mycroft's
+    question?
+    
+    -- Martin Hollis
+
+Note: After peeking at their solution -- apparently I have no
+understanding of the match play described here.  Apparently each
+player only plays three times -- I don't understand the terms
+match/round above.
+
+If I rework the problem with only three "games" each:
+
+    A>B>C>D
+    A+B+C+D=12
+    Each score <= 6
+    
+    Possibilities are:
+    
+```{r}
+zzz=data.frame(a=NA,b=NA,c=NA,d=NA)
+for (a in 0:6) {
+    for (b in 0:6) {
+        for (c in 0:6) {
+            for (d in 0:6) {
+                if ((a+b+c+d) == 12) {
+                    if ((a>b) & (b>c) & (c>d)) {
+                        zzz=rbind(zzz,c(a,b,c,d))
+                    }
+                }
+            }
+        }
+    }
+}
+zzz=zzz[!is.na(zzz$a),]
+zzz
+```
+
+So the only possibilties are:
+
+    a   b   c   d
+    -------------
+    5   4   2   1
+    5   4   3   0
+    6   3   2   1
+    6   4   2   0
+    6   5   1   0
+
+That is the easy part -- still can't reduce any further.
+
+As noted in the Bent:
+
+    A either wins all three or wins two and ties one
+    D either loses all three or loses two and ties one
+    
+    Investigation of the
+    possible outcomes with these restraints
+    gives multiple possible
+    outcomes with one or two ties, no
+    possible outcomes for four or more
+    ties, and only one possible outcome for
+    three ties. Namely, A and B tie,
+    C and D tie, A beats C, A beats D,
+    B and C tie, B beats D, and C and D
+    tie. So, the first round was A vs. D
+    and B vs. C, and A is the lion tamer
+    and B or C is the musician. The last
+    round was A vs. C and B vs. D, and
+    B is the neurologist. So, Doyle is the
+    ornithologist and managed only a tie.
+
+FWIW: this problem is nuts.
+
+My original Solution attempt - everything wrong by factor of 2X.
+Let us consider:
+
+    A = Anstey
+    B = Buchan
+    C = Collins
+    D = Doyle
+    
+    Lion Tamer: 2 in first round
+    Musician:   1 in first round
+    Neurologist: 2 in final round
+    Ornithologist: ???
+
+    Each person plays 6 matches (2 matches * 3 rounds) - 2 points awarded in each match
+    Total of 12 matches
+    Must be an even number of draws
+    Must be an equal number of wins/losses
+    Each person plays each other person 2 times (?)
+    Each person has distinct score
+    Max score for any player is 12
+    Grand total = 24 points (Total of 4 points per match) by all the players
+    
+        A+B+C+D = 24
+        A>B>C>D
+        A<=12, B<=12, C<=12, D<=12
+    
+Try to enumerate - still have 43 feasible solutions
+
+```{r}
+zzz=data.frame(a=NA,b=NA,c=NA,d=NA)
+for (a in 0:12) {
+    for (b in 0:12) {
+        for (c in 0:12) {
+            for (d in 0:12) {
+                if ( (a+b+c+d) == 24 ) {
+                    if ((a>b) & (b>c) & (c>d)) {
+                        zzz=rbind(zzz,c(a,b,c,d))
+                    }
+                }
+            }
+        }
+    }
+}
+zzz=zzz[!is.na(zzz$a),]
+nrow(zzz)
+```
+
+
+## Problem 2
+
+    Three friends, Ann, Betty, and
+    Carol, meet to celebrate the birthday
+    of one of them. "How old are you now,
+    Ann?" asks Betty. "Well," says Ann,
+    "using our exact (not rounded) ages,
+    the sum of our three ages is 80 years.
+    I am twice as old as Carol, and at the
+    time when I become twice as old as
+    you, our three combined ages will be
+    half again as large as now." The question
+    is, whose birthday is it?
+    
+    -- The Platinic Corner
+
+Solution:
+
+    A+B+C = 80
+    A = 2*C
+    
+    (A+k) = 2*(B+k) for some k
+    then:
+    
+    A+k+B+k+C+k = 120 --> k=40/3
+    
+    so:
+    
+    (A+40/3) = 2*(B+40/3)
+    A = 2*B + 40/3 --> B = (A-40/3)/2
+    
+    A+(A-40/3)/2+A/2 = 80
+    2A - 20/3 = 80
+    2A = 80+20/3
+    A = 40+10/3 --> A=130/3, C=130/6, B=(130/3-40/3)/2=15
+    
+    Since the only "exact" age is B we conclude that
+    it must be the birthday for Betty.
+
+
+## Problem 3
+
+    Al and Ben play a game involving a
+    series of coin tosses. Each gambler
+    picks a different series of three possible
+    outcomes, and the winner is the
+    one whose chosen series of outcomes
+    first occurs in the string of coin tosses.
+    Al announces that his series is HHH.
+    If Ben makes an optimal choice for his
+    series, what is his probability of winning?
+    
+    -- nearly impossible Brain Bafflers
+    by Tim Sole and Rod Marshall
+
+TODO
+
+
+## Problem 4
+
+    How fast, that is, how many rotations
+    per year, would the Earth have
+    to rotate in order for a 75 kg person at
+    the equator to lift off the ground?
+    Ignore atmospheric effects.
+    
+    -- Walter O. Stadlin, NJ Gamma'52
+
+Solution:
+
+    Centripetal acceleration = attraction due to gravity
+    Note that mass does not matter.
+    
+    v^2/r = g --> v = sqrt(r*g)
+    
+    r ~ 6378 km, g ~ 9.8 m/s^2 --> v = 7905.972 m/s
+    
+    Angular velocity = v/r = 0.001239569 radians/sec
+        = 17.0453 rotations per day
+
+
+## Problem 5
+
+    A right-circular cone of height H
+    and radius R is rolled on a plane so
+    that the apex remains at a fixed point.
+    How many times will the cone revolve
+    about its axis if the cone is rolled
+    through a complete circle on the
+    plane?
+    
+    -- Daryl Cooper
+
+Solution:
+
+    Consider a point on the edge of the base of the cone.
+    When you lay the cone on the flat surface it will roll
+    in a circle of radius = sqrt(H*H+R*R).  The outside
+    edge of the cone will have to roll along the perimeter
+    of this circle.  The number of revolutions is then:
+    
+    n = ( 2*pi*sqrt(H*H+R*R) ) / ( 2*pi*R )
+      = sqrt(H*H+R*R)/R
+      = sqrt((H/R)**2 + 1)
+
+
+## Bonus
+
+    You have a large supply of
+    one-ohm resistors and some wire, and
+    you wish to create a "black box," i.e., a
+    box with only several terminals showing,
+    which will allow you to achieve
+    any integral resistance from 1
+    through 10 ohms, inclusive, by proper
+    choice of two of the terminals. How
+    should such a box be wired (once
+    wired, the wiring is fixed) if the number
+    of terminals is a minimum? Using
+    some wire to short terminals is not
+    allowed. Remember, resistance can
+    be reduced by wiring resistors in
+    parallel. The solution is relatively
+    simple and does not require any complicated
+    wiring scheme.
+    
+    -- Hubert W. Hagadorn, PA E'59
+
+TODO
+
+
+## Computer Bonus
+
+    For all values of
+    N greater than 4, the decimal
+    representation of N! (N factorial)
+    ends with a string of zeros. We are
+    interested in the digit preceding these
+    zeros. What is the value of the nonzero
+    digit immediately preceding the
+    string of zeros at the end of
+    1,000,000!?
+    
+    -- Howard G. McIlvried III, PA Gamma'53
+
+Solution:
+
+With computers/software in 2020 this is actually pretty easy.
+
+The last character before the string of zeros is 4.
+The final nonzero portion of the factorial is ...65058412544000...
+
+This is digit 5315711 in the factorial.  There are
+nearly 250000 zeros at the end!
+
+```{r}
+library(gmp)
+library(stringi)
+
+a=as.character(factorialZ(1000000))
+for (i in nchar(a):1) {
+    if (stri_sub(a,i,i) != "0") {
+        print(paste0("Char index = ",i,"  Last Digit = ",stri_sub(a,i,i),collapse=''))
+        print(paste0("Last nonzero portion of factorial = ",stri_sub(a,i-10,i+5),collapse=''))
+        break
+    }
+}
+```
+

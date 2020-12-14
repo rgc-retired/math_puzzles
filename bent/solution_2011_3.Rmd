@@ -1,0 +1,477 @@
+---
+title: "Bent Fall 2011"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2011
+
+
+## Problem 1
+
+    Joe the butcher received a bill in the mail.
+    Unfortunately it had gotten wet, and the first and
+    last digits were unreadable. What was legible was:
+
+    72 turkeys $_67.9_ 
+
+    How much was the bill, and what
+    is the cost of one turkey assuming they all cost
+    the same?
+    
+    -- The Stanford Mathematics Problem Book,
+    by G. Polya and J. Kilpatrick
+
+Solution:
+
+    Simple and quick search
+    
+```{r}
+pmax=96799   # Maximum possible price of 72 turkeys, in cents
+pmin=16790   # Minimum possible price of 72 turkeys, in cents
+
+min_price=trunc(pmin/72)
+max_price=trunc(pmax/72)
+
+s=(min_price:max_price)*72
+
+print(paste0("Price per turkey = ",s[grepl(".679.",s)]/7200))
+
+```
+
+The price per turkey is 5.11 with a total bill of 367.92
+
+
+## Problem 2
+
+    Determine the equation of a parabola that passes
+    through the four points (xi, yi): (0, -1), (-1,
+    0), (1, 0), and (0, 3).
+
+    -- Craig K. Galer, MI A'77
+
+Solution:
+
+    The general equation for a parabola is given by:
+    
+    a*x^2 + b*x*y + c*y^2 + d*x + e*y + f = 0
+    
+    with b^2-4*a*c = 0
+    
+    We should be able to substitute in the four points, apply
+    the constraint, and then solve for the 5 independent coeffs.
+    
+    (1) For (x,y) = (0,-1)   c-e+f=0
+    (2) For (x,y) = (-1,0)   a-d+f=0
+    (3) For (x,y) = (1,0)    a+d+f=0
+    (4) For (x,y) = (0,3)    9*c+3*e+f=0
+    (5) b^2-4*a*c=0
+
+    From (2) and (3) we have: a = -f, d = 0
+    
+    This yields:
+    
+    a*x^2 + b*x*y + c*y^2 + e*y - a = 0
+    
+    c-e-a=0     \ 8*c+4*e = 0 --> e = -2*c
+    9*c+3*e-a=0 /
+    
+    This yields:
+    
+    a*x^2 + b*x*y + c*y^2 - 2*c*y - a = 0
+    
+    For (x,y) = (0,-1)     c+2*c-a=0 --> a = 3*c
+    
+    So:
+    
+    3*c*x^2 + b*x*y + c*y^2 - 2*c*y - 3*c = 0
+    
+    but:
+    
+    b^2-4*a*c=0 -> b^2 = 4*a*c = 12*c^2 -> b= +/- 2*sqrt(3)*c
+    
+    Finally:
+    
+    3*c*x^2 +/- 2*sqrt(3)*c*x*y + c*y^2 - 2*c*y - 3*c = 0
+    
+    Dividing out the c:
+    
+    3*x^2 +/- 2*sqrt(3)*x*y + y^2 - 2*y - 3 = 0
+
+    This is actually two different parabolas -- probably mirror
+    images.  If we pick the + sign:
+
+    Solving:
+    
+    y = +/- sqrt(2)*sqrt(2-sqrt(3)*x) - sqrt(3)*x+1
+    
+    or,
+    
+    y = 1 - sqrt(3)*x +/- sqrt(2)*sqrt(2-sqrt(3)*x)
+
+    We can see the two parabolic solutions below:
+    
+```{r}
+x=seq(-2,2,length=200)
+y1a = suppressWarnings((-sqrt(2)*sqrt(2-sqrt(3)*x))-sqrt(3)*x+1)
+y1b = suppressWarnings(sqrt(2)*sqrt(2-sqrt(3)*x)-sqrt(3)*x+1)
+y2a = suppressWarnings((-sqrt(2)*sqrt(sqrt(3)*x+2))+sqrt(3)*x+1)
+y2b = suppressWarnings(sqrt(2)*sqrt(sqrt(3)*x+2)+sqrt(3)*x+1)
+
+xx=c(x,x)
+y1=c(y1a,y1b)
+y2=c(y2a,y2b)
+
+plot(c(0,0),c(1,1),xlim=c(-2,2),ylim=c(-2,4),
+     xlab='x',
+     ylab='y',
+     main="Parabola given 4 points: 2 Solutions")
+points(xx,y1,col='blue')
+points(xx,y2,col='red')
+grid()
+
+# Add the specified points
+dotcolor='black'
+points( 0,-1,pch=19,cex=2,col=dotcolor)
+points( 1, 0,pch=19,cex=2,col=dotcolor)
+points(-1, 0,pch=19,cex=2,col=dotcolor)
+points( 0, 3,pch=19,cex=2,col=dotcolor)
+
+```
+
+## Problem 3
+
+    Two perfect logicians, Ann and Beth, have each
+    been assigned a number by a moderator. Neither
+    woman knows either of the numbers, but they do
+    know that the numbers consist of two positive odd
+    integers that are either the same or differ by 2
+    and that, if the two integers are different, then
+    the larger one is assigned to Beth. Ann and Beth
+    sit in front of computer monitors, arranged so
+    that each can see only her own monitor. They take
+    turns typing in questions of the form, "Is Y's
+    number X?" about the other's number, where X is a
+    positive odd integer. For example, Ann could ask,
+    "Is Beth's number 7?", and Beth could ask, "Is
+    Ann's number 11?" After receiving an honest yes or
+    no answer on the monitor from the moderator, the
+    questioner states aloud, either "I know my number"
+    or "I don't know my number." The following
+    conversation ensues:
+
+    Ann: "I don't know my number."
+    Beth: "I don't know my number."
+    Ann: "I don't know my number."
+    Beth: "I don't know my number."
+    Ann: "I don't know my number."
+    Beth: "I don't know my number."
+    Ann: "I don't know my number."
+    Beth: "I don't know my number."
+    Ann: "I don't know my number."
+    Beth: "I don't know my number."
+    Ann: "I don't know my number."
+    Beth: "I don't know my number."
+    Ann: "I don't know my number."
+    Beth: "I don't know my number."
+    Ann: "I don't know my number."
+    Beth: "I know my number."
+    What are Ann's and Beth's numbers?
+
+    -- adapted from
+    All-Star Mathlete Puzzles by
+    Dr. Richard I. Hess, CA B'62
+
+TODO
+
+    Don't care
+
+
+## Problem 4
+
+    Numbers b and c are chosen at random from the
+    range of real numbers bounded by -q and q. Express
+    the probability, as a function of q, that the
+    quadratic equation, x^2 + bx + c = 0, will have
+    complex roots.
+
+    -- William S. Alderson, MI E'43
+
+Solution:
+
+    Complex roots will occur iff b^2-4*c<0 or c > 1/4 * b^2.
+    
+    If b and c are chosen from random [-q,q] then this is
+    a square in b-c axis and the other curve is a parabola.
+    
+    We need the area inside the square but above the parabola.
+
+    This is illustrated below:
+    
+```{r}
+q=2
+
+x=seq(-q-1,q+1,length=1000)
+y=1/4*x^2
+
+xs=c(-q,q,q,-q)
+ys=c(-q,-q,q,q)
+
+plot(c(x,xs),c(y,ys),type='n',xlab="b",ylab="c",
+     main="Complex Quadratic Roots",
+     sub="Case 1: q<4")
+polygon(xs,ys,border='gray')
+lines(x,y,lwd=3)
+
+xp=seq(-q,q,length=100)
+yp=1/4*xp^2
+xp=c(xp,q,-q)
+yp=c(yp,q,q)
+polygon(xp,yp,col='pink')
+
+
+###
+
+q=8
+
+x=seq(-q-1,q+1,length=1000)
+y=1/4*x^2
+
+xs=c(-q,q,q,-q)
+ys=c(-q,-q,q,q)
+
+plot(c(x,xs),c(y,ys),type='n',xlab="b",ylab="c",
+     main="Complex Quadratic Roots",
+     sub="Case 2: q>4")
+polygon(xs,ys,border='gray')
+lines(x,y,lwd=3)
+
+# Calculate xmin/xma
+xmin=-sqrt(4*q)
+xmax=sqrt(4*q)
+xp=seq(xmin,xmax,length=100)
+yp=1/4*xp^2
+xp=c(xp,xmax,xmin)
+yp=c(yp,q,q)
+polygon(xp,yp,col='pink')
+
+```
+
+    There are two cases to consider (depending on the value of q).
+    If q is very large then the parabola will intersect the top
+    of the square.  If q is very small then the parabola will
+    intersect the sides of the square.
+    
+    The critical value of q that makes the parabola intersect the
+    corner of the square is when q = c = 1/4*b^2 = 1/4*q^2
+    
+    or:
+    
+    q^2 - 4q = 0 --> q = 0, 4
+    
+    So: for q<4 the parabola intersects the the sides of the square.
+    
+        The area is then:
+    
+        integrate(q-1/4*x^2,x,-q,q) = 2*q^2 - q^3/6
+    
+        The total area for b,c is (2*q)^2 = 4*q^2
+    
+        The ratio of the area (e.g. the probability is):
+    
+        Pr = 1/2 - q/24
+        
+    For q>4, the parabola intersects the top of the square.
+    
+        The limits of the integration are:
+    
+            1/4*x^2 = q --> x = sqrt(4*q) = +/- 2*sqrt(q)
+    
+        Area between parabola and top of square:
+        
+            integrate(q-1/4*x^2,x,-2*sqrt(q),+2*sqrt(q)) = 8/3*q^(3/2)
+            
+        The total parameter space is: 4*q^2
+        
+        Pr = 8/3*q^(3/2) / (4*q^2) = 2/(3*sqrt(q))
+
+    This might be all well and good but I still don't get a good feel for
+    the actual probability.  Let's visualize for q = [0,8]
+    
+```{r}
+q=seq(0,8,length=100)
+pr=ifelse(q<4,1/2-q/24,2/(3*sqrt(q)))
+
+plot(q,pr,type='b')
+abline(v=4,col='red')
+grid()
+```
+
+As q->0 the equation becomes:
+
+    x^2 + b*x + c = 0
+    
+    but b,c are very small so x is very small.
+    In this case b*x << c so:
+    
+    X^2 + c ~ 0
+    
+    and whether or not the equation has complex roots depends on the
+    sign of c.  This is a 50% probability as shown in the plot.
+    
+As q->infinity the equation becomes:
+
+    x^2 + b*x + c = 0
+    
+    If b,c are very large then b*x >> c so:
+    
+    x^2 + b*x ~ 0
+    
+    x*(x+b) ~ 0
+    
+    and the equation never has complex roots.  This also matches
+    the general trend of the plot above.
+    
+    This will have complex roots is when b^2<4*c which
+    becomes vanishingly unlikely as q->infinity.
+
+
+## Problem 5
+
+    A uniform billiard ball of diameter D rolls
+    without slipping along a pool table toward a
+    cushion. What height of cushion creates a rebound
+    that maintains rolling-without-slipping motion?
+
+    -- Jeffrey R. Stribling, CA A'92
+
+Solution:
+
+    Need a cushion high enough that the angular momentum is not
+    enough to lift the ball off the table.
+    
+    The Bent solution uses angular acceleration and moment of
+    inertia for a sphere.  Can we do this from first principles?
+    
+    The part of the ball that is above the cushion has momentum
+    that will try to raise the ball off the table when it hits
+    the cushion.
+    
+    Let h = height of rail
+        r = D/2 = radius of ball
+        
+    At the point of impact, the mass above the rail will exert a
+    moment at the point where the ball hits the rail.  The lower
+    part of the ball exerts a countering moment due to gravity.
+    
+    ... okay ... I gave up and looked at Wikipedia for moment
+    of inertia.
+    
+    The moment of inertia for a sphere is:
+    
+        I = 2/5*m*R^2
+        
+    Where this is about an axis through its center of gravity.
+        
+    Torque is related to moment of inertia as:
+    
+        T = I*alpha
+        
+    Where alpha is angular acceleration.
+    
+    The Torque from the upper half of the ball against the cushion
+    is:
+    
+        F*(h-r) = I * alpha
+        
+    Where:
+    
+        F = m*a, a=alpha*r if there is no slipping
+        
+    Substituting:
+    
+        m*alpha*r*(h-r) = 2/5*m*r^2*alpha
+        
+    Solving for h:
+    
+        h = 7/5*r = 7/10*D
+
+    I still don't get a warm and fuzzy feeling about this.
+    
+
+## Bonus
+
+    A geosynchronous orbit is a circular orbit with an
+    orbital period of 24 hours. These orbits,
+    typically used by the equatorial stationary class
+    of communications satellites, have a radius Rs
+    equal to about 26,300 miles. Another class of
+    satellites, the Russian Molniya class, employ
+    inclined, highly eccentric orbits characterized by
+    a 12-hour orbital period. Assuming that the
+    closest approach to the earth's surface of a
+    Molniya orbit is 100 miles to avoid burning in the
+    atmosphere, for what range of eccentricities is
+    the apogee greater than Rs?
+
+    -- Technology Review
+
+Solution:
+
+    According to the Bent we need to look to Kepler:
+    
+        T^2 = 4*pi^2/(GM)*a^3
+        
+    where a is the semi-major axis of the orbit.  I would need
+    to investigate orbital mechanics again to figure out what
+    any of this means.
+    
+    The final solution has:
+    
+        a = 2.66e7 m
+
+    Two solutions:
+    
+        (1) perigee has R = 100 miles plus radius of earth
+                Rp = 6.531e6 m
+                Ra = 4.67e7 m
+        
+        (2) apogee has R = Rs (radius of geosynchronous orbit)
+                Ra = 4.23e7 m
+                Rp = 1.09e7 m
+                
+    The range of e is [0.591, 0.755]
+
+
+## Double Bonus
+
+    What are the last seven digits of (7,777,777)^(7,777,777)?
+
+    -- Adapted from Colin Singleton in New Scientist
+
+Solution:
+
+    I tried brute force with Maxima but I gave up - taking too long.
+    I might try with sympy.
+    
+    I tried with gmp and it was pretty easy:
+    
+```{r}
+library(gmp)
+
+a=as.bigz(7777777)^7777777
+b=as.character(a)
+n=nchar(b)
+print(paste0("Total number of digits = ",n))
+print(paste0("Last 20 digits = ",substring(b,nchar(b)-20,nchar(b))))
+```
+
+    The last 20 digits are: 951673149961995347697
+    The Bent gives the last 7 digits:     5347697
+
+Clearly they did not intend brute force but it was quite simple.

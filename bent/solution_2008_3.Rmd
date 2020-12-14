@@ -1,0 +1,383 @@
+---
+title: "Bent Fall 2008"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2008
+
+
+## Problem 1
+
+    When the five marriage counselors
+    at Healthy Relations got divorced,
+    it was a shock. When all announced
+    remarriage and the brides were
+    revealed to be the five ex-wives, it
+    was a sensation. Still, the priggish
+    Dinah was not the first to remarry
+    and there were no direct swaps, so
+    the decencies were preserved. The
+    weddings were held on successive
+    Saturdays. Peter's took place earlier
+    than Anne's and later than Quentin's.
+    Barbara's was later than Tristram's
+    and earlier than Celia's. Peter married
+    Simon's ex-wife. Barbara got
+    hitched to the man whose former
+    wife married Emily's ex-husband.
+    Quentin paired up with the lady
+    whose former husband married
+    Dinah. Ronald was spliced with the
+    lady whose ex-husband married
+    Celia. Who remarried whom? No one
+    remarried his or her ex-spouse.
+
+    -- Martin Hollis
+
+Solution:
+
+    Dinah
+    Anne
+    Barbara
+    Celia
+    Emily
+
+    Peter
+    Quentin
+    Tristram
+    Peter
+    Simon
+    Ronald
+
+    Order of Weddings (not necessarily sequential)
+    
+    Quentin  -> Peter   -> Anne
+    Tristram -> Barbara -> Celia
+
+    Peter married Simon's ex-wife
+    Barbara married man whose former wife married Emily's ex-husband
+    Quentin married woman whose ex-husband married Dinah
+    Ronald married woman whose ex-husband married Celia
+
+    No one remarried ex-spouse, no direct spouse swaps
+    
+    Need a way to represent this graphically!!!
+    
+
+## Problem 2
+
+    Place eight queens on a standard
+    chessboard so that the number of
+    squares not attacked is a maximum.
+    What is this number? Describe the
+    positions of the queens, labeling
+    columns a-h and rows 1-8.
+
+    -- Technology Review
+
+
+Solution:  I think I looked into this a long time ago
+using grumpy.  I think the answer is 11.  I even made
+a gui to play with this and some code to search for
+the solution.  Ignoring reflections there are only
+choose(64,8) combinations to explore.  This is about 4e9.
+If you take advantage of reflections this can be drastically
+reduced.
+
+In the end there are 7 unique patterns that generate the
+optimal solution of 11 squares not attacked by the 8 queens.
+
+I checked on grumpy under ~/temp/puzzles/queens and there
+were the files.  I resurrected them and pulled them into
+a subdirectory called queens on this machine.
+
+Even on this machine the exhaustive search is going to take
+a long time.  I had to port from Python 2 to 3 but it is
+running very slow.  May want to port this further to LuaJIT.
+
+Furthermore, it was not running correctly.  Over the years the
+syntax on the nonzero() function has changed and it returns a
+tuple instead of a list so the counting logic was fubar.
+
+I fixed this, after several hours of wasted effort, and started
+up the search again.  After a short while I killed the search
+and confirmed that it was generating the correct output.  I
+started it once more and I will allow it to run to conclusion.
+
+I was able to improve the pruning code a bit so maybe it will
+run a bit faster.  Oh yes -- much faster.  The new results
+match the old ones.
+
+BTW the solution they give in the Bent is the same as my solution
+zero except it is flipped top-to-bottom.
+
+From the old `readme.txt` file:
+
+    Problem:
+    --------
+    Position 8 queens on a chessboard such that that number of
+    squares that is not attacked is a maximum
+    
+    Seems simple enough but the number of combinations is large
+    C(64,8)~4.4 Billion.  With reflections, translations, rotations,
+    etc. I am sure the number is much smaller ... but there doesn't
+    seem to be an obvious alorithm to search out just the unique
+    configurations.
+    
+    queens3.py performs exhaustive search
+    queens.tcl provides a board to try the problem manually.
+    
+    After exhaustive search:
+    ------------------------
+    The best achievable score is 11.
+    There are 48 configurations that achieve this.
+    Many are reflections or rotations.
+    They have not been removed.
+    
+    Assume the squares are numbered 0-63 row-wise starting at the
+    upper left corner of the board.  The 8 queens should be positioned
+    as follows to achieve this score:
+
+
+     0  1  2  9 10 11 40 41
+     0  1  2  9 10 32 40 41
+     0  2  9 11 32 33 40 41
+     0  4  5  8  9 13 16 17
+     0  4  5  9 12 13 16 25
+     0  5  8  9 13 16 17 25
+     1  2 10 11 32 33 40 41
+     1  3 16 19 24 25 32 33
+     1  6  8 10 14 17 48 49
+     1  6  9 13 15 22 54 55
+     
+     ... etc ...
+     
+    38 47 50 51 54 58 59 63
+    40 41 48 49 53 56 60 61
+    46 47 50 54 55 58 59 63
+
+
+## Problem 3
+
+    The result of adding the date of
+    the last Monday of last month and
+    the date of the first Thursday of
+    next month is 38. If both dates are
+    in the same year, what is the current
+    month?
+
+    -- Hard-to-Solve Brainteasers by
+    Jamie and Lea Poniachik
+
+Solution:
+
+    The current month must be August.
+
+    The latest a first Thursday can occur is on the seventh
+    of a month.  The only way to get a total of 38 = n+7 is
+    when n=31 so we conclude:
+    
+    Last Monday of previous month is 31
+    First Thursday of next month is 7
+    
+    Current month begins on Tuesday and the last day of the
+    month is a Thursday.  The dates in the current month
+    must be:
+        Tuesday = 1
+        Tuesday = 8
+        Tuesday = 15
+        Tuesday = 22
+        Tuesday = 29
+        Wednesday = 30
+        Thursday = 31 --> current month has 31 days
+        
+    The previous month has 31 days and the current month has
+    the same number (31 days).  If both dates occur in the
+    same year these must be July and August so the current
+    month must be August.
+
+
+## Problem 4
+
+
+    Starting with a standard 52-card
+    deck and drawing cards randomly
+    without replacement, what is the
+    expected number of cards that must
+    be drawn until each of the four suits
+    is represented at least once?
+
+    -- The Theory of Gambling and Statistical
+    Logic by Richard A. Epstein
+
+Solution:
+
+    Let's try Monte Carlo and then (maybe) combinatorics.
+    
+```{r}
+ntrials=100000
+
+n=0
+set.seed(2020)
+for (trial in 1:ntrials) {
+    s=sample(52)
+    s=trunc((s-1)/13)+1
+    m=c(0,0,0,0)
+    for (i in s) {
+        m[i]=m[i]+1
+        if (all(m>0)) {
+            n=n+sum(m)
+            break
+        }
+    }
+}
+print(n/ntrials)
+```
+
+For 100e3 trials the mean number of cards = 7.66367
+
+    Seed   ntrials   Num Cards
+    ==========================
+    42     100e3     7.67276
+    123    100e3     7.66918
+    2020   100e3     7.65759
+
+I don't know if it is worth trying to do this analytically.
+
+They go through the method in the Bent.  Basically you sum up the probabilities
+from draw=4 through 40 or mess with expectation equations.
+
+The result = 4829/630 = 7.665079
+
+To three digits I got the same result with a very quick Monte-Carlo run!
+
+
+## Problem 5
+
+    A stick of length L is standing
+    vertically against a wall, with a small
+    beetle sitting on top of the stick. The
+    stick slides down the wall at a constant
+    rate in such a way that the top
+    maintains contact with the wall and
+    the bottom maintains contact with
+    the floor.
+    The beetle starts to crawl down
+    the stick at a constant speed just as
+    the stick starts to slide. If the beetle
+    reaches the bottom of the stick just
+    as the top of the stick reaches the
+    floor, provide the equation of the
+    beetle's path in terms of Cartesian
+    coordinates only.
+
+    -- Jeffrey R. Stribling, CA A ?92
+
+TODO
+
+I must admit I am intrigued but I don't know how to
+solve this.  The fact that the stick slides down the
+wall at a constant rate might make this more tractable.
+
+The speed of the beetle is directed along the length of
+the stick so we have a vector with speed and direction.
+
+I looked at their solution.  One of the keys is to realize
+that the distance between the top of the ladder and the
+floor is the same as the distance of the beetle from the
+end of the ladder (has to be for them to arrive at the
+same time).  This allows you to work similar triangles and
+get rid of some variables.
+
+They give the equation of the beetle as:
+
+    u = (1-v^0.5)*(1-v)^0.5
+    
+    where u = x/L, v=y/L
+
+
+## Bonus
+
+    A spherical bead of mass M
+    is free to slide along a frictionless,
+    horizontal wire. Hanging from this
+    bead at the end of a massless wire of
+    length L is a lighter sphere of mass
+    m. If the lighter sphere is given a
+    small displacement in a direction
+    parallel to the horizontal wire, what
+    is the period of the resulting oscillation?
+
+    -- John R. Sellars
+
+TODO
+
+I must admit I am intrigued but I don't know how to
+solve this.  I could try to write the equations of
+motion and see where that leads.  We will probably
+need to approximate sin(x)~x for small x and the result
+will be a harmonic oscillator with the smaller mass
+acting as a pendulum but the pivot point moves due
+to tension in the wire.
+
+I looked at their solution and that is what they did.
+I ended up with a 4th degree ODE so I should probably
+work through this to make sure I could.
+
+The end result should be:
+
+    The period of oscillation is T=2*pi*[(L/g)*(M/(m+M))]^0.5
+    
+    The equation is: x'''' + [g*(m+M)/(M*L)]*x'' = 0
+    
+    They make the small angle approximation sin(theta) ~ theta
+    
+    Clearly this has a sinusoidal response with repeated roots
+    at zero that disappear when the boundary conditions are
+    applied.  The oscillation frequency is w0^2 = g*(m+M)/(M*L).
+    
+
+
+
+## Double Bonus
+
+    The infinite horn
+    of plenty for x > 1 is generated by
+    revolving the curve y =1/x about
+    the x-axis. (For this problem, let x
+    and y be in feet.) Your job is to paint
+    the inner surface of the horn using
+    the new nanotech paint. Nanotech
+    paint comes in one gallon cans, can
+    be applied as an infinitely thin layer
+    and dries that way, but it still takes
+    one gallon of paint for each 10,000
+    square feet of surface area. How
+    would you paint the inner surface of
+    the horn, and how much paint would
+    it require?
+
+    -- John L. Bradshaw, PA Alpha'82
+
+Solution:
+
+    OOOps -- when I started solving this I was rotating around
+    the y-axis.  If I use the x-axis instead the results
+    are a bit more interesting.
+
+    Around the X-axis the volume is finite:
+    
+    V = integrate(pi*(1/x)**2,(x,1,oo)) --> pi
+    
+    The surface area of the horn, however, is not finite:
+    
+    A = integrate(2*pi*(1/x),(x,1,oo)) --> infinity
+    
+    So - paradoxically you can fill the horn with pi cubic feet of
+    paint you can never paint the internal surface since it is infinite.

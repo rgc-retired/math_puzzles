@@ -1,0 +1,289 @@
+---
+title: "Bent Winter 2017"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2017
+
+
+## Problem 1
+
+    Looking for some PUZZLEs to fill up your
+    WINTER? What is the solution to the following
+    cryptarithm?
+
+    PUZZLE + PUZZLE + PUZZLE + PUZZLE = WINTER.
+
+    Standard rules apply. Each different letter
+    stands for a different digit, and each
+    different digit is always represented by the
+    same letter; no leading zeros are allowed.
+
+    -- Jeffrey R. Stribling, Ph.D.  CA A'92
+
+Solution: from the cryptic arithmetic notebook
+
+      PUZZLE + PUZZLE + PUZZLE + PUZZLE = WINTER
+
+    a=make_crypt_df('puzzlewinter')
+    k=(make_num(a,'puzzle')*4 == make_num(a,'winter'))
+    k=k&(a$p!=0)&(a$w!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+           p u z l e w i n t r
+    832790 2 3 7 1 6 9 5 0 8 4
+    make_num(a,'puzzle')[k,]
+    [1] 237716
+    make_num(a,'winter')[k,]
+    [1] 950864
+
+
+## Problem 2
+
+    Art, Bob, Cai, Dan, and Eli took a test and
+    were ranked (with no ties) according to their
+    performance. They were each informed of their
+    own ranking, but no one was told details of
+    the others' ranks. Art said he wasn't second,
+    and Bob, who had recently claimed himself a
+    psychic, announced confidently he was sure he
+    was two places better than Dan. Cai overheard
+    these remarks and came to the conclusion -- for
+    reasons that need not concern us -- that one of
+    them was right and the other wrong. After a
+    pause for reflection Cai, who is a Tau Bate
+    and hence highly intelligent, said that he
+    could announce the correct ranking for all
+    five people. But when he did so, he had got
+    everyone in the wrong place except the bottom
+    two. What is the correct order? (It is
+    somewhat satisfying that Art and Bob are
+    placed in the order of their truthfulness.)
+
+    -- 101 Brain Puzzlers, E.R. Emmet
+
+TODO
+
+    meh
+
+
+## Problem 3
+
+    Find a scalene triangle with integral sides
+    and no right angle, such that at least one of
+    its angles is an integral number of degrees.
+    What are the lengths of the sides of such a
+    triangle with the smallest perimeter?
+
+    -- Adapted from Technology Review
+
+Solution:
+
+    Apply law of cosines to find SSS for a known
+    cosine?
+
+    I am shocked -- that is exactly what the Bent did.
+    They noted that the only rational values for cos(theta)
+    is for theta = 60, 90, or 120 degrees.  Since we can't
+    use 90 degrees we can pick 60 or 120 degrees.
+    
+    cos(60 degrees)  = +1/2 = (a^2+b^2-c^2)/(2*a*b)
+    cos(120 degrees) = -1/2 = (a^2+b^2-c^2)/(2*a*b)
+    
+    c^2 = a^2+b^2 +/- a*b
+    
+    Need to solve this by trial and error.  The solution
+    they found was a=3, b=5, c=7.  The perimeter is 15.
+    
+    Not sure that they rigorously showed this was the
+    minimum perimeter but it probably is.
+    
+
+## Problem 4
+
+    The end of my sink faucet bends at a right
+    angle to the horizontal so that the opening,
+    which has an inside diameter of 2.0 cm,
+    points vertically down. The water system has
+    a pressure regulator that, with the faucet
+    fully open, produces a steady downward stream
+    with a circular cross section at a rate of
+    8.328 L/min. I noticed that the stream tapers
+    down to a diameter of 0.9 cm at the point at
+    which it reaches the drain. To the nearest
+    millimeter, how far is the drain from the
+    faucet opening? Use a value of 9.807 m/s2 for
+    the standard acceleration due to gravity.
+
+    -- Adapted from The Chicken from Minsk by
+       Yuri Chernyak and Robert Rose
+
+Solution:
+
+    I never really thought about it before but if the
+    flow rate is known at the exit from the faucet this
+    defines a linear velocity of the fluid.  Since the
+    fluid is falling toward the drain it is increasing
+    in velocity.  As the velocity increases the cross
+    sectional area has to decrease in order to maintain
+    a constant flow rate.
+    
+    Interesting.
+    
+    At the exit from the faucet the cross sectional area
+    is pi*(1)^2 cm^2 with a flow rate of 8328 cm^3/min.
+    This requires a linear velocity of 8328/pi ~ 2651 cm/min.
+    This is 44.18141 cm/sec.
+    
+    At the drain the cross section has been reduced but the
+    flow rate is still 8328 cm^3/min.  If the diameter is 0.9 cm
+    then the linear velocity is 8328/(pi*0.45^2) ~ 13091 cm/min.
+    This is 218.18 cm/sec
+    
+    We should be able to use an energy balance to find the
+    height of the faucet:
+    
+        1/2*0.44181^2 + g*h = 1/2*2.1818^2
+        
+        h = 1/2*(2.1818^2-0.44181^2)/g ~ 2.282528/g ~ 0.2327 m
+        
+    The faucet height is 23.27 cm above the drain.
+
+    The Bent gave 23.3 cm as the solution.
+
+
+## Problem 5
+
+    Allen and Bill were nominated for president
+    of the Golf Club. The club has 350 members,
+    not all of whom voted. The tellers removed
+    the votes from the ballot box and counted
+    them one at a time. Allen not only won, but
+    he was ahead of Bill throughout the entire
+    count. If the probability of this occurring
+    was exactly one in 100, how many votes did
+    Allen and Bill each receive?
+
+    -- New Scientist: Colin Singleton
+
+TODO
+
+    Huh?
+    
+    I looked at the Bent solution and I still have no
+    idea what they are talking about.
+
+
+## Bonus
+
+    Consider a triangular number T which is
+    simultaneously the sum of two cubes and the
+    difference of two cubes (e.g., T = A^3 + B^3 =
+    C^3 - D^3 = n(n+1)/2) such that D = B + 1.  The
+    first such number is 91 = 33 + 43 = 63 - 53,
+    and the second is 48427561 = 3603 + 1213 =
+    3693 - 1223. What is the general formula for
+    the ith such number?
+
+    -- Elementary Number Theory,
+       David M. Burton
+
+TODO
+
+    No clue.
+    
+    I read the solution and, okay, it is understandable
+    but a bit ludicrous.
+
+
+## Computer Bonus
+
+    The prime-counting function, usually denoted
+    as pi(x), returns the number of primes less
+    than or equal to a positive integer x.
+    Similarly, the semi-prime-counting function,
+    usually denoted as pi_2(x), returns the
+    corresponding number of semi-primes (integers
+    with exactly two prime factors, not
+    necessarily distinct). For example, p(20)=8
+    and p2(20)=6. What is the minimum value of x
+    such that pi_2(x)/pi(x) > pi (the mathematical
+    constant 3.1415...)?
+
+    -- Jeffrey R. Stribling, Ph.D., CA A'92
+
+TODO
+
+    No idea -- I would just have to go with exhaustive search.
+    
+    I guess that is what they did as well but they did not
+    explain the result.
+    
+    I would have to start counting at 2 and just decide if each
+    number is prime, semi-prime, or neither and then increment
+    the counter and check the ratio.
+
+    The runs VERY, VERY, SLOWLY.
+    
+    The values given below took over 2 hours and we still aren't there.
+    Not sure if this is algorithmic or the language.
+    
+    The solution should be ~ 693e6
+    
+    Even after more than 2 hours of running the ratio below is only ~ 3.113654
+    
+    This is conceptually simple but the execution time is horrid.
+    
+    As bad as it seems -- this is faster than Python or Lua!
+    
+    It takes about 26-27 seconds per million values so about 120 million per hour.
+    To reach 694 million is a little over five hours of run time.
+    
+```{r, eval=FALSE}
+library(gmp)
+
+pi_count=22727596
+pi2_count=70765869
+
+n=as.bigz(427606621)
+t1=Sys.time()
+while (TRUE) {
+    m=length(factorize(n))
+    if (m==1) { pi_count = pi_count+1 }
+    if (m==2) { 
+        pi2_count = pi2_count+1
+        if (pi2_count/pi_count > pi) {
+            break
+        }
+    }
+    n=n+1
+    if (n%%1000000 == 0) {
+        t2=Sys.time()
+        print(as.numeric(n)*1e-6)
+        print(t2-t1)
+        print(pi2_count/pi_count)
+        t1=t2
+    }
+}
+print(n)
+print(pi_count)
+print(pi2_count)
+
+```
+
+
+Solution found after a long, long time:
+
+    n = 693901529
+    prime_pi =    35953285  (number of primes up to n)
+    prime_pi2 =  112950577  (number of semi-primes up to n)
+
+Amazingly enough these are in exact agreement with the values
+from the Bent.

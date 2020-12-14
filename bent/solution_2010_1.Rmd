@@ -1,0 +1,264 @@
+---
+title: "Bent Spring 2010"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2010
+
+
+## Problem 1
+
+    Find a 3x3 magic square, consisting
+    of nine different, although not necessarily
+    consecutive, integers less than
+    100, that has the following property.
+    When the numbers in the magic square
+    are replaced by the number of letters
+    in their English names, the square is
+    still magic with nine different integers.
+    For example, 10 would be replaced by
+    3 (ten has 3 letters) and 23 would be
+    replaced by 11 (twenty-three has 11
+    letters). A magic square is a square
+    array of all different integers in which
+    each row, column, and major diagonal
+    sum to the same constant.
+
+    -- 50 Mathematical IdeasYou
+    Really Need to Know by Tony Crilly
+
+TODO
+
+    Some day maybe I should look into magic squares.
+    
+
+## Problem 2
+
+    Ann and Beth live on Elm Street,
+    which has houses numbered 1 through
+    99, but neither knows the other's house
+    number. Zack lives in another house
+    on Elm Street, and the women are
+    eager to discover his number. Ann
+    asks Zack two questions: (1) is your
+    number a perfect square, and (2) is it
+    greater than 50? Having heard Zack's
+    answers, she declares she knows his
+    number, but she is wrong because only
+    Zack's second answer is true. Beth, not
+    having heard any of this, asks Zack two
+    different questions: (1) is your number
+    a perfect cube, and (2) is it greater than
+    25? Like Ann, after hearing Zack's
+    answers, she declares she knows his
+    number, but she is wrong because
+    again only Zack's second answer is
+    true. Given the further information
+    that Zack's number is less than both
+    Ann's and Beth's numbers and that the
+    sum of their three numbers is twice a
+    perfect square, what are Ann's, Beth's,
+    and Zack's house numbers?
+
+    -- Brain Puzzlers Delight
+    by E.R. Emmet
+
+TODO
+
+    I am sure I have solved this in the past
+    but not very interested right now.
+    
+
+## Problem 3
+
+    In a certain gambling institution, the
+    game of Lucky-10 is played. The house
+    provides a pot of $10. The player then
+    tosses two coins simultaneously. If two
+    heads appear, the player takes $1 from
+    the pot; if two tails appear, the player
+    adds $1 to the pot; and if a head and a
+    tail appear, the player neither adds nor
+    takes from the pot. After ten tosses
+    (including draws), if there is exactly
+    $10 in the pot, the player takes it. Otherwise,
+    the house gets whatever is in
+    the pot. How much should the player
+    initially pay the house (to the nearest
+    penny) to make this a fair game, that
+    is, with expected winnings of 0?
+
+    -- Joseph-Louis Lagrange
+    (1736-1813)
+
+Solution:
+
+    I think this is a duplicate of a different
+    problem (or a very minor variation).
+
+    Spring 2005, Problem 2
+    
+    The result there was $1.76
+
+[Duplicate problem](solution_2005_1.html#problem-2)
+
+
+## Problem 4
+
+    How many digits long is 100,000!?
+
+    -- Prime Numbers, the Most
+    Mysterious Figures in Math
+    by David Wells
+
+Solution:
+
+    The product of integers in the factorial can be calculated
+    by summing the logs.  In base 10, the integer part of the
+    log indicates the number of digits (actually 1 less).
+    
+    SO: num digits = trunc(sum(log10(1:100000)))+1 = 456574
+    
+    BTW: using sympy we can actually calculate this:
+    
+    factorial(100000) = 2824229407... ending in a string of 24999 zeros
+
+
+## Problem 5
+
+    Solve the following cryptarithm, in
+    which none of the letters is zero.
+
+    AB/CD + EF/GHJ = A
+
+    Each of the letters represents a different
+    digit, and each digit is a different
+    letter.
+
+    -- Joseph Nabutovsky
+
+Solution: solved in cryptic arithmetic notebook
+
+    Rearrange to eliminate fractions:
+
+      AB * GHJ + EF * CD = A * CD * GHJ
+
+    source('rgc_lib.R')
+    a=make_crypt_df('abcdefghj')
+    x_ab=make_num(a,'ab')
+    x_cd=make_num(a,'cd')
+    x_ef=make_num(a,'ef')
+    x_ghj=make_num(a,'ghj')
+    x_a=make_num(a,'a')
+    k=(x_ab*x_ghj + x_ef*x_cd == x_a*x_cd*x_ghj)
+    a[k,][apply(a[k,],1,function(x) {all(x != 0)}),]
+            a b c d e f g h j
+    2062764 5 7 1 2 9 6 3 8 4
+
+    m=2062764
+    x_ab[m,] = 57
+    x_cd[m,] = 12
+    x_ef[m,] = 96
+    x_ghj[m,] = 384
+    x_a[m,] = 5
+
+    ab/cd + ef/ghj = 57/12 + 96/384
+                   = 19/4 + 1/4
+                   = 20/4
+                   = 5
+
+
+## Bonus
+
+    A hula-hoop is supported on a
+    knife edge so that it hangs in a vertical
+    plane. It is given a small push and set
+    into back and forth oscillatory motion
+    in the vertical plane. Later, the bottom
+    half of the hula-hoop is cut off so that
+    exactly one quarter of the hoop is on
+    each side of the knife edge, and the
+    half hoop is set into oscillatory motion
+    in the vertical plane. What is the ratio
+    of the period of oscillation of the half
+    hoop to that of the whole hoop?
+
+    -- Mad About Physics by Christopher
+    P. Jargodzki and Franklin Potter
+
+Solution:
+
+    I am going to guess that this is just a pendulum
+    problem where we need to calculate the center of
+    mass for the full hoop vs. the half hoop.
+    
+    The ratio of these two lengths should define the
+    ratio of the periods -- possibly including a sqrt.
+
+
+## Computer Bonus
+
+    Sequences of four
+    consecutive primes whose last digits
+    are 1, 3, 7, and 9, but whose other digits
+    are the same, are not common. The
+    first two such sequence are (11, 13, 17,
+    19) and (101, 103, 107, 109). What is the
+    thousandth such sequence?
+
+    -- Don A. Dechman, TX A'57
+
+Solution:
+
+    We can try to enumerate sequential primes and then
+    see if they have correct final digits.  If so, then
+    check the leading digits.  If they match, then
+    count the sequence.
+    
+```{r}
+library(gmp)
+
+p1=2
+p2=nextprime(p1)
+p3=nextprime(p2)
+p4=nextprime(p3)
+done=FALSE
+
+n=0
+while(! done) {
+    if (p1%%10 == 1) {
+        if (p2%%10 == 3) {
+            if (p3%%10 == 7) {
+                if (p4%%10 == 9) {
+                    if ( ((p1-1)==(p2-3)) & ((p1-1)==(p3-7)) & ((p1-1)==(p4-9)) ) {
+                        n=n+1
+                        if (n %in% c(1,2,1000)) {
+                            print(paste0("Sequence number = ",n))
+                            print(c(p1,p2,p3,p4))
+                        }
+                        if (n==1000) {
+                            done=TRUE
+                            break
+                        }
+                    }
+                }
+            }
+        }
+    }
+    p1=p2
+    p2=p3
+    p3=p4
+    p4=nextprime(p4)
+}
+```
+
+The 1000th such sequence is:
+
+    11740031 11740033 11740037 11740039
+

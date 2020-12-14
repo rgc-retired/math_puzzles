@@ -1,0 +1,438 @@
+---
+title: "Bent Summer 2007"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2007
+
+
+## Problem 1
+
+    The makers of Grunt, who claim
+    that their aftershave is so appealing
+    to women that users will have to fight
+    them off, are puzzled that some men
+    are using Phew, so they hired Judy
+    to investigate. She boarded a bus to
+    question the male passengers. The
+    first man said, "I use Grunt." Then,
+    the rest of the men in turn said, "I use
+    Grunt, but the man you just interviewed
+    uses Phew." Finally, the first
+    man added, "The last man you interviewed
+    uses Phew." Confused, Judy
+    asked a few of the men how many of
+    the male passengers used Phew. The
+    tallest man said "19," and the man she
+    had originally interviewed fourth after
+    him said "24." The fattest man said
+    "13," and the man she had originally
+    interviewed fifth after him said "28."
+    The nicest man said "24," and the man
+    she had originally interviewed sixth
+    after him said "13." If each man uses
+    either Grunt or Phew, but only Grunt
+    users tell the truth, how many men
+    use Phew?
+
+    -- Martin Hollis
+
+TODO
+
+    Aaaaargh!
+    
+
+## Problem 2
+
+    On his trips to Monte Carlo, Sam
+    always gambles exactly $50 each night
+    on roulette. Usually, he just plunks
+    all his chips down on black (result
+    is double or nothing) and quits after
+    one spin, regardless of the outcome.
+    The probability of winning is 18/37.
+    One night he decides to change his
+    strategy by making $1 bets on black
+    until he either loses the $50 or gains
+    another $50. What is his probability
+    of winning with his new strategy?
+
+    -- Technology Review
+
+Solution: Let's try a Monte-Carlo analysis
+
+```{r}
+set.seed(42)
+ntrials=10000
+win=0
+for (trial in 1:ntrials) {
+    # Play until n=100 or n=0
+    n=50
+    while (T) {
+        if (runif(1)<=18/37) {
+            n=n+1
+        } else {
+            n=n-1
+        }
+        if (n==100) {
+            win=win+1
+            break
+        }
+        if (n==0) {
+            break
+        }
+    }
+}
+print(paste0('Percent wins = ',win/ntrials))
+```
+
+Winning occurs a little more than 6% of the time:
+
+    0.0618  @ 10K trials
+    0.0655  @ 10K trials (seed=123)
+    0.0644  @ 10K trials (seed=42)
+    0.0579  @ 10K trials (seed=2020)
+    0.06401 @ 100K trials
+
+This should be possible to calculate analytically.  I suspect the result depends
+only on the relative likelihood of winning/losing 50 bets.  So, the probability
+of winning/losing is;
+
+    (18/37)^50 vs. (19/37)^50
+    
+I am not sure about all the other probabilities (e.g W/L cancelling) but I
+suspect they all cancel out in the end.
+
+
+              (18/37)^50
+    P = ----------------------- ~ 0.062775
+        (18/37)^50 + (19/37)^50
+
+I think we can prove this formula by examining a simpler problem and then
+calculating the results.  Assume the original bankroll is 2 and the goal
+is either to win 2 or lose 2.  For two rounds of betting we get:
+
+    B1 B2  Bankroll
+    ---------------
+    L  L   0 --> loser: P = (19/37)^2
+    L  W   2 \ each has P = (18/37)*(19/37)
+    W  L   2 /
+    W  W   4 --> winner: P = (18/37)^2
+    
+In this case: you win (18/37)^2, you lose (19/37)^2, and you are back to
+the original problem the rest of the time.  The cases where you end up back
+at the beginning could still end up with winning so the total probability of
+winning should be:
+
+    winner = (18/37)^2 + 2*(18/37)*(19/37)(18/37)^2 +
+                         4*(18/37)^2*(19/37)^2*(18/37)^2 +
+                         ...
+                         
+           = (18/37)^2 * (1 + (2*18/37*19/37) + (2*18/37*19/37)^2 + ... )
+           = (18/37)^2 * 1/(1-2*18/37*19/37)
+           = 0.473
+
+This is much higher than I thought but it agrees with the formula that I
+suspected above.  For a bankroll of 2 we have:
+
+             (18/37)^2
+    P = --------------------- = 0.4729927
+        (18/37)^2 + (19/37)^2
+
+Extending the argument to a bankroll of n we have:
+
+             (18/37)^n
+    P = ---------------------
+        (18/37)^n + (19/37)^n
+
+
+Note that the longer you play the more likely you are to lose
+it all.  No wonder casinos do so well.
+
+```{r}
+n=seq(2,100,2)
+p=(18/37)^n / ( (18/37)^n + (19/37)^n )
+plot(n,p,type='l',xlab='Initial Bankroll',ylab='Probability of Winning')
+points(n,p,col='red')
+```
+
+## Problem 3
+
+    Different letters are different digits;
+    same letter is same digit throughout.
+
+    See picture
+
+	-- Eric R. Emmet
+
+Solution: not solved in the cryptic arithmetic notebook
+
+    Needs a solution.
+    
+              - - a -
+        -----------------
+    - - | d - - - - x
+          k - -
+          ---------------
+              - -
+              t -
+              -----------
+              m - -
+              m - -
+              -----------
+              x - x
+              h - -
+              -----------
+                k -
+
+
+## Problem 4
+
+    On the island of Approxima, all
+    measurements are only to the closest
+    inch. Alex, who makes yardsticks, has
+    realized that he doesn't have to put
+    marks at each inch to still be able to
+    measure all integral number of inches
+    from 1 through 36, inclusive. Distances
+    are measured between two marks,
+    or between a mark and an end of the
+    ruler, or between the two ends of the
+    ruler. For example, a foot ruler only
+    needs marks at 1, 2, 6, and 9 inches in
+    order to measure all distances from 1
+    inch through 12 inches, inclusive. Using
+    eight marks, where does Alex put
+    them on his yardsticks?
+
+    -- The Numerology of Dr. Matrix
+    by Martin Gardner
+
+Solution:
+
+    We need to measure 1-36 inches (integer)
+    The distances can be:
+    
+    (1) from the end to a marker
+    (2) from the opposite end to a marker
+    (3) between two markers
+    (4) between two ends.
+    
+    I tried some guessing - but nothing worked.
+
+OK - time to give up and try exhaustive search.  Let us assume that markers are
+required at locations 1 and 2.  The remaining markers can be at any location
+from 3 to 33.  That didn't work.  Modify the search to look for 8 markers over
+the full range of the yardstick.  This is **SLOW** since it looks at choose(35,8)
+combinations (~23.5e6) and needs to calculate 10x10 outer with logic to find the
+unique values for each combination.
+
+The two solutions that are found are actually just reflections of one solution.
+
+```{r}
+maxlen=0
+
+t1=Sys.time()
+for (m1 in 1:35) {
+    for (m2 in (m1+1):35) {
+        for (m3 in (m2+1):35) {
+            for (m4 in (m3+1):35) {
+                for (m5 in (m4+1):35) {
+                    for (m6 in (m5+1):35) {
+                        for (m7 in (m6+1):35) {
+                            for (m8 in (m7+1):35) {
+                                x=c(0,36,m1,m2,m3,m4,m5,m6,m7,m8)
+                                # print(x)
+                                m=length(unique(as.vector(abs(outer(x,x,"-")))))
+                                if (m>maxlen) { maxlen=m; bestx=x }
+                                if (m==37) {
+                                    print(sort(x))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+t2=Sys.time()
+print(t2-t1)
+```
+
+There are two solution sets that work:
+
+    end    ....... markers ......    end
+    0  --- 1  3  6 13 20 27 31 35 --- 36
+    0  --- 1  5  9 16 23 30 33 35 --- 36
+
+This may be easier to understand by looking at the difference
+between marks.  A length may be measured based on a difference
+or the sum of adjacent differences.  For the two sets of
+markers we have:
+
+    1 2 3 7 7 7 4 4 1
+    1 4 4 7 7 7 3 2 1
+
+By summing adjacent sections near the left/right ends you can
+achieve all the smaller numbers.  The center groups are only
+needed to get a coarse level and then use pieces of the edges
+to achieve fine tuning to the desired value.
+
+The two sets of diffs are just reflections of each other so these
+really represent the same solution.
+
+
+## Problem 5
+
+    You have eight objects of eight different
+    weights, which have been partially
+    ordered. That is, the order of the first
+    four is known among themselves, and
+    the order of the second four is known
+    among themselves. What is the minimum
+    number of weighings on a two-pan
+    balance to ensure that the eight weights
+    can be ordered in all cases?
+
+    -- Super-Puzzles, Jean-Claude Baillif
+
+TODO
+
+    I am going to guess that the answer is 3.
+
+
+## Bonus
+
+    A student pilot, initially located
+    at coordinates (x0,y0), rashly
+    decides to fly under the Golden Gate
+    Bridge, the ends of which are located at
+    (-1,0) and (1,0). These end points subtend
+    a visual angle Q (vertex at the
+    student's airplane), and all movement
+    and measurements lie in the same
+    X-Y plane. He flies along a path that
+    maximizes the instantaneous rate of
+    increase of Q. What is the equation of
+    his flight path? Assume the X-Y plane
+    is parallel to a flat ocean.
+
+    -- Byron R. Adams, TX A '58
+
+Solution?
+
+    I don't really understand this problem.
+    
+    Does the maximization of the instantaneous rate of
+    increase of Q define a full flight path?
+    
+    The angle from the left end of the bridge (-1,0) to
+    the student plane is:
+    
+        alpha1 = atan(y0/(x0+1))
+        
+    The angle from the right end of the bridge (1,0) to
+    the student plane is:
+    
+        alpha2 = atan(y0/(x0-1))
+        
+    The angle at the vertex is just the difference between
+    these two:
+    
+        Q = alpha1-alpha2
+          = atan(y0/(x0+1)) - atan(y0/(x0-1))
+
+    How do we maximize the rate of change?
+    
+        maximize( (dq/dx)^2 + (dq/dy)^2 )?
+        
+    This is maximized (e.g. d^2/dx^2 and d^2/dy^2 = 0) when:
+    
+        x = sqrt(1-y^2), or
+        x = 0, or
+        x = -sqrt(1-y^2)
+    
+    Or,
+    
+        x=0 --> fly down the y axis.
+        x^2 = 1-y^2 --> x^2+y^2 = 1  --> circle with radius = 1
+
+
+
+## Double Bonus
+
+    If A, B, and C are the
+    measures of the angles of a plane triangle,
+    what are the values of L and H in
+
+    L <= sin(3A) + sin(3B) + sin(3C) <= H
+    
+    when equality holds? Prove your answers.
+
+    -- Tenth U.S.A. Mathematical
+    Olympiad (1981)
+
+Solution:
+
+    I don't agree with the published solution.  They take the equation
+    below and then diff wrt A and set it equal to zero.  The result is
+    that:
+    
+        cos(3*A) + cos(3*A+3*B) = 0
+        
+    and then they conclude that A = (pi-3*B)/6 which leads to a min of 0.
+    
+    I think they are missing the case of A = (3*pi-3*B)/6 which lead to a
+    much deeper min.  See the contour and 3D plots below for the region
+    where min < 0.
+    
+    This is fairly obvious if you consider a very tall, narrow triangle.
+    Each base angle is ~90 degrees and the apex is nearly 0.  The value
+    of sin(3*A) and sin(3*B) is each nearly -1 and the apex is 0 so the
+    sum must approach:
+    
+        limit --> -2
+
+    You can see this in the contour plot near a=1.57 where for low values
+    of b the min is very negative (angle c ~ 90 degrees) and for b near
+    1.57 (about 90 degrees) the apex angle will be zero.  The same min
+    occurs for low values of a with b~c~1.57.  These are all really
+    the same condition just a swap of a, b and c.
+
+    Algebraically I don't have much.  About all I can figure out is that
+    
+    C = pi-(A+B) so:
+    
+    L <= sin(3A) + sin(3B) + sin(3A+3B) <= H
+    
+    I can manipulate this to:
+    
+    L <= sin(3A)*(1+cos(3B))+sin(3B)*(1+cos(3A)) <= H
+    
+    But that is about it.
+    
+    I can explore the solution space numerically:
+    
+```{r}
+foo = function(a,b) {
+    return(sin(3*a)+sin(3*b)+sin(3*a+3*b))
+}
+
+a=seq(0,pi,length=100)
+b=seq(0,pi,length=100)
+
+zzz=outer(a,b,foo)
+xxx=outer(a,b,"+")
+zzz=ifelse(xxx>pi,NA,zzz)
+
+
+contour(a,b,zzz,asp=1)
+persp(a,b,zzz,phi=30)
+```

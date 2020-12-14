@@ -1,0 +1,360 @@
+---
+title: "Bent Winter 2010"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2010
+
+As a note -- these problems seem remarkably familiar.
+I think I may have worked these before.
+
+## Problem 1
+
+    Al's job is testing bowling balls. He
+    has two identical bowling balls and
+    is to test their impact resistance by
+    dropping them out of windows on various
+    floors of a 100-story building. He
+    is to determine from which exact floor
+    a dropped bowling ball will shatter
+    on impact with the pavement below.
+    Al knows nothing about the strength
+    of the balls. They may shatter when
+    dropped from the first floor or not
+    until dropped from the 100th floor.
+    What is the minimum number of ball
+    drops needed to guarantee that Al
+    can uniquely determine the floor from
+    which the balls will shatter? Balls
+    that do not shatter may be dropped
+    again. Both balls may be destroyed
+    during the test. Include a brief outline
+    of how the testing is done.
+
+    How to Ace the Brain Teaser
+    Interview by John Kador
+
+Solution:
+
+    I think this is the problem where you
+    want to minimize the maximum penalty.
+    Turns out you go up 14 then 13 ...
+    such that the total number of potential
+    drops is minimized (and constant).
+
+    If you start at 14 and the ball shatters
+    then you need to go back to 1, 2, ... 13
+    for a total of 14 drops.
+    
+    If you start at 14 and the ball survives,
+    then you have used up one drop so you go
+    up to 27 and repeat the process.
+    
+    Each time the maximum exposure is 14.
+    
+    The starting floors for a really tall
+    building are:
+    
+        n, 2*n-1, 3*n-2, 4*n-3, 5*n-4,
+        6*n-5, 7*n-6, 8*n-7, 9*n-8, 10*n-9,
+        11*n-10,
+        
+    If n = 12 we get stalled at 78 floor
+    If n = 13 we get stalled at 91 floor
+    If n = 14 we make it to 105 floor
+    
+    So the smallest n that reaches the top
+    of the 100 floor building is 14.
+
+
+## Problem 2
+
+    Our local Soggy Center Donut
+    shop makes six different kinds of
+    doughnuts -- namely barbeque, garlic,
+    pepperoni, jalapeno, broccoli, and onion.
+    Each day I stop and buy a different
+    selection of a dozen doughnuts.
+    If I always buy at least one of each
+    different kind, how many days will it
+    take to exhaust all the possibilities?
+    Assume that the shop always has at
+    least seven of each different kind on
+    hand.
+
+    -- Adapted from Introductory Combinatorics
+    by Richard A. Brualdi
+
+Solution:
+
+    Lots of room for error here -- but I'll try.
+    
+    The most you can get of any one type is 7 since
+    you need to get at least one of each flavor.
+    
+    I could try exhaustive enumeration.  This is only
+    6 nested loops of 1:7 = 7^6 = 117649 possible cases.
+    The total for the 6 loops has to be 12.
+    
+```{r}
+n=0
+for (n1 in 1:7) {
+    for (n2 in 1:7) {
+        for (n3 in 1:7) {
+            for (n4 in 1:7) {
+                for (n5 in 1:7) {
+                    for (n6 in 1:7) {
+                        if ((n1+n2+n3+n4+n5+n6) == 12) {n=n+1}
+                    }
+                }
+            }
+        }
+    }
+}
+n
+```
+
+There are 462 combinations
+
+The run-time is almost instantaneous
+
+    Can I do this analytically?
+    
+    Assume n1=1 then there are 11 donuts to be split between
+    5 different flavors.
+    
+    choose(11,5) = 462 --> same as above
+    
+    Is this just luck?
+
+
+## Problem 3
+
+    If we write an integer in the decimal
+    system, its representation either
+    contains at least one digit 5 or it does
+    not. Find the smallest and the largest
+    values of N such that for the integers
+    between 1 and N inclusive, exactly
+    half contain at least one digit 5.
+
+    -- Adapted from Keys to Infinity
+    by Clifford A. Pickover
+
+Solution:  we can just count them?
+
+Turns out that brute force is not a good solution method.
+We can find the lower limit that way but not the upper.
+
+Ooops - I think I misread the problem.  It says EXACTLY half.
+This search is lengthy but not ridiculous.
+
+
+```{r}
+n=0
+ilow=0
+ihigh=0
+for (i in 1:10000000) {
+  n=n+grepl('5',i)
+  if (n==(i/2)) {
+    print(paste0("i = ",i))
+    if (ilow == 0) { ilow = i }
+    ihigh=i
+  }
+}
+print(paste0("Low = ",ilow))
+print(paste0("High = ",ihigh))
+```
+
+Over the range of 1-10e6 the limits are:
+
+    Low  =  590488
+    High = 5314408
+
+
+## Problem 4
+
+    Given that TEN is one more than
+    a perfect square that is divisible by 9,
+    NINETY is divisible by 9, and there
+    are SIX perfect squares between
+    TEN and NINETY, what is the
+    value of SENT? The usual rules for
+    cryptics apply.
+
+    -- Susan Denham in New Scientist
+
+Solution: solved in the cryptic arithmetic notebook
+
+      TEN is one more than a perfect square that is divisible by 9
+      NINETY is divisible by 9
+      SIX perfect squares between TEN and NINETY
+
+      What is the value of SENT?
+
+
+    1. There are a limited number of 3 digit numbers that can be TEN.
+       If we use the perfect square, divisible by 9, and distinct digits
+       we have the following possibilities:
+
+        TEN = 145, 325, 730, 901
+   
+       Since N begins NINETY it can't be zero we can remove 730
+
+       Thus: TEN = 145, 325, 901
+
+    2. There are a lot of 5 digit numbers divisible by 9 but if we add
+       constraints for the values of TEN and limits on non-zero digits
+       it becomes manageable.
+
+       A brute force search of number of perfect squares between the
+       limits of TEN and NINETY requires less than 200 sequences.
+
+       We create a list of perfect square (0:775)^2 and then count the
+       number between TEN and NINETY for each feasible sequence.
+
+    Solution:
+
+        TEN = 901
+        NINETY = 151092
+        SIX = 358
+
+        SENT = 3019
+
+    Note that there are only 7 symbols used (TENIYSX)
+
+
+## Problem 5
+
+    Fill in the following cross-number puzzle with 13
+    different three-digit perfect squares. No leading zeros.
+    Read top-to-bottom and left-to-right
+    as in a crossword puzzle.
+
+    -- Richard I. Hess, CA B'62
+
+    The puzzle grid looks like this:
+
+    +-+-+-+-+-+-+-+-+-+-+-+
+    | |X| | | |X| | | |X| |
+    +-+-+-+-+-+-+-+-+-+-+-+
+    | | | |X| | | |X| | | |
+    +-+-+-+-+-+-+-+-+-+-+-+
+    | |X| | | |X| | | |X| |
+    +-+-+-+-+-+-+-+-+-+-+-+
+
+TODO
+
+    I don't think I ever solved this.
+
+    There are 22 candidate values:
+    
+    100 121 144 169 196 225
+    256 289 324 361 400 441
+    484 529 576 625 676 729
+    784 841 900 961
+
+    The digit counts by position are:
+    
+               ...... Digit ......
+               0 1 2 3 4 5 6 7 8 9
+    ------------------------------               
+    Hundreds:  0 5 3 2 3 2 2 2 1 2
+    Tens:      3 0 6 0 3 1 3 2 3 1
+    Units:     3 5 0 0 4 2 4 0 0 4    
+    ------------------------------               
+
+    This information could be used to reduce the number of possible
+    numbers to be tried.
+    
+    The vertical numbers that also start another number, for example,
+    can not have 0 as the Tens digit.  In addition, since no number has
+    a 3 as the tens digit the numbers that start at a Tens digit can
+    not start with 3.
+    
+    The vertical numbers that end another number can not have 2,3,7, or 8
+    as the Tens digit.
+
+    These are all relatively weak constraints and don't get to a unique
+    solution.
+    
+    I don't see an algorithmic solution.  This smacks of trial and error
+    or using a Monte Carlo approach.
+    
+    Not sure I care.
+
+
+## Bonus
+
+    If 12 one-ohm resistors are soldered together to
+    form a cube, with each resistor being the edge of the cube,
+    then the equivalent resistance of the network between
+    two corners at the ends of a body diagonal is 5/6 ohm.
+    It is also possible to solder 32 one-ohm resistors
+    together in the network equivalent of a four-dimensional
+    hypercube. The vertices of a four-dimensional hypercube
+    can be designated using the coordinates (w,x,y,z) where
+    each variable has a value of 0 or 1. Then adjacent vertices
+    are those in which only one variable has a different value;
+    for instance, (0,1,0,1) and (0,1,1,1) are adjacent vertices.
+    One can show that the equivalent resistance of the fourdimensional
+    hypercube between a body diagonal, say
+    (0,0,0,0) and (1,1,1,1), is 2/3 ohm.
+    Now, consider 192 resistors soldered together to form
+    the network equivalent of a six-dimensional hypercube.
+    What is the equivalent resistance between corners at the
+    ends of a six-dimensional body diagonal?
+
+    -- John L. Bradshaw, PA A'82
+
+Solution:
+
+    I would probably just create a Spice deck and use it to solve
+    this problem.  There may be some clever way to do this with
+    combinatorics.
+
+
+## Computer Bonus
+
+    Thirty-six is the smallest number,
+    greater than one, that is both a triangular number and
+    a perfect square. What are the next four numbers that
+    are both triangular and a perfect square? Triangular
+    numbers are numbers of the form n(n + 1)/2, the first few
+    being 1, 3, 6, 10, and 15.
+
+    -- The Colossal Book of Mathematics by Martin Gardner
+
+Solution:
+
+    Should be able to search for this by generating the triangular
+    numbers and then checking to see if they are perfect squares.
+    
+```{r}
+n=0
+# Check the first 10000 triangular numbers
+for (i in 37:100000) {
+    t=i*(i+1)/2
+    m=trunc(sqrt(t))
+    if (t == (m*m)) {
+        print(t)
+        n=n+1
+        if (n==10) { break }
+    }
+}
+```
+
+The next four values after 36 are:
+
+        1225
+       41616
+     1413721
+    48024900
+
+BTW:  the next value is 1631432881.

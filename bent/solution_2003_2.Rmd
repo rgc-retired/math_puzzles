@@ -1,0 +1,379 @@
+---
+title: "Bent Summer 2003"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2003
+
+
+## Problem 1
+
+    Two park rangers at a Civil War
+    battle site are assigned the job of
+    counting a pile of cannonballs
+    arranged in the shape of a regular
+    tetrahedron. The first ranger says,
+    "We will have to disassemble the
+    pile to count the cannonballs in the
+    middle." The second ranger, a Tau
+    Bate, replies, "That won't be
+    necessary. Just tell me the number n
+    of balls along one side of the bottom
+    layer, and I can calculate the total
+    number in the stack." What closedform
+    formula did he use?
+    
+    -- John R. Sellars
+
+Solution: (seems too easy)
+
+    The number of balls on each side should
+    increase by one on each layer.  The top
+    row is 1, the next is 2, etc.  Need to
+    calculate:
+    
+    summation(m**2,(m,1,n)) using sympy
+    
+    In [306]: summation(m**2,(m,1,n))
+    Out[306]: n**3/3 + n**2/2 + n/6
+
+    In [307]: factor(summation(m**2,(m,1,n)))
+    Out[307]: n*(n + 1)*(2*n + 1)/6
+
+Well I obviously don't know what a tetrahedron is.
+I used a pyramid with 4 sides and a bottom.  They
+wanted a pyramid with 3 sides and a bottom.  In that
+case:
+
+    Top row = 1
+    Next    = 3
+    Next    = 6
+    ... triangular numbers ...
+    
+    So - if you give the number along one side then that is the layer number
+    and the number on the layer is n*(n+1)/2
+    
+    So - sum these up:
+    
+    In [406]: summation(m*(m+1)/2,(m,1,n))
+    Out[406]: n**3/6 + n**2/2 + n/3
+
+    In [407]: factor(summation(m*(m+1)/2,(m,1,n)))
+    Out[407]: n*(n + 1)*(n + 2)/6
+
+Which was the requested result.
+
+
+## Problem 2
+
+    An urn contains ten balls, numbered
+    1 through 10. Three balls are
+    drawn at random without replacement.
+    What is the probability that
+    the values on the three balls can be
+    sides of the same triangle?
+    
+    -- Unknown
+
+Solution: Monte-Carlo, Permutations, analytical
+
+Given sides = a,b,c
+
+Can form a triangle iff:
+
+    a+b > c, and
+    a+c > b, and
+    b+c > a
+
+Look at Monte-Carlo first:
+
+```{r}
+num_trials=1000000
+
+n=0
+for (i in 1:num_trials) {
+    s=sample(1:10,3)
+    a=s[1]; b=s[2]; c=s[3]
+    if ( (a+b)>c & (a+c)>b & (b+c)>a ) { n=n+1 }
+}
+n/num_trials
+```
+
+Solution by Monte-Carlo suggests probability = 0.41571.
+
+Try this be exhaustive enumeration:
+
+```{r}
+library(gtools)
+
+a=permutations(10,3,1:10)
+
+k1=(a[,1]+a[,2]>a[,3])
+k2=(a[,1]+a[,3]>a[,2])
+k3=(a[,2]+a[,3]>a[,1])
+k=k1&k2&k3
+
+paste0("Number of possible drawings  = ",nrow(a),collapse='')
+paste0("Number of feasible triangles = ",sum(k),collapse='')
+paste0("Probability = ",sum(k)/nrow(a),collapse='')
+```
+
+So the exhaustive probability = 300/720 = 5/12 = 0.41666...
+
+Finally, we try to enumerate them:
+
+    Total possibilities = choose(10,3)*3! = 720 permutations
+    Total triangle permutations = 50*3! = 300 possible triangles
+    
+    Details below:
+    
+    Note that we fail to form a triangle if:
+    
+        a+b>c, or
+        a+c>b, or
+        b+c>a
+
+    Consider only the choose(10,3)=120 combinations.  We can figure
+    out which are permissible and then multiply by 3! to account for
+    permutations.  Since each value is unique, assume a < b < c
+    
+    Consider each case for a = 1, 2, ..., 8.  Note that a can not
+    exceed 8 since b=9, c=10 will be the only combination.
+    
+    In general:
+    
+        a in range [1,8]
+        b in range [a+1,9]
+        c in range [b+1,min(a+b-1,10)]
+    
+    Enumeration of the solutions:
+    
+    a=1 --> no solution since c > b and c <= b.
+    
+    a=2, b=3, c=4  \
+    a=2, b=4, c=5   | 7 combinations
+    a=2, b=5, c=6   |
+    ...             |
+    a=8, b=9, c=10 /
+    
+    a=3, b=4, c=5,6  \
+    a=3, b=5, c=6,7   | 11 combinations
+    ...               |
+    a=3, b=8, c=9,10  |
+    a=3, b=9, c=10   /
+    
+    a=4, b=5, c=6,7,8   \
+    a=4, b=6, c=7,8,9    | 12 combinations
+    a=4, b=7, c=8,9,10   |
+    a=4, b=8, c=9,10     |
+    a=4, b=9, c=10      /
+
+    a=5, b=6, c=7,8,9,10 \
+    a=5, b=7, c=8,9,10    | 10 combinations
+    a=5, b=8, c=9,10      |
+    a=5, b=9, c=10       /
+
+    a=6, b=7, c=8,9,10   \
+    a=6, b=8, c=9,10      | 6 combinations
+    a=6, b=9, c=10       /
+    
+    a=7, b=8, c=9,10     \  3 combinations
+    a=7, b=9, c=10       /
+    
+    a=8, b=9, c=10       - 1 combination
+
+    Total number of combinations = 7+11+12+10+6+3+1 = 50 combinations
+    Total triangle permutations = 50*3! = 300 possible triangles
+    
+
+## Problem 3
+
+    Solve the following cryptics. Each
+    letter has the same value in both
+    cryptics, and each letter also
+    represents a different digit.
+    FIVE - FOUR = ONE
+    FIVE + FIVE = EVEN
+    
+    -- M. Yagi, CA I'96
+
+Solution: solved in the cryptic arithmetic notebook
+
+    FIVE = 2374
+    FOUR = 2190
+    ONE  = 184
+    EVEN = 4748
+
+
+## Problem 4
+
+    Given a one-meter cube, drill a
+    hole of diameter 0.25m with its axis
+    along a diagonal of the cube. What is
+    the volume of the material removed?
+    
+    -- SW Missouri State U. Math. Dept.
+
+Solution: this seems hard.  A lot like the water pipe through the
+    manhole but in three dimensions.  If we ignore the slight distortion
+    on the ends this is essentially a cylinder of the specified diameter
+    with a length equal to the diagonal of the cube.
+    
+    Cube diagonal length = sqrt(3)
+    cylinder radius = 0.25/2
+    
+    Approximate volume = L * pi*r**2
+        = sqrt(3)*pi*0.125**2
+        = 0.085 m^3
+
+    To get a precise solution I think you need to view this in a plane
+    parallel to the diagonal of the cube -- one that bisects the cube and
+    the drill hole.  That would make this problem a lot like
+    the water pipe/manhole problem and it would be "simple" to make
+    the calculation.
+    
+    I am not very good with 3D geometry.
+
+    Their solution is very complex (IMHO) and yields V = 0.0754 m^3 after
+    subtracting out the corners of the cube.
+
+
+## Problem 5
+
+    If the Earth's movement
+    matched the Gregorian calendar
+    perfectly, how many degrees per
+    day would the Earth rotate relative
+    to the "fixed" stars? Give the
+    answer exactly.
+    
+    -- Byron R. Adams, TX A'58
+
+TODO
+
+I don't even understand this problem.  Even after reading their
+solution I don't understand what is going on.
+
+Here is their analysis:
+
+    Length of a year = 365+97/400 days (97 leap years in 400?)
+    
+    Number of rotations in a year = 1+365+97/400
+    
+    Rotations per day = (1+365+97/400)/(365+97/400)
+    
+    deg per day = 360*Rotations
+                = 360*(1+365+97/400)/(365+97/400)
+                = 5859880/16233
+                ~ 360.9856465225158
+
+
+## Bonus
+
+    This is a variation of a
+    problem that appeared in the Winter
+    2003 column. A package-handling
+    company will ship a package with a
+    length plus girth of up to 108 inches.
+    A customer wishes to mail a rightcircular
+    cone of maximum volume
+    consistent with the given limitation.
+    If the girth is defined as the shortest
+    loop of string through which the
+    cone will pass and the length is
+    defined as the maximum dimension
+    of the cone, what are the altitude
+    and base diameters of the cone?
+    
+    -- R. Wilson Rowland, MD B'51
+
+Solution:
+
+    I almost had this -- they say the girth around the cone is the
+    same a flattening the cone into a pizza slice (not a simple triangle).
+    They solve the resulting equations by trial and error to get:
+    
+        See their solution.  Need to work through this in detail
+        to understand the girth values they are using.
+    
+    I am not sure that you can actually flatten a cone without distorting
+    the surface of the cone.
+    
+    My attempt:
+
+    The girth could be the circumference of the circular base
+    or it could be the size of the eqilateral triangle composed
+    of the diameter of the base and the two edges of the cone.
+    
+    For a very short cone the circumference of the base will
+    not define the girth.  It will be shorter to put the cone
+    through the loop "sideways".  For a taller cone, however, the girth
+    will be defined by the circumference of the base.
+    
+    The critical height is: h=r*sqrt(pi/(pi-2)) where r=radius of base
+    
+    The length of the cone is the longest dimension.  For the very
+    short cones the length will actually be defined by the diameter
+    of the base.  For a long "skinny" cone the longest dimension will
+    be the length of the side (sqrt(h**2+r**2)).  The critical
+    height is: h=r*sqrt(3) where r=radius of base.
+    
+    Interestingly, these two critical values are very close to each other.
+    
+    So:
+    
+    h < r*sqrt(pi/(pi-2)) --> girth = 2*r+sqrt(h^2 + r^2) else 2*pi*r
+    h < r*sqrt(3)         --> length = 2*r else sqrt(h^2 + r^2)
+    
+    Thus:
+    
+    h < r*sqrt(pi/(pi-2))  --> girth = 2*r+sqrt(h^2+r^2), length = 2*r
+    h > r*sqrt(3)          --> girth = 2*pi*r, length=sqrt(h^2 + r^2)
+    otherwise              --> girth = 2*pi*r, length=2*r
+
+    This is very ugly -- there must be a better way.
+    
+    What about Monte-Carlo?
+    
+    
+## Double Bonus
+
+    What are the
+    smallest and largest perfect squares
+    that use each of the digits 0 to 9 once
+    and only once. A leading 0 is not
+    allowed.
+    
+    -- Technology Review
+
+
+Solution: exhaustive search (awfully easy)
+
+    Range is 32043 to 99066
+    
+    32043^2 = 1026753849
+    99066^2 = 9814072356
+    
+    FYI there are 87 squares using all 10 digits exactly once.
+
+```{r}
+n1=trunc(sqrt(1e9))
+n2=trunc(sqrt(1e10))
+
+zzz=c()
+for (i in n1:n2) {
+    n=length(unique(strsplit(as.character(i^2),'')[[1]]))
+    if (n==10) {
+        # print(i)
+        zzz=c(zzz,i)
+    }
+}
+range(zzz)
+```
+

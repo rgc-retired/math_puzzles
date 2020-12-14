@@ -1,0 +1,383 @@
+---
+title: "Bent Spring 2008"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2008
+
+
+## Problem 1
+
+    A photographer has been hired to
+    take a group picture of a high-school
+    reunion that is attended by 100
+    graduates. How many pictures should
+    he take to have at least a 95 percent
+    probability that he has at least one
+    picture in which no one has his or her
+    eyes closed? Assume that the average
+    person blinks six times a minute
+    and that their eyes are closed for
+    one tenth of a second on each blink.
+    Assume the shutter clicks instantaneously.
+
+    -- H.G. McIlvried III, PA Gamma'53
+
+Solution:
+
+    Pr(blink) = 0.6/60 = 0.01
+    Pr(noblink) = 0.99
+    
+    For 100 students: Pr(noblink)=(0.99)^100
+       Pr(noblink) = 0.3660323
+       
+    For a given photo: Pr(failure) = 1-Pr(noblink)
+                                   = 0.6339677
+                                   
+    For n photos we want Pr(failure)<0.05 so:
+    
+    0.6339677^n < 0.05
+    
+    n >= 6.573
+    
+    So we need at least 7 photos.
+
+
+## Problem 2
+
+    Six unit squares can be joined
+    along their edges to form 35 different
+    hexominos, the simplest being a one
+    by six rectangle. How many of these
+    hexominos can be folded along edges
+    joining the squares to form a unit
+    cube? A rotation or reflection is not
+    considered to be a different hexomino.
+
+    -- The Colossal Book of Mathematics
+    by Martin Gardner
+
+TODO
+
+
+## Problem 3
+
+    Many of you puzzle fans are familiar
+    with the famous cryptic, SEND
+    + MORE = MONEY. Here is the
+    response: ALAS + LASS + NO +
+    MORE = CASH. We want the solution
+    to this cryptic addition with the
+    biggest NO. Each different letter represents
+    a different digit, but the same
+    letter always represents the same
+    digit. There are no leading zeros.
+
+    -- Madachy's Mathematical
+    Recreations by Joseph S. Madachy
+
+Solution: solved in cryptic arithmetic notebook
+
+    > a[k,][4,]
+    
+           a l s n o m r e c h
+    423046 1 2 5 9 6 3 8 4 7 0  
+
+    alas = 1215
+    lass = 2155
+    no   = 96
+    more = 3684
+    cash = 7150
+    
+
+## Problem 4
+
+    The game of snooker is played
+    with 22 balls (15 red balls, six colored
+    balls, and a cue ball) on a six pocket
+    table that resembles a standard pool
+    table. The red balls are not numbered,
+    but the colored balls are numbered
+    2, 3, 4, 5, 6, and 7.
+    A player scores one point for each
+    red ball pocketed and the indicated
+    number of points for pocketing a
+    colored ball. A player must pocket
+    a red ball, then any colored ball,
+    then another red ball, then another
+    colored ball, etc. The red balls are
+    not respotted, but as long as any red
+    balls are on the table, colored balls
+    are respotted.
+    After all 15 red balls are pocketed,
+    the six colored balls are sunk in
+    numerical order without being respotted.
+    Al recently ran the table, sinking
+    one ball at a time. His cumulative
+    score after pocketing each of the first
+    14 colored balls and the 15th red ball
+    was always a semiprime (the product
+    of two primes), but his score after
+    pocketing each of the final six colored
+    balls was never a semiprime.
+    What was his final score?
+
+    -- Richard England in New Scientist
+
+TODO
+
+
+## Problem 5
+
+    Triangular numbers are numbers
+    of the form Tn = n(n + 1)/2. They are
+    called triangular numbers because Tn
+    points can be arranged, bowling pin
+    style, to form a triangle.
+    The first few triangular numbers
+    are 1, 3, 6, 10, and 15. What is the
+    sum of the reciprocals of the triangular
+    numbers from 1 to infinity?
+
+    -- Mathematical Journeys
+    by Peter D. Schumer
+
+Solution:
+
+    Sympy to the rescue: the sum is 2
+    
+    In [1097]: summation(1/(n*(n+1)/2),(n,1,oo))
+    Out[1097]: 2
+
+    Attempting to do it by hand?  Try partial fraction expansion
+    
+    S = summation(2/(n*(n+1))) = summation(2/n - 2/(n+1))
+    
+    As n=1..oo
+    
+        S1 = 2/1 + 2/2 + 2/3 + ...
+        S2 =       2/2 + 2/3 + ...
+        
+        S = S1-S2 = 2
+
+    Actually not that hard!
+
+
+## Bonus
+
+    Fred has five dice and decides
+    to see how long it will take him
+    to throw five 6s using the following
+    procedure. He tosses all five dice.
+    He then picks up and re-tosses those
+    that are not 6s. He repeats this process
+    until he has all 6s. What is the
+    expected number of tosses to get five
+    6s? Give the answer exactly in terms
+    of a fraction.
+
+    -- F.J. Tydeman, CA Delta'73
+
+Solution:
+
+    Start with Monte-Carlo and then do the analytics
+    
+```{r}
+ntrials=1000000
+
+set.seed(42)
+n=0
+for (trial in 1:ntrials) {
+   m=0
+   nd=5
+   while (nd != 0) {
+       s=sample(1:6,nd,replace=T)
+       # print(s)
+       m=m+1
+       nd=length(s[s!=6])
+   }
+   n=n+m
+}
+print(n/ntrials)
+```
+
+For 1e5 trials
+
+    Seed   N
+    ===============
+    42     13.01873
+    123    13.03723
+    2020   13.04215
+    
+For 1e6 trials
+
+    Seed   N
+    ===============
+    42     13.01179
+
+The Bent solution using combinatorics:
+
+    3,698,650,986/283,994,711 = 13.024
+
+    They work up to this by starting with one die.
+    if N1 = expected number of tosses then the
+    expression is:
+    
+        N1 = 1/6 + 5/6*(1+N1)
+        
+    e.g. there is a 1/6 chance of getting it in one
+    toss and a 5/6 chance that it will take more
+    than one toss.  The subtlety is the recursion
+    in the term (1+N1).
+    
+    This did not occur to me.  I would express it like
+    this:
+    
+        N1 = 1*1/6 + 2*5/6*1/6 + 3*5/6*5/6*1/6 + ... + n*(5/6)**(n-1)*1/6 + ...
+           = summation(1/6*n*(5/6)**(n-1),(n,1,oo))
+           = 6
+           
+    But we note:
+
+        5/6*N1 = 1*5/6*1/6 + 2*5/6*5/6*1/6 + 3*5/6*5/6*5/6*1/6 + ...
+
+        1+5/6*N1 = 1 + 1*5/6*1/6 + 2*5/6*5/6*1/6 + 3*5/6*5/6*5/6*1/6 + ...
+
+        How do we prove this is N1?
+
+        N1 = 1*1/6 + 1*5/6*1/6 + 2*5/6*5/6*1/6 + ... + (n-1)*(5/6)**(n-1)*1/6 + ...
+                     1*5/6*1/6 + 1*5/6*5/6*1/6 + ... + 1*    (5/6)**(n-1)*1/6 + ...
+        
+           = 1/6 + 5/6*(1*1/6 + 2*5/6*1/6 + ... + (n-1)*(5/6)**(n-2)*1/6 + ...) +
+                   5/6*1/6*(1 + 5/6 + ...             (5/6)**(n-2) + ...)
+                   
+           = 1 + 5/6*(1*1/6 + 2*5/6*1/6 + ... + (n-1)*(5/6)**(n-2)*1/6 + ...)
+           = 1 + 5/6*N1
+           = 1/6 + 5/6 + 5/6*N1
+           
+        N1 = 1/6 + 5/6*(1+N1)
+        
+    This just seems way too hard.  Why isn't it obvious from first principles?
+
+
+    Solving for N1:
+    
+        N1*(1-5/6) = 1
+        
+        N1 = 6
+        
+    So, with only one die we expect to roll 6 times to
+    get a 6.
+    
+    For two dice it gets a bit more complicated.
+    They just straight to the combinatorics but we
+    will try to derive it here:
+    
+    On first toss the odds of getting both 6s is:
+    
+        1/6*1/6
+        
+    This can only happen one way: C(2,0)
+        
+    The odds of getting one 6 and one non-6 is:
+    
+        1/6*5/6
+        
+    This can happen two ways: C(2,1)
+        
+    The ods of getting two non 6s is:
+    
+        5/6*5/6
+        
+    This can only happen one way: C(2,2)
+    
+    Summing up the probabilities:
+    
+        N2 = C(2,0)*1/6*1/6 + 
+             C(2,1)*1/6*5/6*(1+N1) +
+             C(2,2)*5/6*5/6*(1+N2)
+             
+    Solving for N2:
+    
+        N2 = 1/36 + 2*5/36*(1+N1) + 25/36*(1+N2)
+        N1 = 6 (from above)
+        
+        N2 = 1/36 + 10/36*7 + 25/36*(1+N2)
+        
+        N2*(1-25/36) = 1/36 + 70/36 + 25/36 = 96/36
+        N2*11/36 = 96/36
+        N2 = 96/11 ~ 8.727273
+        
+    To get 2 6s with 2 dice requirs ~ 8.7273 tosses
+        
+    Continuing for N3:
+    
+        N3 = C(3,0)*1/6*1/6*1/6+
+             C(3,1)*1/6*1/6*5/6*(1+N1)+
+             C(3,2)*1/6*5/6*5/6*(1+N2)+
+             C(3,3)*5/6*5/6*5/6*(1+N3)
+             
+    Solving for N3:
+    
+        N3 = 10566/1001
+
+    All five solutions are:
+    
+    N   Expected Tosses         Numerical
+    --------------------------------------------
+    1   6                       6.00000000000000
+    2   96/11                   8.72727272727273
+    3   10566/1001              10.5554445554446
+    4   728256/61061            11.9266962545651
+    5   3698650986/283994711    13.0236615075553
+
+
+## Computer Bonus
+
+    A weak prime is a
+    prime such that, when any of its digits
+    is replaced (one at a time) by any
+    different digit, the resulting integer
+    is no longer prime. The two smallest
+    weak primes are 294,001 and
+    505,447. What is the smallest weak
+    prime such that, when its digits are
+    reversed, the result is also a weak
+    prime? This one may take some time.
+    As an exception to our usual rule, we
+    will acknowledge correct solutions in
+    the Fall column.
+
+    -- R. Dudley White, VA Alpha'76
+
+Solution:
+
+    Not sure if this will really be a solution if they
+    are admonishing a long solution time.  I will use
+    the same sympy routine I used for 2004_2 to find
+    weak primes and then check the palindrome.
+    
+    This is brute force but I don't have any other simple
+    solutions.
+    
+    I could try to re-implement in gmp under R
+    
+    My sympy search is fairly brain-damaged and does a lot
+    of checking of numbers that can't possibly be solutions.
+    Need to skip numbers where the first digit is even or 5
+    since they can not be prime.
+    
+    No solutions found up to 400e6.
+    or 1e9
+    or 2e9
+    
+    Had to run several hours but solution found:
+    
+        n =   3376225859
+        n2 =  9585226733    

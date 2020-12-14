@@ -1,0 +1,483 @@
+---
+title: "Bent Spring 2020"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2020
+
+
+## Problem 1
+
+    I started with 10 cards with a different
+    digit on each card. After discarding one
+    card, I used the remaining nine cards to form
+    a two digit prime, a three-digit prime, and a
+    four-digit prime (with no leading zeros).
+    Even if I told you what the sum of these
+    three primes was, you would not be able to
+    deduce the digit I discarded; but if, in
+    addition, I told you that the middle two
+    digits of the sum were each equal to the
+    digit I discarded, then you would be able to
+    deduce the sum of the three primes I found.
+    What was that sum?
+
+    -- Susan Denhan in New Scientist
+
+Solution:
+
+    This is a cryptic arithmetic problem in disguise.
+    I will generate a solution using those tools.
+    
+```{r}
+source('rgc_lib.R')
+library(gmp)
+
+a=make_crypt_df('abcdefghi')
+x2=make_num(a,'ab')
+x3=make_num(a,'cde')
+x4=make_num(a,'fghi')
+k=(isprime(x2[,1])==2) & (isprime(x3[,1])==2) & (isprime(x4[,1])==2)
+
+# All solutions not including hint about center digits
+# k = list of index numbers into a
+k=k & (a['a']!=0) & (a['c']!=0) & (a['f']!=0)
+k=which(k)
+print(length(k))
+
+# Find the 4 digit sums with a repeated digit
+# that is not included in the original digits
+# k2 = list of index numbers into a
+# zzz = matrix of the feasible solutions
+zzz=c()
+k2=c()
+s=x2+x3+x4
+for (i in k) {
+    b=as.numeric(strsplit(as.character(s[i,]),"")[[1]])
+    if (length(b)==4) {
+        if (b[2] == b[3]) {
+            dup_digit=b[2]
+            missing_digit=(0:9)[which(!(0:9 %in% a[i,]))]
+            if (dup_digit == missing_digit) {
+                ### print(c(x2[i,],x3[i,],x4[i,],s[i,],missing_digit))
+                zzz=append(zzz,c(x2[i,],x3[i,],x4[i,],s[i,],missing_digit))
+                k2=append(k2,i)
+            }
+        }
+    }
+}
+zzz=matrix(zzz,ncol=5,byrow=TRUE)
+
+# Need to find a value that is unique in s[k2] but
+# is not unique in s[k]
+
+for (i in unique(s[k2,])) {
+    if (sum(s[k2,]==i) == 1) {
+        if (sum(s[k,]==i) != 1) {
+            print(sprintf("Feasible total = %d",i))
+            print(zzz[zzz[,4]==i,])
+        }
+    }
+}
+
+```
+
+    The only feasible sum is given below:
+
+    Feasible total = 8991
+    
+        2 digit prime   = 23
+        3 digit prime   = 467
+        4 digit prime   = 8501
+        sum             = 8991
+        discarded digit = 9
+
+
+## Problem 2
+
+    On each day of a non-leap year, I gave my
+    daughter a new penny, which I obtained
+    directly from the U.S. Mint and which I,
+    consequently, assumed to be of standard
+    weight.  I learned, however, that there had
+    been a minor production problem at the Mint
+    one day during the year, and a few pennies
+    had been released (I don't know on which day)
+    that were heavier or lighter than standard.
+    Assuming my daughter's penny collection
+    contains at most one off-spec penny, what is
+    the minimum number of weighings with a common
+    two pan balance scale needed to determine
+    whether or not she has an odd penny; and, if
+    she does, which is the odd penny and whether
+    it is heavier or lighter than standard?
+
+    -- The Puzzle Corner in Technology Review
+
+TODO
+
+    Partition into thirds - except 365/3 doesn't work.
+    
+    Compare first two parts and remainder -- 2 tests reduce to 1/3 of total
+    
+        Scales balance
+            Try remainder
+            If it balances --> no odd pennies
+            If heavier     --> odd penny heavier in final 1/3
+            If lighter     --> odd penny lighter in final 1/3
+
+        Scales imbalance
+            Swap lighter group with remainder
+            If it balances --> lighter group has odd penny
+            If heavier     --> impossible -- this would be three different weights
+            If lighter     --> heavier group has odd penny
+            
+    Repeat until identify the odd penny
+
+        365*(1/3)^(n/2) <= 1
+        
+        n=10.74 weighings.
+        
+
+## Problem 3
+
+    Solve the following cubic cryptarithm. All
+    the usual rules apply: the same letter always
+    represents the same digit, each digit is
+    represented by a unique letter, and there are
+    no leading zeros.
+
+    ABCDE = (A + B + C + D + E)^3
+
+    -- Source Unknown
+
+Solution:
+
+```{r}
+a=make_crypt_df('abcde')
+
+x_abcde=make_num(a,'abcde')
+s=(a['a']+a['b']+a['c']+a['d']+a['e'])^3
+
+k=(x_abcde == s) & (a['a']!=0) & (a['b']!=0) & (a['c']!=0) & (a['d']!=0) & (a['e']!=0)
+
+print(as.matrix(a[k,]))
+
+```
+
+    Solution:
+    
+         a b c d e
+    5961 1 9 6 8 3
+
+    sum = 27, 27^3 = 19683
+
+
+## Problem 4
+
+    Brag is a poker-like game played with a
+    standard deck of 52 cards, but a hand
+    consists of only three cards instead of the
+    usual five. The possible hands that can be
+    dealt are defined below:
+
+    (1) Royal flush (AKQ in same suit)
+    (2) Straight flush (sequence of 3
+    cards in same suit)
+    (3) 3 of a kind (3 cards of same
+    denomination)
+    (4) Straight (sequence of 3 cards
+    representing at least 2 different
+    suits)
+    (5) Flush (3 cards in same suit but
+    not in sequence)
+    (6) Pair (2 cards of same
+    denomination plus an unmatched 3rd
+    card)
+    (7) High card (3 unmatched cards -- 2
+    or 3 different suits and 3 different
+    denominations, not in sequence)
+
+    Aces can be high or low for a straight. How
+    many of each type of hand are there? Present
+    your answer as a table with 7 rows and 2
+    columns. Enter the numbers 1 to 7 in column 1
+    (no need to repeat the whole definitions); in
+    column 2 list the number of different ways of
+    being dealt each type of hand.  Be careful
+    not to double count. For example, if you
+    count all the straight flushes, you will be
+    counting the Royal Flushes twice.
+
+    -- The Ultimate Book of Card Games by The
+       Diagram Group
+
+Solution:
+
+    Exhaustive search -- yes this is very ugly.
+
+```{r}
+deck=0:51
+
+a=combinations(52,3,deck)
+pip=trunc(a/4)+2
+suit=a%%4
+
+n=rep(0,7)
+for (i in seq(nrow(a))) {
+    if (length(unique(pip[i,]))==1) {           # Three of a kind
+        n[3]=n[3]+1
+    } else if (length(unique(suit[i,]))==1) {   # Some kind of flush (royal, straight, other)
+        if (all(sort(pip[i,])==c(12,13,14))) {  # Royal Flush
+            n[1]=n[1]+1
+        } else {
+            x=sort(pip[i,])
+            if (all(diff(x)==1)) {              # Straight flush
+                n[2]=n[2]+1
+            } else if (c(14) %in% x) {
+                x=sort(ifelse(x==14,1,x))
+                if (all(diff(x)==1)) {          # Straight flush (ace low)
+                    n[2]=n[2]+1
+                } else {
+                    n[5]=n[5]+1                 # Flush
+                }
+            } else {
+                n[5]=n[5]+1                    # Flush
+            }
+        }
+    } else if (length(unique(pip[i,]))<3) {    # Pair
+        n[6]=n[6]+1
+    } else {                                   # Straight or bust
+        x=sort(pip[i,])
+        if (all(diff(x)==1)) {                 # Straight
+            n[4]=n[4]+1
+        } else if (c(14) %in% x) {
+            x=sort(ifelse(x==14,1,x))
+            if (all(diff(x)==1)) {             # Straight (ace low)
+                n[4]=n[4]+1
+            } else {
+                n[7]=n[7]+1                    # Bust
+            }
+        } else {
+            n[7]=n[7]+1                        # Bust
+        }
+    }
+}
+print(n)
+```
+
+    Results
+    
+    1   4       Royal Flush
+    2   44      Straight Flush
+    3   52      Three of a kind
+    4   720     Straight
+    5   1096    Flush
+    6   3744    Pair
+    7   16440   High Card (Bust)
+
+
+## Problem 5
+
+    What is the remainder when the number
+    2^4,700,063,497 is divided by 4,700,063,497?
+
+    -- Prime Numbers, the Most Mysterious Figures
+    in Math by David Wells
+
+Solution:
+
+    I am pretty sure there are modulo-arithmetic rules to
+    make this relatively easy to clculate but I don't know
+    them so I am reduced to brute force.
+
+    Brute force with python: remainder = 3 after crunching for 35 seconds.
+    
+    Maxima exploded with "out of heap" message
+    
+    R (gmp) barfed with "exponent e too large for pow(z,e) = z^e"
+    
+    If I set the modulus as shown below then things seem to work.
+    When you set the modulus on a bigz value all the calculations
+    are peformed using the given modulus:
+    
+    b=as.bigz(4700063497)
+    a=as.bigz(2,mod=b)
+    r=as.bigz(a^b)
+    
+    r = 3 with essentially no delay
+    
+    So gmp works but you have to treat it kindly.
+    Python just sort of works.
+
+
+## Bonus
+
+    Consider a chain (loop or circle) of length L
+    = n(n+1)/2 with links of integral lengths 1,
+    2, 3, 4, ..., n  occurring sequentially. You
+    desire to tightly wrap the chain around three
+    posts that form the vertices of an
+    equilateral triangle with vertices a distance
+    of S = L/3 apart, so that the posts occur
+    exactly at a break between two links. The
+    smallest example of such a chain has n = 9
+    links; for this chain, S = L/3 = 9(10)/6 =
+    15; one post is between links 3 and 4, the
+    second post is between links 6 and 7, and the
+    third post is between links 8 and 9, so the
+    three sides are (4 + 5 + 6), (7 + 8), and (9
+    + 1 + 2 + 3). What is the largest chain with
+    less than 1,000 links that will form an
+    equilateral triangle?  What is the shortest
+    chain that can be wrapped around 3 posts in
+    more than one way? Make the usual simplifying
+    assumptions: the chain and the corner posts
+    have zero radii, there is no overlap where
+    the ends of the chain join, etc.
+
+    -- The Puzzle Corner in Technology Review
+
+Solution:
+
+    For a chain of n links the total length is n*(n+1)/2.
+    The length of each side is 1/3 of this total
+    or:
+            S = n*(n+1)/6
+
+    In addition, there must be a set of links that
+    sum to S.  If there are breakpoints after link
+    m1,m2, and m3 then we know:
+
+        length m1 to m2: m2*(m2+1)/2 - m1*(m1+1)/2 = S
+        length m2 to m3: m3*(m3+1)/2 - m2*(m2+1)/2 = S
+        
+    The third side gets tricky assuming it wraps
+    around the end of the chain.  The length of the end
+    plus the start must sum to S:
+    
+        (length m3 to n) + (length up to m1) = S 
+        
+        n*(n+1)/2 - m3*(m3+1)/2 + m1*(m1+1)/2 = S
+        
+    
+    I will assume m1, find m2 (if it exists), and then find m3
+    (if it exists) and then check the remainder length.
+    
+    I do not know how to find these breakpoints efficiently.
+    I will do it with brute force - but it seems like
+    there must be a better way.
+
+```{r}
+# Give a chain of n links = 1, 2, 3, ..., n
+# Find the next subchain starting after link m that is
+# precisely s units long
+next_link = function(n,m,s) {
+    k=1:n
+    t=k*(k+1)/2
+    which(t== (m*(m+1)/2+s))
+}
+
+for (n in 1:1000) {
+    target=n*(n+1)/6
+    if (target == trunc(target)) {
+        for (first_link in 0:(n-1)) {
+            second_link=next_link(n,first_link,target)
+            if (length(second_link)==0) { next }
+            last_link=next_link(n,second_link,target)
+            if (length(last_link)==0) { next }
+            remainder=n*(n+1)/2-last_link*(last_link+1)/2+first_link*(first_link+1)/2
+            if (remainder == target) {
+                print(c(n,first_link,second_link,last_link))
+            }
+        }
+    }
+}
+
+```
+
+    Using some ugly brute force although the runtime isn't too long:
+    
+    Longest chain = 989 links
+        Break after 164, 594, 824
+        
+    Multiple solutions = 125 links
+        Break after  2, 72, 102
+        Break after 57, 92, 117
+
+    All solutions with less than 1000 links:
+
+        Chain   1st Break  2nd Break  3rd Break
+        ---------------------------------------
+        9       3          6          8
+        90      15         54         75
+        125     2          72         102
+        125     57         92         117
+        153     51         102        135
+        189     15         110        155
+        440     24         255        360
+        819     56         476        671
+        989     164        594        824
+
+
+## Computer Bonus
+
+    Find three consecutive triangular numbers
+    whose sum is a perfect square. The first such
+    set is 15 + 21 + 28 = 64 = 8^2. What is the
+    third such set?  A triangular number is a
+    number of the form n(n + 1)/2, where n is a
+    positive integer.
+
+    -- Elementary Number Theory by David M.
+       Burton
+
+Solution:
+
+    Brute force
+    
+```{r}
+
+T = function(n) { n*(n+1)/2 }
+
+s=c(T(1),T(2),T(3))
+n=3
+
+num_found=0
+while (TRUE) {
+    m=sum(s)
+    k=round(sqrt(m))
+    if (k*k == m) {
+        print(n)
+        print(s)
+        print(m)
+        print(k)
+        print("---------------")
+        num_found=num_found+1
+        if (num_found == 5) { break }
+    }
+    n=n+1
+    s[1]=s[2]
+    s[2]=s[3]
+    s[3]=T(n)
+}
+
+```
+
+    This seems awfully easy.
+    
+
+    n            T(n)                   sum    sqrt(sum)
+    ----------------------------------------------------
+    5   6   7    15     21     28       64      8
+    14  15  16   105    120    136      361     19
+    63  64  65   2016   2080   2145     6241    79  <-- requested values
+    152 153 154  11628  11781  11935    35344   188
+    637 638 639  203203 203841 204480   611524  782
+    ----------------------------------------------------

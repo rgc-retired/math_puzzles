@@ -1,0 +1,289 @@
+---
+title: "Bent Fall 2019"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2019
+
+
+## Problem 1
+
+    The following cryptic additions are to be
+    solved simultaneously, that is, letters have
+    the same value in both cryptics; different
+    letters are different values; * can represent
+    any value. There are no zeros anywhere. The
+    two sums are mirror images (i.e., reverses)
+    of each other.
+
+         ******    MIRROR
+        +MIRROR   +IMAGE*
+         ------    ------
+         IMAGE*    ******
+
+    -- an Enigma by Albert Haddad in New Scientist
+
+Solution:
+
+    Should be able to solve these with the standard
+    cryptic artithmetic tools with a digit set of
+    MIRROR, IMAGE + one more symbol.
+    
+    Need simultaneous solutions of:
+    
+         ******    MIRROR
+        +MIRROR   +IMAGE*
+         ------    ------
+         IMAGE*    *EGAMI
+
+    Only the sums are mirror images.
+    
+    The Bent solution:
+    
+        447265 = *****      274434 = MIRROR
+        274434 = MIRROR     721693 = IMAGE*
+        ------              ------
+        721699 = IMAGE*     996127 = *EMAGI
+
+    After working some more I get 5 solutions:
+ 
+    The third of my 5 solutions is the one from the Bent.
+    
+    I can't find anything wrong with the other four solutions.
+    
+    Oops - I missed a constraint.  The problem says there are
+    no zeros anywhere!!!
+    
+    When I add that constraint the solution is unique.
+  
+```{r}
+source("rgc_lib.R")
+
+a=make_crypt_df("MIRRORIMAGE")
+
+x_mirror=make_num(a,"MIRROR")
+x_egami=make_num(a,"EGAMI")
+x_image=make_num(a,"IMAGE")
+
+for (i in 0:9) {
+    x=x_mirror+(x_image*10+i)
+    k=(x<1000000) & ((x%%100000) == x_egami) & (a['M']!=0) & (a['I']!=0) & (x_image*10 > x_mirror)
+    if (any(k)) {
+        for (j in which(k)) {
+            if (any(a[j,]==0)) { next }
+            n1=x_mirror[j,]
+            n2=(x_image[j,]*10+i)
+            n3=as.numeric(paste0(rev(strsplit(as.character(n1+n2),"")[[1]]),collapse=""))
+            if (n3>n1) {
+                n4=n3-n1
+                print(sprintf("i = %d",i))
+                print(as.matrix(a[j,]))
+                print("Left sum:")
+                print(sprintf("%6d         ",n4))
+                print(sprintf("%6d = MIRROR",n1))
+                print(sprintf("%6d = IMAGE*",n3))
+                print("Right sum:")
+                print(sprintf("%6d = MIRROR",n1))
+                print(sprintf("%6d = IMAGE*",n2))
+                print(sprintf("%6d = *EMAGI",n1+n2))
+                print("-----")
+            }
+        }
+    }
+}
+
+```
+
+    Matches the solution from the Bent.
+
+
+## Problem 2
+
+    An antimagic square is an NxN grid containing
+    the integers from 1 through N^2, such that the
+    sum of each row, column, and main diagonal is
+    a different number, and those sums form a
+    consecutive sequence of integers. There are
+    no 3x3 antimagic squares, but there are some
+    that are close in that the sequence of sums
+    is consecutive except for one missing value.
+    Find a 3x3 near antimagic square in which the
+    three digit number represented by the top
+    left (hundreds position) to bottom right
+    (units position) main diagonal is a minimum.
+    Present your answer as a 3x3 grid containing
+    the digits 1 through 9.
+
+    -- H.G. McIlvried III, PA G'53
+
+TODO
+
+    meh
+
+
+## Problem 3
+
+    On average, how often (once every N years)
+    does a blue moon (2nd full moon in the same
+    month) fall on New Year's Eve in Los Angeles?
+
+    -- F.J. Tydeman, CA Delta'73
+
+TODO
+
+    meh
+
+
+## Problem 4
+
+    As a promotion, a pizza shop advertises a
+    medium plus a large pizza, with up to five
+    toppings each, for just the price of a large
+    pizza. The advertisement further states that
+    a patron has a choice of 1,048,576 different
+    combinations of two pizzas. Assuming this
+    statement is correct, if a topping can be
+    used only once on a given pizza and the two
+    pizzas can each have a different combination
+    of toppings, how many different toppings does
+    the pizza shop have?
+
+    -- Allan Gottlieb's Puzzle Corner in
+       Technology Review
+
+Solution:
+
+    This seems kind of obvious.
+    
+    1048576 = 2^20 then each pizza has 2^10=1024 combinations
+    of 0 to 5 toppings.
+    
+    Need: C(n,0)+C(n,1)+C(n,2)+C(n,3)+C(n,4)+C(n,5) = 1024
+    
+    Just search for n:
+    
+```{r}
+
+for (n in 5:15) {
+    m=sum(choose(n,0:5))
+    print(c(n,m))
+}
+```
+
+    The solution is to use 11 toppings --> 1024 combinations.
+
+
+## Problem 5
+
+    Another order of merit (no ties) for A, B, C,
+    D, E -- this time for Deception. In their usual
+    chatty way, they are making remarks about
+    their places. The remarks of those who were
+    first and second are false, the rest are
+    true.
+
+        A: D was third.
+        B: E was not first.
+        C: I was not last.
+        D: C was lower than B.
+        E: B was second.
+
+    What were their places (first to last)?
+
+    -- Brain Puzzler's Delight
+       by E.R. Emmet
+
+TODO
+
+    meh
+
+
+## Bonus
+
+    Consider a unit radius circle whose center is
+    at the origin of a set of Cartesian
+    coordinates. Construct a 2 Theta sector of this
+    circle lying along the x-axis, with half the
+    sector lying above the x-axis and half lying
+    below the x-axis. Inscribe in this sector a
+    series of circles of radii R1, R2, R3, ...,
+    whose centers are on the x-axis. The first
+    circle is tangent to the arc of the sector
+    and its two sides. The second circle is
+    tangent to the first circle and the sides of
+    the sector; the third circle is tangent to
+    the second circle and the sides of the
+    sector; ad infinitum. Obviously, the ratio of
+    the sum of the circles' areas to the sector's
+    area is less than 1. For what value of Theta is
+    this ratio the largest, and what is this
+    largest ratio?
+
+    -- Allan Gottlieb's Puzzle Corner in
+    Technology Review
+
+Solution:
+
+    See the files in c:\rgc\test\play\bent\2019\3_fall
+    
+    Unfortunately my final solution said the angle should
+    shrink to zero which bothered me:
+    
+    Maximum(area_ratio) = pi/4
+    Optimal theta = 0
+
+    I wonder what the Bent says ...
+    
+    yep -- that is what they got too ... and it didn't seem
+    to bother them one bit.
+
+
+## Computer Bonus
+
+    The prime 5 exactly divides the sum of all
+    the primes smaller than itself, (2+3)/5 = 1.
+    The next prime with this property is 71. What
+    is the next (after 71) such prime?
+
+    -- Prime Numbers, the Most Mysterious Figures
+    in Math by David Wells
+
+Solution:
+
+    Let's try brute force and see what happens.
+    
+```{r}
+library(gmp)
+
+# All primes up to 1e6
+p=(2:1000000)[isprime(2:1000000)==2]
+
+# cumsum includes each prime so need to subtract them out
+s=cumsum(as.numeric(p))-p
+
+# Find the sums that are integer multiples of the primes
+k=(s%%p == 0)
+
+# List them
+t(rbind(p[k],s[k]))
+
+```
+
+    The primes that are factors of the sum of smaller primes are:
+
+          Prime        Sum
+    [1,]      2          0
+    [2,]      5          5
+    [3,]     71        568
+    [4,] 369119 5536785000  <-- solution requested
+    
+        prime = 369119
+        sum   = 5536785000
+        
+    I got lucky -- the solution was below 1e6.

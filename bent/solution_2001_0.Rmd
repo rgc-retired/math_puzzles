@@ -1,0 +1,392 @@
+---
+title: "Bent Winter 2001"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2001
+
+
+## Problem 1
+
+    Some space travelers landing on a
+    distant planet find a thriving civilization
+    similar to our own. However, those on
+    the planet have eight fingers on each
+    hand, and thus they use a hexadecimal
+    system. By coincidence, they use coins
+    with values of 1, 5, 10, 25, and 50, just as
+    we do, but these numbers are
+    hexadecimal. Furthermore, they love to
+    gamble as evidenced by their toll bridge,
+    which instead of being a fixed toll,
+    flashes the toll as a random number from
+    1 through 100, inclusive, and hexadecimal,
+    of course. To use the exact change lane,
+    how many coins of each denomination
+    must a traveler carry in order to have the
+    least total value of coins and still be able
+    to exactly pay any toll?
+    
+    -- William W. Verkuilen, WI Beta'92
+
+Solution:
+
+We can convert these to base 10 and look at the equivalents.
+This should be similar to the same problem in base 10 using
+our conventional coins:
+
+    0x01 = 1
+    0x05 = 5
+    0x10 = 16
+    0x25 = 37
+    0x50 = 80
+    
+The toll varies from 0x01 to 0x100 = 1 to 256 decimal.
+
+For the smallest tolls we must carry 4 coins with value = 1.
+
+If we add a coin with value = 0x05 we can cover all tolls from 1-9.
+If we add a second coin with value = 0x05 we can cover 1-14
+
+We need one more coin with value = 1 to cover a toll of 15.
+
+At this point we can cover the tolls 1-15:
+
+    0x01 Coins = 5
+    0x05 Coins = 2
+
+Adding a coin of value 0x10 gives all tolls 16-31.
+Adding a second coin of value 0x10 gives all tolls up to 47.
+
+We have overlapped with the coin of value = 0x25 (decimal 37) so we can
+add one of those.  This allows us to cover tolls up to 47+37 = 84.
+
+We have overlapped with the coin of value = 0x50 (decimal 80) so we can
+add one of those.  This allows us to cover tools up to 84+80 = 164.
+
+This leaves a gap of 256-164 = 92.  The most efficient way to cover this
+is to add one more coin of value = 0x50 (decimal 80), two coins of value 0x05,
+and two coins of value 0x01.
+
+Final count:
+
+    0x01 Coins  = 7
+    0x05 Coins  = 4
+    0x10 Coins  = 2
+    0x25 Coins  = 1
+    0x50 Coins  = 2
+    ----------------
+    Total Coins = 16
+    Total Value = 7+4*5+2*16+37+2*80 = 256
+
+Some questions:
+
+1. Does this really cover all the totals?
+
+2. Can I improve on this and still cover all possible totals?
+
+Answer the second question first:  
+
+We can't get rid of any coins because the total is just precisely enough to cover
+the highest toll.  The only way to reduce the coin count is to trade multiple coins
+of a lower denomination for ones of a higher value.
+
+Consider the smaller coins: need at least 4 coins of value = 0x01 to cover the
+lowest toll values.  This means that only 3 are negotiable.  This is not enough to
+exchange for any other coin so we will leave this alone.
+
+Consider the next coin (0x05): could trade three of these and a coin of value = 0x01
+for a coin of value 0x10.  This would reduce the coin count by 3 but it would leave
+a gap in the toll coverage.  The modified counts would be:
+
+    0x01 Coins = 6
+    0x05 Coins = 1
+    0x10 Coins = 3
+    
+These can not cover a toll of 12, 13, 14, or 15.  In order to cover these cases we
+would need to add 4 coins of value = 0x01 which is worse than where we started.
+Conclude -- no change in the coins with value = 0x05.
+
+Consider coins with value = 0x010: could trade two of these and a coin of value = 0x05
+for a coin of value 0x25.  This would reduce the coin count by 2 but it would leave
+a gap in the toll coverage.  The modified counts would be:
+
+    0x01 Coins = 7
+    0x05 Coins = 3
+    0x10 Coins = 0
+    0x25 Coins = 2
+
+It is not possible to pay a toll of 23, 24, ..., 36 (and many more).
+Conclude -- no change in the coins with value = 0x10.
+
+There is only one coin of value 0x25 so an exchange is not possible.
+
+Coins of value 0x50 are the largest coins to so no exchange is possible.
+
+Final conclusion: this is a minimum set of coins.
+
+We can verify the coverage of the totals with exhaustive search:
+
+```{r}
+coin_value=7+4*5+2*16+1*37+2*80
+value=rep(0,coin_value)
+for (c01 in 0:7) {
+  for (c05 in 0:4) {
+    for (c10 in 0:2) {
+      for (c25 in 0:1) {
+        for (c50 in 0:2) {
+          total = c01+5*c05+16*c10+37*c25+80*c50
+          value[total]=value[total]+1
+        }
+      }
+    }
+  }
+}
+all(value[1:256]>=1)
+```
+
+So we conclude that all possible tolls are covered.  In fact, some totals may be
+achieved many different ways which some of the toll values are unique.  This
+is shown below:
+
+```{r}
+table(value)
+```
+
+There are 29 toll values that can only be achieved with one combination of the coins.
+
+
+## Problem 2
+
+    What minimal number of knights is
+    required so every square on a standard
+    8 x 8 chessboard is either occupied by a
+    knight or threatened by a knight? A
+    square is threatened if a knight can
+    move to that square. Recall that a
+    knight moves two squares in any
+    direction and then one square
+    perpendicular to that direction to land
+    on a square of opposite color. The move
+    can occur even if the intervening
+    squares are occupied.
+    
+    -- Daryl Cooper
+
+TODO
+
+## Problem 3
+
+    An integer N consisting of five all-different
+    nonzero digits has the curious
+    property that it is equal to the sum of all
+    the different three-digit integers formed
+    by the three-digit permutations of its five
+    digits. Find N.
+    
+    -- Thomas R. Diaz-Davilla, PR Alpha'96
+
+Solution: seems like exhaustive search.  Use Python itertools.
+
+```{r}
+library(reticulate)
+```
+
+```{python}
+import itertools
+
+def make_num(a,nbase=10):
+  """ Given digits in a
+  Calculate value is given base.
+  """
+  n=0
+  for i in a:
+      n=nbase*n+i
+  return(n)
+
+def perm_sum(a,n=3):
+  """ Given set of digits in a
+  Calculate the sum of all n digit permutations
+  """
+  s=0
+  for i in itertools.permutations(a,n):
+      s=s+make_num(i)
+  return(s)
+
+for a in itertools.permutations([1,2,3,4,5,6,7,8,9],5):
+  n1=make_num(a)
+  n2=perm_sum(a)
+  if (n1==n2):
+    print(a)
+```
+
+The solution is 35964.
+
+I was shocked at how fast this runs!  Less than a second!
+
+
+Just for grins -- let's try the same thing with R gtools:
+
+```{r}
+library(gtools)
+
+t1=Sys.time()
+a=permutations(9,5)
+for (i in 1:nrow(a)) {
+  n1=as.integer(paste0(a[i,],collapse=''))
+  b=permutations(ncol(a),3,v=a[i,])
+  n2=sum(apply(b,1,function(x) {as.integer(paste0(x,collapse=''))}))
+  if (n1==n2) {
+    print(a[i,])
+  }
+}
+t2=Sys.time()
+print('Execution time:')
+t2-t1
+```
+
+It yields the same answer as Python but the run-time is much slower.
+
+
+## Problem 4
+
+    In the tiny kingdom of Podunk, there
+    are exactly 1,000 inhabitants, and they
+    have their own vehicles with three-digit
+    license-plate numbers from 000 through
+    999. Plate 000 belongs to comedian Zero
+    Mousetell. One day, someone noticed
+    that the king's flag had been flown
+    upside down, a considerable insult. A
+    surveillance camera caught the
+    departing car and showed that the first
+    two digits of its license plate were 00
+    but the third digit was blocked by a
+    pole. Zero was the prime suspect. Most
+    citizens were out of town attending a
+    fair, but those at the fair did not see
+    Zero there. On a random basis, how
+    many citizens, not counting Zero, would
+    have had to remain in town for Zero to
+    have just less than a 50% chance of
+    being the culprit?
+    
+    -- Kurt F. Hafner Jr.
+
+Solution: we can try Monte-Carlo or an analytical solution.
+Let us number all the other residents 1, 2, ..., 999.
+We need to randomly sample N out of 999 and see how many low
+license plate numbers (resident numbers) were present.
+If this number is zero then Zero Mousetel is the only
+suspect.  If the number is 1 then Zero is a 50% chance.
+If the number is 9 then ZM has a 10% chance.
+
+In general, if the number is m then the chance that ZM is
+the cuplrit is 1/(1+m)
+
+
+```{r}
+n_trial=100000
+
+n=rep(0,10)
+a=c()
+for (i in 1:n_trial) {
+  s=sum(sample(999,168)<10)
+  a=c(a,s)
+  n[s+1]=n[s+1]+1
+}
+
+print(n)
+sum(1/(1+0:9)*n)/n_trial
+
+```
+
+A quick run with trial and error suggests you need about 168 people in town.
+This is hard to be precise due to Monte-Carlo variation.
+
+
+## Problem 5
+
+    To produce this odd-looking product
+    table, I wrote four digits in ascending
+    order from left to right across the top
+    and repeated them down the left side
+    and then filled in the product matrix in
+    the usual way. Then I transliterated the
+    numerals, replacing each digit with a
+    different one consistently throughout.
+    Finally, I rubbed out all the entries in
+    the table except 1 x 1 = 0 and 7 x 9 = 54.
+    What are the four digits I started with?
+    
+    +----+----+----+----+----+
+    |  x |  1 |  3 |  7 |  9 |
+    +----+----+----+----+----+
+    |  1 |  0 |    |    |    |
+    +----+----+----+----+----+
+    |  3 |    |    |    |    |
+    +----+----+----+----+----+
+    |  7 |    |    |    | 54 |
+    +----+----+----+----+----+
+    |  9 |    |    | 54 |    |
+    +----+----+----+----+----+
+    
+    -- Martin Hollis
+
+TODO
+
+## Bonus
+
+    Dissect a square into the least
+    number of right triangles with legs in the
+    ratio of 2 to 1 such that the area of each
+    triangle is different. What is this least
+    number?
+    
+    -- Karl Scherer
+
+TODO
+
+## Double Bonus
+
+    What is the largest 11-digit prime that
+    contains each of the digits 0 through 9 at
+    least once.
+    
+    -- Richard I. Hess, CA Beta'62
+
+TODO
+
+Need to learn more about primes and how to determine approximate locations.
+I don't think I want to exhaustively search all the 11 digit numbers looking
+for primes and then checking to see if they have the right pattern.
+
+We might be able to eliminate some ranges looking at the sum of digits.
+Consider just the first and last digits.  The central 9 digits are 012345678
+in any order.  The last digit must be odd (otherwise not prime).  The last
+digit can not be 0 or 5 (otherwise divisible by 5):
+
+    98765432109 --> SOD = 54 --> divisible by 3 --> not feasible
+    98765432107 --> SOD = 52 --> 
+    98765432103 --> SOD = 48 --> divisible by 3 --> not feasible
+    98765432101 --> SOD = 46 --> 
+    
+    89765432109 --> SOD = 54 --> divisible by 3
+    89765432107 --> SOD = 54
+    89765432103 --> SOD = 48 --> divisible by 3
+    89765432101 --> SOD = 46
+
+    etc.
+    
+    I looked for additional SOD rules to eliminate some of the other combinations
+    but I couldn't really find anything useful.  Wikipedia has a page on division rules
+    that might be useful but ...
+    
+    Need to think about this one some more.
+    

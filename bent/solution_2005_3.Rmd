@@ -1,0 +1,291 @@
+---
+title: "Bent Fall 2005"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2005
+
+Wow - after the first three I got slaughtered.
+
+
+## Problem 1
+
+    Solve the following cryptic addition:
+
+    A/DE + B/FG + C/HJ = 1
+
+    where each letter represents a different
+    digit and none of them is zero. DE,
+    FG, and HJ are each two-digit integers,
+    e.g. DE = 10 * D + E. We want
+    the solution in which A < B < C.
+
+    -- Technology Review
+
+Solution:  solved in the cryptic arithmetic notebook.
+
+    ## Permutation number = 1953814
+    
+    ## a       5
+    ## d       3
+    ## e       4
+    ## b       7
+    ## f       6
+    ## g       8
+    ## c       9
+    ## h       1
+    ## j       2
+
+
+## Problem 2
+
+    Rex lies a lot. In fact, he tells the
+    truth on only one day of the week.
+    One day, he said, "I lie on Mondays
+    and Tuesdays." The next day, he
+    said, "Today is either Thursday,
+    Saturday, or Sunday." The next day,
+    he said, "I lie on Wednesdays and
+    Fridays." On which day of the week
+    does Rex tell the truth?
+
+    -- Mind Puzzlers
+    by George J. Summers
+
+Solution:
+
+    Conclusion Tuesday is Truth day, S1 on Sunday, S2 on Monday, S3 on Tuesday
+
+    Assume he tells truth on Mon, Tue, ... and look for contradictions.
+    Only one of the statements CAN be True.  They could all be lies.
+    
+    S1: I lie on Mondays and Tuesdays
+    S2: Today is either Thurs, Sat, or Sun
+    S3: I lie on Wed and Fri
+
+    Assume S1 on Monday --> contradiction
+    Assume S1 on Tuesday --> contradiction
+    Assume S3 on Wednesday --> contradiction
+    Assume S3 on Friday    --> contradiction
+
+    S1 on Wednesday --> S3 on Friday --> contradiction
+    
+    S1 on Thursday --> S2 on Friday, S3 on Saturday --> Friday is Lie day - Sat is truth day
+        If so then S1 is a lie so truth day must be Mon or Tues --> Contradiction
+    
+    S1 on Friday   --> S2 on Saturday, S3 on Sunday --> Saturday is Truth day
+        If so - then S1 is a lie --> Truth day must be Monday or Tuesday --> Contradiction
+        
+    S1 on Saturday --> S2 on Sunday, S3 on Monday   --> Sunday   is Truth day
+        If so - then S1 is a line --> Truth day must be Monday or Tuesday --> Contradiction
+        
+    S1 on Sunday   --> S2 on Monday, S3 on Tuesday --> Monday is Lie day - Tuesday is truth day
+        This is consistent with S1
+        
+    Conclusion Tuesday is Truth day, S1 on Sunday, S2 on Monday, S3 on Tuesday
+
+
+## Problem 3
+
+    What is the dihedral angle between
+    two faces of a regular tetrahedron?
+    Express your answer exactly
+    using integers and trigonometric and
+    algebraic functions. 
+
+    -- Paul J. Blatz
+
+Solution:  I had to look up the definition of dihedral angle and a
+regular tetrahedron.  Unfortunately, I inadvertently saw the dihedral
+angle of the tetrahedron -- but I think we can derive it.
+
+The solution in the Bent is 2*asin(1/sqrt(3)) which is numerically the
+same.  I have a bit of difficulty in proving these are the same.
+
+    The dihedral angle is acos(1/3)
+
+    Regular tetrahedron = four sided pyramid.  This can be thought of
+    as connecting the four non-adjacent vertices of a cube.
+    
+    Consider a cube with vertices = (+/-1, +/-1, +/-1)
+    
+    The tetrahedron is the set of vertices with odd (or even) sign parity.
+    
+    Let us pick:  (-1,-1,1), (-1,1,-1), (1,-1,-1), (1,1,1)
+    
+    We can choose two of the vertices and find the midpoint.  From this
+    midpoint we can construct vectors to each of the two remaining vertices.
+    The angle between these two vectors should be the desired angle.
+    
+    Step 1: find midpoint of (-1,-1,1) and (-1,1,-1) = (-1,0,0)
+    
+    Step 2: Vector to (1,-1,-1) = (2,-1,-1)
+            Vector to (1,1,1)   = (2, 1, 1)
+            
+    Step 3: Angle calculated by dot product
+    
+        v1 dot v2 = |v1| * |v2| * cos(theta)
+        
+        (2,-1,-1) dot (2,1,1) = 4-1-1 = 2
+        
+        |v1| = sqrt(6), |v2| = sqrt(6)
+        
+        So:
+        
+            2 = sqrt(6)*sqrt(6)*cos(theta)
+            
+            cos(theta) = 1/3
+            
+            theta = acos(1/3) (approx. 70.52879 degrees)
+
+    As an extra-credit calculation let us consider the angle
+    between two edges of the tetrahedron.  Since these are all
+    equilateral triangles we know the answer.  Arbitrarily pick the
+    edges between the first and second vertex and the first and third vertex.
+    
+        v1 = (0,2,-2) --> |v1| = sqrt(8)
+        v2 = (2,0,-2) --> |v2| = sqrt(8)
+        
+        v1 dot v2 = 4 = sqrt(8)*sqrt(8)*cos(alpha)
+        
+        alpha = acos(1/2) = 60 degrees (as expected)
+
+
+## Problem 4
+
+    Here is the situation on a game
+    show. As three contestants enter
+    the stage, a red or blue hat is placed
+    on each one's head, depending on the
+    flip of a fair coin. Each contestant
+    can see the other's hats but not his
+    own, and they cannot communicate
+    with each other in any way. They are
+    told that if one or more of them can
+    identify the color of hat he or she is
+    wearing and no one gives a wrong
+    answer, each will win a prize, but if
+    no one answers or if one or more give
+    a wrong answer, they will get nothing.
+    However, before the hats are put
+    on them, they are allowed to consult
+    with each other. If they adopt the
+    optimal strategy, what is their probability
+    of winning?
+
+    -- Dr. Todd D. Ebert, PA B'91
+    University of California-Irvine
+
+Solution:
+
+    According to the Bent -- the best solution gives 75% chance of win.
+    If any of them sees two hats of the same color they should guess
+    that their hat is the opposite color.  This only loses if all three
+    hats are the same color (2/8 of the time).  In all other cases
+    only one person sees two of the same color and their hat will
+    always be the opposite color.
+    
+    My approach was sort of similar except I missed the guess opposite!!!
+
+    One simple strategy would be to have Mr. A take a guess iff he sees
+    two of the same color hat.  This would be a signal to Mr. B and Mr. C
+    so they would know the color of their own hat.
+    
+        If Mr. B and Mr. C have same color hat --> Pr(win) = 50% based on Mr. A guess
+        
+        25% of all games will be a win
+        25% of all games will be a loss
+        
+    If Mr. B and Mr. C have different color hats then Mr. A keeps quiet.
+    
+    In a similar way - Mr. B takes a guess iff he sees two of the same color
+    hat and Mr. A has either answered or kept quiet.  Half of the time Mr. B
+    will guess correctly and then Mr. C will know the color of his hat.
+
+        Half of these games will be a win (12.5%)
+        Half of these games will be a loss (12.5%)
+        
+    Last two cases (Mr A was quiet, Mr B was quiet)
+
+        Mr. C knows his hat is the opposite of Mr. A and Mr. B (who must match)
+        
+        All of these games will be a win (25%)
+        
+        
+    Total --> Win 62.5% of the time (5/8)
+    
+    Can we do better?  Can we eliminate the guessing?
+
+    Rule 1 = keeps quiet if two blue hats
+    Rule 2 = keeps quiet if two red hats
+    Rule 3 = keeps quiet if one of each
+    
+                     ... Mr. A .......   ... Mr. B .......   ... Mr. C .......
+    A    B    C      Rule1 Rule2 Rule3   Rule1 Rule2 Rule3   Rule1 Rule2 Rule3
+    Blue Blue Blue   Quiet   x     x     Quiet   x     x     Quiet   x     x
+    Blue Blue Red      x     x   Quiet     x     x   Quiet   Quiet   x     x
+    Blue Red  Blue     x     x   Quiet   Quiet   x     x       x     x   Quiet
+    Blue Red  Red      x   Quiet   x       x     x   Quiet     x     x   Quiet
+    Red  Blue Blue   Quiet   x     x       x     x   Quiet     x     x   Quiet
+    Red  Blue Red      x     x   Quiet     x   Quiet   x       x     x   Quiet
+    Red  Red  Blue     x     x   Quiet     x     x   Quiet     x   Quiet   x
+    Red  Red  Red      x   Quiet   x       x   Quiet   x       x   Quiet   x
+
+## Problem 5
+
+    Assume that you have a frictionless
+    hemisphere of radius R with its
+    flat side fastened to a perfectly level
+    table. You place a very small object
+    of mass m infinitesimally off center
+    on top of the hemisphere. At what
+    height above the table does the object
+    leave the hemisphere, and how
+    far from the center of the hemisphere
+    does it land?
+
+    -- Technology Review
+
+TODO
+
+    This looks like fun.
+
+
+## Bonus
+
+    Find the equation traced
+    by the locus of the focus of the parabola
+    y = ax^2 as this curve is rolled
+    without slipping against the x-axis.
+
+    -- John L. Bradshaw, PA A'82
+
+TODO
+
+    Hmmmm ...
+
+
+## Double Bonus
+
+    Consider an
+    infinite square lattice of points with
+    integer coordinates on a plane. If two
+    lattice points are chosen at random,
+    what is the probability that the
+    straight-line segment joining the two
+    lattice points will not pass through
+    any other lattice points?
+
+    -- The Joy of Pi by David Blatner
+
+TODO
+
+    Hmmmm ...
+
+

@@ -1,0 +1,374 @@
+---
+title: "2000_1"
+author: "R. G. Cronce"
+date: "12/18/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(reticulate)
+```
+
+# Bent Brain Ticklers, 2000_1
+
+Brain ticklers from Spring 2000
+
+
+## Problem 1
+
+A farmer has a hemispherical tub of radius 1 m that he uses to water his cattle.  What is the
+depth of water when it is half full?
+
+-- C. K. Galer, MI A'77
+
+Need symbolic math so we will use sympy:
+
+This works -- but need to fix this so it produces a real solution.  As shown below I found the
+correct root numerically and then examined the real/imaginary parts separately.
+
+```{python}
+import sympy
+from sympy import *
+
+R=S(1)            # Radius of Tub
+x=Symbol('x', real=True)    # X-axis
+y=Symbol('y', real=True)    # Y-axis (height of water)
+r=Symbol('r', real=True)    # Radius of circular disk used in calculating volume
+y0=Symbol('y0', real=True)  # Height of water when tank is half full
+
+r=sqrt(R**2-(R-y)**2)           # radius of circular disk as a function of height
+dv=pi*r**2                      # differential volume of circular disk with radius=r
+V_full=integrate(dv,(y,0,R))    # Volume of a full hemisphere
+V_half=integrate(dv,(y,0,y0))   # Volume of bottom part (up to height of y0)
+V_top=integrate(dv,(y,y0,R))    # Volume of upper part (above height of y0)
+print('V_full = ',V_full)
+print('V_half = ',V_half)
+print('V_top = ',V_top)
+# We could solve for V_half = V_full/2, or
+# We could solve for V_top  = V_full/2, or
+# We could solve for V_top  = V_half
+#
+# Arbitrarily pick the last one
+solution=simplify(solve(V_half-V_top,y0)[0])
+print('Solution: y0 = ',solution)
+print('   re:       = ',trigsimp(re(solution)))
+print('   im:       = ',im(solution))
+print('Numerically  = ',N(re(solution)))
+```
+
+This makes intuitive sense -- need more than half the height of the hemisphere filled with
+water to get half the volume.  The upper half has a larger radius so doesn't need as much
+height.
+
+
+## Problem 2
+
+Let f(n) be the number of times the digit 1 is used in printing all the numbers from 1 to n inclusive.
+Thus, for example, f(3) = 1 and f(12) = 5 (1,2,3,4,5,6,7,8,9,10,11,12 - 11 has two 1s).  Now, f(1)=1.
+What is the next value of n such that f(n)=n?
+
+-- Technology Review
+
+By brute force and some trial and error:
+
+```{r}
+
+num_ones = function(m) {
+  n=0
+  for (i in 1:m) {
+    b=sum(unlist(strsplit(as.character(i),''))=='1')
+    n=n+b
+  }
+  return(n)
+}
+
+for (i in c(1,19,199,1999,19999,199990)) {
+  n=num_ones(i)
+  print(paste(i,n,i-n))
+}
+```
+
+The smallest value of n I could find was 199990 with trial and error.
+
+I tried LuaJIT to see if it was blazingly faster and it is -- but it still takes a long
+time for exhaustive search.  After thinking about the algorithm I realized I was making
+it run ridiculously slowly by repeating all of the work for all previous calculations!!!
+
+After fixing the algorithm the Lua code is very fast.
+
+Using the Lua program I found 199981 as the smallest.
+
+The code below uses the modified algorithm where we just add the number of ones in the next number
+to the previously calculated value (c0).  This runs much slower than the Lua code but at least
+it finishes in a reasonable amount ot time.
+
+FYI: LuaJIT code = 0.1 seconds, R code = 1.2 seconds without storage of results.
+Addition of storing the results yields 1.28 seconds.  If we use dynamically sized
+storage (e.g. x=c(x,new value)) the run-time goes through the roof!!!
+
+
+```{r}
+t1=Sys.time()
+c0=0
+x=rep(0,200000)
+y=rep(0,200000)
+for (i in 1:200000) {
+    b=sum(unlist(strsplit(as.character(i),''))=='1')
+    c0=c0+b
+    x[i]=i
+    y[i]=c0
+    if (i==c0) {
+      print(i)
+    }
+}
+t2=Sys.time()
+print(paste0('Elapsed time = ',t2-t1))
+
+```
+
+## Problem 3
+
+The MGGC (Mathematicians Goofy Golf Club) holds banquet in July.  Trying to find the date from
+some fellow members who were being obtuse.  One told me the date was an odd number, another
+that it was greater than 13, a third that it was not a perfect square, and a fourth that it was
+a perfect cube.  Finally, W. W. Webb, the president of the club, told me the date was less than
+my highest single hold score last season (which was 17).  Later, when I finally learned the date,
+I found that only one of the statements was true.  What is the date of the banquet?
+
+-- Adapted from Brain Puzzlers Delight by E. R. Emmet
+
+TODO
+
+
+## Problem 4
+
+Cryptic multiplication:  SINK * THEM = DEEPDEEP
+
+TODO -- already done in the cryptic notebook
+
+
+## Problem 5
+
+An urn contains 80 balls, 72 green and 8 red.  The balls are drawn one at a time without replacement
+until all the red balls are drawn.  What is the expected value of the number of balls remaining in
+the urn at that point?
+
+-- William Allen Whitworth (1901)
+
+We can solve with Monte Carlo:
+
+```{r}
+t1=Sys.time()
+num_trials=100000
+
+n=c()
+for (i in 1:num_trials) {
+  s=sample(80)                # Randomly sample the 80 balls (red=1-8, greep=9-80)
+  n=c(n,80-max(which(s<9)))   # Find out how many are left when last red one is picked
+}
+summary(n)
+t2=Sys.time()
+print(paste0("Exection time = ",t2-t1," seconds"))
+```
+
+So, we conclude the expected number of balls remaining is 8.
+
+Another approach is to consider the probability that the last ball is green, then the second last,
+etc. and keep adding balls until we have them all accounted for.  This is like the birthday
+problem in reverse.
+
+Let:
+
+    n = number of balls remaining after picking last red ball
+    
+    Then - before picking the last red ball:
+
+    Number of balls remaining    = n+1
+    Number of balls chosen       = 80-(n+1)
+    Number of red balls chosen   = 7
+    Number of green balls chosen = 80-(n+1)-7 = 72-n
+    
+    Pr(7 red balls chosen with n+1 remaining) = choose(8,7)*choose(72,72-n)/choose(80,80-(n+1))
+    Pr(next ball is red) = 1/(n+1)
+    
+    Expected value = sum(Pr(7 red)*Pr(next red)*n, n=0 to 79)
+    
+    Note n = number of balls remaining after picking the last red ball so this is the
+    multiplier in calculating the weighted probability (e.g. mean value).
+
+
+```{r}
+xbar=0
+for (n in 0:79) {
+  p_7_red = choose(8,7)*choose(72,72-n)/choose(80,80-(n+1))
+  p_next_red = 1/(n+1)
+  xbar = xbar + p_7_red*p_next_red*n
+}
+print(paste0('Expected number of balls remaining = ',xbar))
+```
+
+OK -- numerically this works.
+
+Can I do this symbolically?
+
+```{python}
+def choose(n,m):
+    return(factorial(n)/(factorial(n-m)*factorial(m)))
+
+n=Symbol('n',integer=True)
+
+pr_7_red = choose(8,7)*choose(72,72-n)/choose(80,80-(n+1))
+pr_next_red = 1/(n+1)
+
+xbar = summation(pr_7_red*pr_next_red*n,(n,0,79))
+
+print(xbar)
+```
+
+Apparently so -- even symbolically this reduces to precisely 8 balls remaining.
+
+
+## Bonus
+
+A boy is standing on a dock looking at the water in a smooth pond, when the ball he is holding
+slips from his hand. As he watches it disappear below the surface, he fears that it is gone forever.
+However, he is relieved a short time later to see it reappear.
+
+The ball, which has a diameter of 6 cm and a mass of 112 gm, falls from rest
+at a height of 2 m from the center of
+the ball to the surface of the water. Although
+not completely accurate, for
+the purposes of this problem assume
+that the drag force on the ball in the
+water equals `k*v**2` where v is the ball's
+velocity in m/s, A is the cross sectional
+area of the ball in `m**2`, and k has the
+value of 353.7 `Newton s**2/m**4`. Ignore
+air resistance, and assume that the ball
+encounters no drag or buoyancy forces
+in the water until the ball is half submerged,
+at which point these forces
+come into full play. Use a density of
+1,000 `kg/m**3` for the water and a value
+of 9.8 `m/sec**2` for the acceleration due
+to gravity. To three significant figures,
+how many seconds elapse between the
+time the ball leaves the boy's hand
+until it just breaks the surface upon
+reappearing?
+
+-- John W. Langhaar, PA A'33
+
+TODO
+
+## Computer Bonus
+
+Find the smallest integer greater than one which has the property that the sum of all the integral
+divisors of its square equals a perfect cube. One and N are both divisors of N.
+
+-- Pierre de Fermat (circa 1650)
+
+Solution:
+
+Using Python (see `fermat.py`) yields a solution of n=43098 as the smallest
+value (other than 1) with the desired property.  This is also the only solution
+below 1e7.  Finding the solution is rather quick (runtime ~4.4 seconds).
+Checking all the way to 1e6 takes quite a bit longer (runtime ~210 seconds).
+A further check to 1e7 also failed to find angthing (runtime ~2738 seconds).
+A further check to 2e7 with LuaJIT failed to find anything (runtime for the
+range 1e7-2e7 was 3343 seconds, runtime for 1-1e7 was 1574 seconds).  I
+don't have the patience to run this any longer.
+
+Needed Python.sympy to get the prime factor function.
+
+I also rewrote this in Lua (see `fermat.lua`, `ferma2.lua`, and `primes.lua`)
+
+FYI: here is a transcript of the ipython session showing the final results
+
+    In [386]: sympy.factorint(43098*43098)
+    Out[386]: {2: 2, 3: 2, 11: 2, 653: 2}
+
+    In [388]: s=(1+2+4)*(1+3+9)*(1+11+121)*(1+653+653*653)
+
+    In [389]: s
+    Out[389]: 5168743489
+
+    In [390]: cbrt(s)
+    Out[390]: 1729.0
+
+    In [391]: sympy.factorint(1729)
+    Out[391]: {7: 1, 13: 1, 19: 1}
+
+I don't understand how to find this algorithmically other than search.
+This all begs the question -- what is the next larger value?
+
+
+I did some research on the sum of the integral divisors and there is a
+well known theorem relating to the prime factors of a number and the sume
+of the divisors.  Essentially, if you sum all the possible products of
+all the powers of the prime factors and then add 1 to the result you get
+the sum of the divisors.  Assuming you can do the prime factorization
+in a reasonable amount of time the calculation of the sum of divisors
+goes very quickly.
+
+The products are relatively easy to calculate if we generate terms of
+the form:
+
+    1 + p + p^2 + ... + p^n
+
+Where p = prime factor and n is the multiplicity.
+
+If we form one of these terms for each prime factor and then calculate the
+product this will be the same as the sum of the factors.  As an example:
+
+    Assume the number is 360 = 2^3 * 3^2 * 5
+
+    The terms are:
+        1+2+2^2+2^3 = 15
+        1+3+3^2     = 13
+        1+5         = 6
+
+    Sum of all the factors = 15*13*6 = 1170
+
+    Directly listing the factors:
+        
+          1,   2,   3,   4,   5,   6,
+          8,   9,  10,  12,  15,  18,
+         20,  24,  30,  36,  40,  45,
+         60,  72,  90, 120, 180, 360
+
+For small numbers the difference in calculation is not large.  For big numbers, however,
+calculating all the factors becomes difficult.
+
+This is particularly useful in this problem since the prime factors of the square of a number
+are just the same as the original number (with double the multiplicity) so we don't even need
+to find the prime factors of the larger number.
+
+Python has sympy.factorint() that returns a dictionary with keys of the prime
+factors with the values being the multiplicity.
+
+Using Python yields a solution of n=43098 as the smallest value (other than 1) with the
+desired property.
+
+```{r}
+calc_factors = function(n) {
+  fff=c()
+  for (i in 1:n) {
+    if (n%%i == 0) { fff=c(fff,i) }
+  }
+  return(fff)
+}
+
+```
+
+Turns out that brute force is going to take a really long time.  A scan up to 5745 does
+not reveal any solutions (e.g. checking for cube root of numbers up to the sum of the factors
+of 5745*5745).  There must be some more systematic way of attacking this -- but it is called
+a computer bonus so maybe I just need to search further?
+
+Note that this runs very slowly.  The scan noted above took ~2 hours or so.
+

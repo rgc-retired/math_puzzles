@@ -1,0 +1,254 @@
+---
+title: "Bent Summer 2011"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2011
+
+I found this group of problems to be less interesting
+than most.  Not one of my favorite problem sets.
+
+## Problem 1
+
+    Al, Bob, Carl, Don, and Ed took a
+    mathematics test with five questions.
+    For a correct answer, 10 points were
+    given; if the answer were wrong, either
+    7, 2, or 0 points were given, depending
+    on the method used and the way the
+    work was presented. (No points other
+    than 10, 7, 2, or 0 were awarded, and it
+    is perfectly possible for two students
+    to get the same wrong answer, but be
+    given different points.) At least one
+    student got each question right. Some
+    information about the answers of different
+    students is shown in the table.
+
+         1   2  3  4 5
+    Al   5   ?  11 ? 4.5
+    Bob  3.5 17 5  ? 3.4
+    Carl 4   43 5  ? 2.8
+    Don  2.5 17 11 6 3.8
+    Ed   7   17 7  7 5.2
+
+    The total points for Al, Bob, Carl,
+    Don, and Ed were 34, 19, 31, ?, and 9,
+    respectively. The total points for each
+    question, #1 - #5, were 14, 29, 22, 42,
+    and ?. You may also find it helpful to
+    know that Ed got more points for question
+    5 than Bob. Determine the number
+    of points awarded each student for
+    each question.
+
+    -- Brain Puzzler's Delight
+    by E. R. Emmet
+
+
+TODO
+
+
+## Problem 2
+
+    2010 was the 75th anniversary of
+    the creation of the WPA, which provided
+    millions of jobs during the Great
+    Depression. Solve the following two
+    cryptic addition problems simultaneously
+    in base 11 (use a lower case a to
+    represent the digit 10).
+
+    USA + FDR = WPA
+    USA + WPA = PARK
+
+    Different letters represent different
+    digits, the same letter always represents
+    the same digit, and there are no
+    leading zeros.
+
+    -- Howard G. McIlvried III, PA Gamma'53
+
+Solution: done in the cryptic arithmetic notebook
+
+  Cryptic addition in Base 11
+
+      USA + FDR = WPA
+      USA + WPA = PARK
+
+    a=make_crypt_df('usafdrwpapark',num_base=11)
+    dim(a)
+    [1] 19958400        9
+    x_usa=make_num(a,'usa',11)
+    x_fdr=make_num(a,'fdr',11)
+    x_wpa=make_num(a,'wpa',11)
+    x_park=make_num(a,'park',11)
+    k=(x_usa+x_fdr==x_wpa) & (x_usa+x_wpa == x_park)
+    k=k&(a$u!=0)&(a$f!=0)&(a$w!=0)&(a$p!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+             u  s a f d r w p k
+    10793931 5 10 4 3 2 0 9 1 8
+
+    x_usa[k,]
+    [1] 719
+    x_fdr[k,]
+    [1] 385
+    x_wpa[k,]
+    [1] 1104
+    x_park[k,]
+    [1] 1823
+
+    Note that 's' has a value of 'a' using conventional notation.
+    All of the x_* values given above are in base 10!!!
+
+
+## Problem 3
+
+    In a game of 7-card stud poker with
+    deuces wild, what is the probability of
+    getting five of a kind?
+
+    -- Howard G. McIlvried III, PA Gamma'53
+
+Solution:
+
+    Should be able to tackle with random sampling
+    
+```{r}
+
+cards=rep(1:13,each=4)
+ntrials=1000000
+
+set.seed(42)
+num_wins=0
+for (trial in 1:ntrials) {
+    s=sample(cards,7)
+    if (any(s==2)) {
+        wild=which(s==2)
+        s=s[-wild]
+        if (max(table(s))+length(wild)>4) {
+            num_wins=num_wins+1
+        }
+    }
+}
+
+print(paste0("Num wins = ",num_wins))
+print(paste0("Pr       = ",num_wins/ntrials))
+
+```
+
+For 1e6 trials
+
+    Num wins = 4572
+    Pr       = 0.004572
+
+With set.seed(42), 1e6 trials
+
+    Num wins = 4603
+    Pr       = 0.004603
+
+
+## Problem 4
+
+    Twenty-six identical coins lie on a table --
+    ten heads and 16 tails. Blindfolded,
+    you are told to divide the coins into two
+    groups with the same number of heads
+    in each group. You may move the coins
+    and turn them over, but have no way of
+    telling whether a coin is heads or tails.
+    How do you accomplish this?
+
+    -- All-Star Mathlete Puzzles
+    by Richard I. Hess, CA B'62
+
+TODO
+
+
+## Problem 5
+
+    Any number, real or complex, may
+    be represented in the form
+    
+    r(cos(theta) + i sin(theta)).
+    
+    Considering values of theta only in
+    the range -pi to +pi radians, determine
+    whether i to the ith to the ith to the
+    ith power, ad infinitum, approaches
+    a limit, and, if so, provide r and theta to
+    4 digits. As a reminder of standard
+    practice, note, for example, that 3 to
+    the 3rd to the 3rd means 3^27, and not
+    27^3. That is, the continued exponential
+    is evaluated from the top down, not
+    from the bottom up.
+
+    -- John W. Langhaar, PA A'33
+
+TODO
+
+
+## Bonus
+
+    Given a 2x4 rectangle of
+    squares (a map) with the front marked
+    with the digits
+
+        1 2 3 4
+        5 6 7 8
+
+    and the back marked with letters:
+
+        d c b a
+        h g f e
+
+    (that is, the Nth letter of the alphabet
+    is on the back of the square with the
+    digit N).
+    This 2x4 map can be folded (which
+    includes tucks) along the boundaries
+    between squares in many ways to end
+    with a 1x1 by 8 layers configuration
+    with the '1' square on top of the other
+    seven and the '1' visible. For example,
+    abcd folded onto efgh, 78 folded onto
+    65, and 3 folded onto 4, ends up with
+    the configuration: 1e8d3g6b. How
+    many unique final configurations can
+    be achieved, and what are they? To
+    make grading easier, please provide
+    the configurations, one per line, sorted
+    in ascending order (digits less than
+    letters and using only the marks on
+    the upper surfaces) using the above
+    numbering system.
+
+    -- Fred J. Tydeman, CA Delta'73
+
+
+TODO
+
+
+## Double Bonus
+
+    Consider a quadrilateral.
+    Construct a square on each
+    of its sides. Prove that the two line
+    segments joining the centers of opposite
+    squares are equal in length and
+    mutually perpendicular.
+
+    -- Jan Smit, CA Delta'41
+
+TODO
+
+

@@ -1,0 +1,449 @@
+---
+title: "Bent Winter 2006"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2006
+
+
+## Problem 1
+
+    One hundred parishioners attended
+    our church picnic, and 90 had
+    a hot dog, 80 had potato salad, 70 had
+    cake, and 60 had ice cream. However,
+    no one ate all four items. How many
+    had both cake and ice cream?
+
+    -- Classic Mathemagic by
+    R.A.Blum, A. Hart-Davis, B. Longe,
+    and D. Niederman
+
+Solution:  30 people ate Cake and Ice Cream
+
+    If no one had all four items
+    then everyone skipped (at least) one item.
+
+
+    10 people skipped the hot dog
+    20 people skipped the potato salad
+    30 people skipped the cake
+    40 people skipped the ice cream
+    
+    Total = 100 people skipped something so
+    each person skipped exactly one item.
+    
+    The four meals (along with counts) were:
+    
+    n1 = Hot dog and Potato Salad and Cake
+    n2 = Hot dog and Potato Salad          and Ice Cream
+    n3 = Hot dog and                  Cake and Ice Cream
+    n4 =             Potato Salad and Cake and Ice Cream
+
+    We know:
+    
+    n1+n2+n3 = 90
+    n1+n2+n4 = 80
+    n1+n3+n4 = 70
+    n2+n3+n4 = 60
+    
+    Solving yields: n1=40, n2=30, n3=20, and n4=10
+    
+    Cake and Ice Cream = n3+n4 = 30
+
+
+The Bent solution was actually quite interesting.  They make the
+same observation about no overlap in the skipped foods and then
+make a series of bars that represent the foods and the skipped
+foods as follows:
+
+    - = food consumed, X = food skipped
+
+    Hot Dog       |X---------|
+    Potato Salad  |-XX-------|
+    Cake          |---XXX----|
+    Ice Cream     |------XXXX|
+
+    Since each group is independent we can just look at the Cake and
+    Ice Cream lines and see that only 30 people ate both.  This is
+    very elegant.
+    
+    This also makes it possible to solve the problem by inspection.
+    Since no person skipped more than one food we know:
+    
+    10 people skipped the hot-dog      -> they ate Cake and Ice Cream
+    20 people skipped the potate salad -> they ate Cake and Ice Cream
+    The other people skipped either Cake or Ice Cream so they did not
+    eat both.
+    
+    Trivially, then, the total eating Cake and Ice Cream is 30.
+
+
+## Problem 2
+
+    Al, Sam, and Ralph play a challenge
+    tennis tournament in which
+    two of them play a set, with the
+    winner staying on the court to play
+    the person who sat out. In the course
+    of the tournament, Al played 15
+    sets, Sam played 14 sets, and Ralph
+    played 9 sets. Who played in set #13?
+
+    -- Richard I. Hess, CA B '62
+
+Solution:  Al-Sam play in set #13
+
+    The total number of sets must be
+    half of the total of the three players:
+    
+    Number of sets = (15+14+9)/2 = 19 sets
+
+    Who could Al have played and how many times.
+    
+    Al vs Sam = 14 times -> only leaves 1 set for Ralph
+    Al vs Sam = 13 times -> leaves 3 sets for Ralph
+    Al vs Sam = 12 times -> leaves 5 sets for Ralph
+    Al vs Sam = 11 times -> leaves 7 sets for Ralph
+    Al vs Sam = 10 times -> leaves 9 sets for Ralph
+    
+    Conclude:
+    
+    Al played Sam 10 times
+    Al played Ralph 5 times
+    Sam played Ralph 4 times
+    
+    What sequence could generate this?
+    The following sequence works -- is this unique?
+    
+    (The Bent argues that Ralph plays 9 times and nobody sits more than
+    one set in a row so the only way for this to occur is if Ralph
+    plays in all the even sets.)
+    
+    Al-Sam play all odd sets
+    Ralph plays even sets with alternating opponents starting with Al.
+    
+    Al plays 15 sets:    WWL-WWL-WWL-WWL-WWX
+    Sam plays 14 sets:   LWW-LWW-LWW-LWW-LX
+    Ralph plays 9 sets:  all losses
+    
+    1.	Al-Sam
+    2.	Al-Ralph
+    3.	Al-Sam
+    4.	Sam-Ralph
+    5.	Al-Sam
+    6.	Al-Ralph
+    7.	Al-Sam
+    8.	Sam-Ralph
+    9.	Al-Sam
+    10.	Al-Ralph
+    11.	Al-Sam
+    12.	Sam-Ralph
+    13.	Al-Sam
+    14.	Al-Ralph
+    15.	Al-Sam
+    16.	Sam-Ralph
+    17.	Al-Sam
+    18.	Al-Ralph
+    19.	Al-Sam
+
+
+## Problem 3
+
+    In the following equations, each
+    letter always has the same value, but
+    different letters may have the same
+    value, and values may be positive,
+    negative, zero, integer, or fractional.
+    Given that 
+    
+        U+N=1
+        D+E+U+X=2
+        T+R+O+I+S=3
+        Q+U+A+T+R+E=4
+        C+I+N+Q=5
+        S+I+X=6
+        S+E+P+T=7
+        H+U+I+T=8
+        N+E+U+F=9
+        D+I+X=10
+        O+N+Z+E=11
+        D+O+U+Z+E=12
+        T+R+E+I+Z+E=13
+        Q+U+A+T+O+R+Z+E=14
+        Q+U+I+N+Z+E=15,
+    
+    what is the value of S+A+I+N+T+T+R+O+P+E+Z?
+
+    -- C.W. Haigh in New Scientist
+
+Solution: solved in the cryptic arithmetic notebook
+
+    Solution set:
+    
+    u   4.5
+    n  -3.5
+    d  -7.0
+    e   4.5
+    x   0.0
+    t -13.5
+    r   0.5
+    o  10.0
+    i  17.0
+    s -11.0
+    q  -7.5
+    a  15.5
+    c  -1.0
+    p  27.0
+    h   0.0
+    f   3.5
+    z   0.0
+    
+    The desired sum: SAINTTROPEZ = 33
+
+
+## Problem 4
+
+    On my last birthday, I received
+    a present packed in a rectangular
+    box, 10 cm by 20 cm by 30 cm. The
+    box was wrapped by an inelastic
+    continuous loop of very narrow ribbon
+    that crossed all six faces at least
+    once, held in place with transparent
+    tape, with the total length of ribbon
+    on each face being at least 1 cm.
+    What is the shortest ribbon that
+    meets these requirements? Express
+    your answer accurate to three decimal
+    places.
+
+    -- James M. Garnett III, MS '65
+
+Solution:
+
+    Seems like the shortest piece would be
+    a loop that just looped over the top of
+    opposite corners, ran at an angle down each
+    side, and make long angular runs along the
+    bottom.
+    
+    Need a diagram to figure this out and then
+    some calculus to minimize.
+
+    The Bent hand-waves the minimization step and
+    just asserts the shortest distance possible.
+    
+
+## Problem 5
+
+    Five friends, Andrew, Bernie,
+    Cliff, Don, and Ed, each has a son
+    and a daughter. Their families are
+    so close that each friend's daughter
+    is married to the son of one of his
+    friends. As a result, the daughterin-
+    law of the father of Andrew's sonin-
+    law is the sister-in-law of Bernie's
+    daughter. And, the son-in-law of
+    the father of Cliff's daughter-in-law
+    is the brother-in-law of Don's son.
+    Furthermore, the daughter-in-law
+    of the father of Bernie's daughter-inlaw
+    has the same mother-in-law as
+    the son-in-law of the father of Don's
+    son-in-law, and the son-in-law of the
+    father of Ed's son-in-law has the
+    same father-in-law as the daughterin-
+    law of the father of Cliff's daughter-
+    in-law. However, the situation is
+    simplified by the fact that no daughter-
+    in-law is the sister-in-law of the
+    daughter of her father-in-law. Who is
+    married to whom?
+
+    -- 100 Games of Logic by Pierre Berloquin
+
+
+Solution: exhaustive search for all the combinations
+and then check for contradictions.  Just reading this
+problem hurts my head.  **I give up.**
+
+    According to the Bent solution, there are five
+    statements.
+    
+    S1 implies something about A's daughter:
+    either A's daughter is married to B's son or A's son
+    is married to B's daughter.
+    
+    S2 means C's son married to D's daughter or
+    C's daughter married to D's son.
+    
+    This leaves 8 possibilities
+    
+    S3 means B's daughter-in-law's brother is D's
+    son-in-law -> eliminates 5 of the possibilities.
+    
+    S4 means C's daughter-in-law's brother is E's
+    son-in-law -> eliminates 2 more.
+    
+    The only remaining possibility is:
+    
+    A's son is married to B's daughter
+    B's son is married to C's daughter
+    C's son is married to D's daughter
+    D's son is married to E's daughter
+    E's son is married to A's daughter
+
+
+## Bonus
+
+    A mathematics professor
+    smokes a pipe. He carries two identical
+    matchboxes, originally containing
+    20 matches each. When he lights
+    his pipe, he selects a matchbox at
+    random and lights his pipe with one
+    match and discards the used match.
+    There will come an occasion when
+    he first selects a matchbox with only
+    one match in it. At this point, what is
+    the expected number of matches in
+    the other box? Express your answer
+    accurate to three decimal places.
+
+    -- Adapted from An Introduction
+    to Probability Theory and
+    Its Applications by William Feller
+
+Solution: I think this is the same as the coffee ticket
+problem from the Riddler.
+
+
+    The problem is similar to flipping a coin.  We can
+    calculate the probabilities of flipping a coin and
+    having it come up H 20 times in a row -- this would
+    be like picking every match out of the same box and
+    ending up with a box with only 1 match.  This
+    probability is:
+    
+    0.5^20 = 0.5^20
+    
+    Now, consider flipping 20 H and one T.  The T can
+    not be in the final position.  The total number of
+    items is then 20+1-1, and there is one T so the
+    total probability is:
+    
+    Pr(1) = choose(20,1)*0.5^20*(1-0.5)^1 = 20*0.5^21
+    
+    In general, picking n tails in a row:
+    
+    Pr(n) = choose(20+n-1,n)*0.5^20*(1-0.5)^n
+          = choose(19+n,n)*0.5^(20+n)
+    
+    The mean value is then: sum(n*Pr(n),n=0 to 19)
+    
+    This could occur for either box so we need to double the probability.
+    
+    Finally, this is the mean number picked from the other box so we need
+    to subtract this from 20 to get the number left over:
+    
+```{r}
+n=0:19
+20-2*sum(n*choose(19+n,n)*0.5^(20+n))
+```
+
+Conclude: we expect 5.014828 matches left in the other box.
+
+Can we get this by Monte-Carlo?
+
+```{r}
+n_trials=100000
+
+zzz=rep(0,n_trials)
+for (trial in 1:n_trials) {
+    n_box1=20
+    n_box2=20
+    while(T) {
+        s=sample(2,1)
+        if (s==1) {
+            if (n_box1==1) {
+                n=n_box2
+                break
+            }
+            n_box1=n_box1-1
+        } else {
+            if (n_box2==1) {
+                n=n_box1
+                break
+            }
+            n_box2=n_box2-1
+        }
+    }
+    zzz[trial]=n
+}
+
+print(paste0("Mean remaining = ",mean(zzz),collapse=""))
+```
+
+Ideal result = 5.014828
+
+Monte-Carlo results, 1e5 trials per test:
+
+    5.00191
+    5.01455
+    5.0147
+    4.99383
+    5.01945
+
+Which are all in the same range as the analytical solution.
+
+The distribution is far from gaussian:
+
+```{r}
+hist(zzz)
+abline(v=5.014828,col='red',lwd=3)
+grid()
+```
+
+## Computer Bonus
+
+    Solve the following
+    cryptic multiplication problem.
+
+    GEORGE = HW * BUSH
+
+    -- H.G. McIlvried III, PA Gamma'53
+
+Solution: Somehow missed this in cryptic arithmetic notebook.
+Not really sure why this is a computer bonus but I will use
+the computer in any event:
+
+```{r}
+source('rgc_lib.R')
+
+a=make_crypt_df('georgehwbush')
+
+x_george=make_num(a,'george')
+x_hw=make_num(a,'hw')
+x_bush=make_num(a,'bush')
+k=(x_george == x_hw*x_bush) & (a$g != 0) & (a$h !=0) & (a$b !=0)
+
+print(paste0("Number of solutions = ",sum(k),collapse=""))
+print(t(a[k,]))
+print_num(a,'george',k)
+print_num(a,'hw',k)
+print_num(a,'bush',k)
+```
+
+Solution:
+
+    george = 764076
+    hw = 82
+    bush = 9318

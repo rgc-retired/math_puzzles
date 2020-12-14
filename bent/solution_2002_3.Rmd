@@ -1,0 +1,240 @@
+---
+title: "Bent Fall 2002"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2002
+
+
+## Problem 1
+
+    What is the total number of pips
+    on the 136 dominoes making up a
+    double-fifteen set?
+    
+    -- Madachy's Mathematical
+    Recreations by Joseph S. Madachy
+
+Solution:
+
+    I had no idea what a double-15 set of dominoes was so I looked
+    on the Web and saw the answer in an add for a company that sells them.
+    The Wikipedia article on dominoes describes this in detail.
+    
+    A set of double-n dominoes contains every possible combination of
+    0-n pips on each half domino.  For a double-n set we have:
+    
+    0 paired with 0-n --> n+1
+    1 paired with 1-n --> n
+    2 paired with 2-n --> n-1
+    ...
+    n paired with n   --> 1
+    
+    Total number of dominoes is (n+1)*(n+2)/2
+    Total number of pips is n*(n+1)*(n+2)/2
+
+    The number of dominoes is obvious for a summation of 1 to n+1.
+    The number of pips just multiplies by the average number of pips per domino.
+
+    For double-15 set: Number of pips = 15*16*17/2 = 2040
+
+## Problem 2
+
+    Solve the following cryptic
+    multiplication: PEN x INK =
+    LETTER with different letters
+    being different digits, the same
+    letter being the same digit throughout,
+    and no leading zeros.
+    
+    -- Howard G. McIlvried, PA Gamma'53
+
+Solution: solved in the cryptic arithmetic notebook.
+
+    PEN = 615
+    INK = 354
+    LETTER = 217710
+
+
+## Problem 3
+
+    In a game of bridge, South is
+    declarer at a contract of three no
+    trump and holds A, K, 10, x, x of
+    spades, while dummy holds J, x, x of
+    spades. (Declarer has no knowledge
+    of how the rest of the spade suit is
+    distributed.) After winning the first
+    trick, on which no spades were
+    played, declarer leads the A of
+    spades. Both opponents follow suit,
+    but the Q does not drop. What is the
+    probability that the Q will fall if
+    declarer now leads the K of spades?
+    
+    -- John W. Langhaar, PA A'33
+
+Solution:
+
+    The solution in the Bent is WAY more complex.
+    Need to consider the split of the cards before the
+    first round of spades a well as after.
+    
+    End results is P(Q) = 0.3 instead of 0.25.
+    
+    My original solution:
+    
+    Prior to leading the A there are 5 spades
+    in the hands of the opposition (E-W).
+    
+    After leading the A there are three remaining.
+    
+    These are Q, x, x and they can either be located
+    in E or W.  The only way the Q drops is if it is
+    a singleton.  These are the possible distributions
+    of the three spades:
+    
+    Q   x   x   result
+    ------------------
+    E   E   E
+    E   E   W
+    E   W   E
+    E   W   W   Q falls
+    W   E   E   Q falls
+    W   E   W
+    W   W   E
+    W   W   W
+
+    So, Q falls in 2/8 of the distributions = 1/4 of the time.
+    
+
+## Problem 4
+
+Problem is missing -- there is no problem 4!
+The solutions in next month explained that there was a typo
+in the problem and there was no unique solution so the
+problem was not counted for determining perfect
+solution submissions.
+
+
+## Problem 5
+
+    What is the maximum number of
+    knights that can be placed on a
+    standard 8x8 chess board, so that no
+    knight threatens another knight,
+    i. e., no knight can move to a square
+    occupied by another knight? Also,
+    what is the placement of the knights
+    on the board? A knight moves two
+    squares in one direction and one
+    square in another direction to end up
+    on the diagonally opposite corner of a
+    2 x 3 grid. The move can occur even if
+    intervening squares are occupied.
+    
+    -- Daryl Cooper
+
+TODO
+
+I think I solved this once before - but I'm not sure if that was
+the case of no knight attacking another knight or no knight that
+was not under attack.  I remember some blocks of knights in the
+four corners.
+
+I peeked at their solution -- not the problem I recall.  They note
+that you can just put all the knights on the same color and they
+can't attack one another -- e.g. 32 knights.
+
+
+## Bonus
+
+    Most people are familiar
+    with how water sloshes back and
+    forth in a bathtub, rising and falling
+    at the ends of the tub, similar to
+    ocean tides, but on a much higher
+    frequency. A similar phenomenon
+    can occur in a lake, usually initiated
+    due to the action of the wind piling
+    up water at one end. Assume the
+    Lake of Geneva behaves like a tank
+    of water, 70 km long, 8 km wide, and
+    150 m deep. What is the period of
+    the unimodal oscillations in the lake?
+    
+    -- Vibrations and Waves
+    by A.P. French
+
+TODO
+
+I don't have a clue.
+
+They cite some obscure formula -- not worth the effort!!!???
+
+
+## Double Bonus
+
+    Consider the equation: x^7 + y^3 = z^2.
+    Two solutions to this equation are: 
+    
+        x = 1, y = 2, z = 3; and 
+        x = 2, y = 17, z = 71.
+        
+    Find another solution in which x, y, and z
+    are relatively prime positive integers.
+    
+    -- Mathematical Mountaintops
+    by John L. Casti
+
+Solution:  let's try exhaustive search.  Keep x small to prevent
+numerical overflow.
+
+```{r}
+source('rgc_lib.R')
+
+for (x in 1:20) {
+    for (y in 1:100000) {
+        m=x^7+y^3
+        z=floor(round(sqrt(m)))
+        if (z*z == m) {
+            s1=prime_factor(x)
+            s2=prime_factor(y)
+            s3=prime_factor(z)
+            if (any(s1 %in% s2) | any(s1 %in% s3) | any(s2 %in% s3) ) {
+                # Not a solution
+            } else {
+                print(paste0("x = ",x,"   y = ",y,"   z = ",z))
+                # print(c("   x factors = ",s1))
+                # print(c("   y factors = ",s2))
+                # print(c("   z factors = ",s3))
+            }
+        }
+    }
+}
+```
+
+Most of the solutions have common prime factors so we really need to
+filter out the extraneous solutions.  Feasible solutions for the
+range of x=[0-20], y=[0-100e3]:
+
+    x         y        z
+    ---------------------
+    1         2        3
+    2        17       71
+    17    76271 21063928
+
+Exhaustive search with sympy:
+
+    x = 17         = 17
+    y = 76271      = 13*5867
+    z = 210639280  = 2^4 * 5 * 79 * 33329
+
+FYI: the author's note that this is the only other known solution
+to this problem.

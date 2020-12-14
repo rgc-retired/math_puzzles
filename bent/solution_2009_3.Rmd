@@ -1,0 +1,255 @@
+---
+title: "Bent Fall 2009"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2009
+
+
+## Problem 1
+
+    In cross-country matches, teams
+    of six runners compete against each
+    other. Team scores are determined
+    by adding the finishing positions of
+    the first four runners to cross the
+    finish line on each team. The lowest
+    score wins. The fifth and sixth runners
+    on each team do not score, but they
+    do count in determining the positions
+    of runners following them. Individuals
+    never tie for any position. If two
+    teams have the same score, the team
+    whose fourth runner has the lower
+    score wins. In a recent two-team
+    match, Al was a non-scorer on the
+    winning team. Each team's score was
+    a prime number, and if you knew those
+    scores, you could deduce the finishing
+    positions of all the runners on each
+    team. You don't know those scores,
+    but if you knew Al's position, together
+    with the above information, you could
+    again deduce all the finishing positions.
+    What was Al's finishing position
+    and those of the scorers on his team?
+
+    -- Richard England in New Scientist
+
+
+TODO
+
+    meh -- logic guessing games
+    
+
+## Problem 2
+
+    In the following cryptic addition:
+    ALCOHOL + ALCOHOL + ... +
+    ALCOHOL = HANGOVER ,
+    how much ALCOHOL is needed?
+    There are no leading zeros, different
+    letters are different digits, and same
+    letter is same digit throughout.
+
+    -- recreational puzzles newsgroup
+
+Solution: solved in the cryptic arithmetic notebook
+
+      ALCOHOL + ALCOHOL + ... + ALCOHOL = HANGOVER
+      
+      How much ALCOHOL is required?
+      
+    a=make_crypt_df('alcoholhangover')
+    x_alcohol=make_num(a,'alcohol')
+    x_hangover=make_num(a,'hangover')
+    k=(x_hangover == floor(x_hangover/x_alcohol)*x_alcohol)
+    k=k&(a$a!=0)&(a$h!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+            a l c o h n g v e r
+    1226065 3 4 5 1 9 2 0 6 7 8
+    x_alcohol[k,]
+    [1] 3451914
+    x_hangover[k,]
+    [1] 93201678
+    x_hangover[k,]/x_alcohol[k,]
+    [1] 27
+
+
+## Problem 3
+
+    Consider a circle with a unit radius.
+    Inscribe an equilateral triangle
+    in this circle. Then, inscribe another
+    circle in the triangle. Next, inscribe
+    a square in this circle and another
+    circle in the square, and then inscribe
+    a regular pentagon. Continue this
+    process, each time inscribing a circle
+    followed by a regular polygon with
+    one more side. What is the radius of
+    the limiting circle?
+
+    -- Mathematical Sorcery
+    by Calvin C. Clawson
+
+Solution:
+
+    Given a circle with radius R and inscribed polygon with
+    N sides.  The internal angle on the polygon is a set of
+    pizza slices with angles given by:
+    
+        theta = 2*pi/N
+        
+    Radius of inscribed circle is: R*cos(theta/2) = R*cos(pi/N)
+    
+    So the radius varies as:
+    
+    R(limit) = R*cos(pi/3)*cos(pi/4)*cos(pi/5)*...
+    
+    For the given problem:
+    
+    R(limit) ~ 0.1149422 (using 5e6 sided polygon)
+
+    The Bent claims this converges "quickly" and I would disagree.
+    You need at least 1000 polygons to arrive at the answer they
+    give as ~ 0.115.
+
+
+## Problem 4
+
+    Three points are chosen at random
+    in a hemisphere of radius R.
+    What is the expected value of the
+    distance of the closest point from the
+    hemisphere's flat surface?
+
+    -- Russell T. Nevins, MA B'77
+
+Solution: This is very similar to the problems for
+triangles, cones, and spheres in other volumes.
+
+[For the triangle](solution_2007_3.html#problem-4)
+
+[For the cone](solution_2006_1.html#bonus)
+
+[For the sphere](solution_2006_3.html#problem-4)
+
+
+We can repeat this for the hemisphere:
+
+    Consider a hemisphere laying on the table.  We take
+    a differential horizontal slice at an elevation y above
+    the table.  The slice has a volume:
+    
+    pi*r**2*dy where r**2 = R**2 - y**2
+    
+    The full volume of the hemisphere is:
+    
+    V = 1/2*4/3*pi*R**3
+    
+    The probability that a point is located in the differential
+    slice is then:
+    
+        pr1 = (pi*(R**2-y**2)*dy)/(2/3*pi*R**3)
+        
+    The probability that each of the other two points are higher than this:
+    
+        pr2 = (volume above point y)/(hemisphere volume)
+        
+        volume above point y = pi*(2*R**3 - 3*R**2*y + y**3)/3
+
+    Total probability:
+    
+        pr1*(pr2**2)
+        
+    The expected value is then:
+    
+        3*integral(y*pr1*(pr2**2),(y,0,R))
+
+        = 387/2240 * R ~ 0.17277 * R
+        
+    The factor of 3 is due to the fact that any of the three points may
+    be the lowest.
+
+
+## Problem 5
+
+    Let N be a positive integer, and let
+    S(N) represent the sum of the digits
+    of N. For example, S(1249) = 16,
+    and S(122) = 9. What is the value of
+    S(S(S(4444^4444)))?
+
+    -- Classic Mathemagic by R. Blum,
+    A. Hart-Davis, B. Longe, and
+    D. Niederman
+
+Solution:
+
+    Brute force solution with sympy:
+    
+    4444**4444 = number with 16211 digits = 510363...981696
+    S(4444**4444)       = 72601
+    S(S(4444**4444))    = 16
+    S(S(S(4444**4444))) = 7
+
+
+## Bonus
+
+    A one-meter massless string is attached
+    to the end of a vertically rotating shaft,
+    with a mass of 25 g attached to the other
+    end of the string. The rate of rotation is
+    such that the string makes an angle of a
+    with the vertical. The mass is then given
+    a small outward horizontal impulse that
+    causes it to oscillate up and down across the
+    circular path it had been following.  Find an
+    expression for the frequency of oscillation.
+
+    -- John R. Sellars
+
+TODO
+
+
+## Double Bonus
+
+    Given that
+
+    S(n) = 1(1!) + 2(2!) + 3(3!) + 4(4!) + ... + n(n!),
+
+    what is the value of S(n)?
+
+    -- The Mathematics Teacher
+
+Solution:
+
+    sympy returns this result directly:
+    
+    In [94]: summation(m*factorial(m),(m,1,n))
+    Out[94]: n*factorial(n) + factorial(n) - 1
+
+    or (n+1)*factorial(n) - 1
+    
+    or factorial(n+1) - 1
+
+    The Bent gives this last solution but they do
+    derive it rather easily.  Define T as:
+
+    T = 1! + 2! + ... + n! + (n+1)!
+      = 1  + (1+1)*1! + (1+2)*2! + ... + (1+n)*n!
+      = 1  + (1! + 2! + ... + n!) + S(n)
+      = 1  + (T-(n+1)!) + S(n)
+
+    so:
+
+    S(n) = (n+1)! - 1

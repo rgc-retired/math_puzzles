@@ -1,0 +1,501 @@
+---
+title: "Bent Winter 2014"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2014
+
+
+## Problem 1
+
+    I have found six different six-
+    digit positive integers, whose sum
+    also has six digits, with all 42 digits
+    having one of only two different
+    values. If I told you the sum, you
+    would be able to identify all six
+    numbers (no leading zeros). What is
+    this sum?
+
+    -- An Enigma by Jan Kay in New Scientist
+
+Solution:
+
+    FWIW - this problem was very messy and not a lot
+    of fun!  The Bent solution was virtually identical to
+    what I did below but they made a table and hand
+    calculated the sums to identify the unique one.
+
+    Consider the MS Digit: it must be a 1.
+    
+    It can not be 0 (by problem statement) and no other digit than
+    1 will allow for 6 values that sum to less than 10.  It could be
+    something other than 1 mixed with some 1 digits but all of those
+    cases would result in the MS digit of the sum that is not one
+    of the two allowed digits.
+    
+    If we look at the least significant digit we know that the sum must
+    end in one of the two digits.  We can search for candidate pairs of
+    digits that can work.
+
+
+```{r}
+library(gtools)
+```
+
+```{r, eval=FALSE}
+m=0
+for (i in 1) {
+    for (j in 0:9) {
+        if (j==i) { next }
+        a=combinations(2,6,c(i,j),repeats.allowed = T)
+        n=apply(a,1,sum)%%10
+        if (any(n==i) | any(n==j)) {
+            print(c(i,j))
+            m=m+1
+        }
+    }
+}
+print(paste0("Number of possible solutions = ",m))
+```
+
+    So the other digit must be 0, 2, 4, 6, or 8.
+
+    The MS digit must sum to (at least) 6.  This eliminates
+    all possibilities except:
+    
+        1-6
+        1-8
+
+    In both cases, all MS digits must be 1.  If there is no
+    carry into the MS digit sum then the sum is 6.  If the
+    carry into the MS digit sum is 2 then the sum is 8.
+    
+    The only was the carry into the MS digit is if the next
+    column sum is less than 10.  There is no way for this to
+    happen unless all the values are 1 (6+5>10 and 8+5>10).
+    Conclude: the carry into the MS digit can not be 0 so the
+    MS sum can not be 6.
+    
+    The sum must be 8 so the digits must be 1,8.
+
+    After a lot of messing around I got candidates for each
+    column but other than trial and error I don't know how
+    to fill these in as the individual numbers.  Only two
+    of the columns are unique and the other 4 columns have
+    two possible sets of digits.
+
+    (After saying this I looked at the problem statement -- the sum must
+    be unique -- maybe that would limit it further.)
+
+    I think I will punt and just look for all the combinations:
+    
+```{r, eval=FALSE}
+library(gtools)
+
+a=permutations(2,6,c(1,8),repeats.allowed=T)
+n=apply(a,1,function(x) {as.numeric(paste0(x,collapse=""))})
+
+# I hardcoded the loops since there are ~75e6 combinations of
+# the 64 candidates taken 6 at a time.
+
+thesum=c()
+for (i1 in 1:59) {
+    for (i2 in (i1+1):60) {
+        for (i3 in (i2+1):61) {
+            for (i4 in (i3+1):62) {
+                for (i5 in (i4+1):63) {
+                    for (i6 in (i5+1):64) {
+                        n2=n[i1]+n[i2]+n[i3]+n[i4]+n[i5]+n[i6]
+                        if (n2<1000000) {
+                            d=unique(strsplit(as.character(n2),"")[[1]])
+                            if (all(d %in% c("1","8"))) {
+                                m=c(n[i1],n[i2],n[i3],n[i4],n[i5],n[i6],n2)
+                                m=sort(m)
+                                print(m)
+                                thesum=append(thesum,n2)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+The solution sets are:
+
+        <------ First six numbers --------------> < Sum >
+    [1] 111811 111818 111888 118888 181818 181888 818111
+    [1] 111811 111818 111888 181818 181888 188888 888111
+    [1] 111818 111881 111888 118818 181818 181888 818111
+    [1] 111818 111881 111888 118888 181818 181888 818181 <-- Solution
+    [1] 111818 111881 111888 181818 181888 188818 888111
+    [1] 111818 111881 111888 181818 181888 188888 888181
+    [1] 111818 111888 118818 181818 181881 181888 888111
+    [1] 111818 111888 118888 181811 181818 181888 888111
+    [1] 111818 111888 118888 181818 181881 181888 888181
+
+The only unique sum is 818181 so the numbers are as seen above
+
+
+## Problem 2
+
+    You are to paint a totem pole,
+    consisting of twelve animal images
+    stacked on top of each other, using
+    only two colors, blue and yellow. No
+    two adjacent animals can be painted
+    blue, although consecutive yellow
+    colors are allowed. In how many
+    different ways can you paint the
+    totem pole?
+
+    -- BrainMatics Logic Puzzles
+    by Ivan Moscovich
+
+Solution:
+
+    No Blue: 12*Y
+    1 Blue:  12 cases
+    2 Blue:  66 cases but some have 2 blue in a row
+        We can have BY+(10 cases of where to put blue)
+        We can have YBY + (9 cases of where to put blue)
+        Total of 19 cases
+    3 Blue
+    4 Blue
+    5 Blue
+    6 Blue
+    >6 Blue is not possible without adjacent blue sections.
+    
+    This gets ugly in a hurry.  I cheated and peeked at the
+    solution.  Let us try some shorter totem poles
+    and see if we can get a pattern:
+    
+    One animal: 2 possibilities
+    Y
+    B
+    
+    Two animals:  3 possibilities
+    B + (any of the 1 animal possibilities, don't start with B) = 1
+    Y + (any of the 1 animal possibilities) = 2
+    
+    Three animals: 5 possibilities
+    B + (any two animal possibilities, don't start with B) = 2
+    Y + (any two animal possibilities) = 3
+
+    Four animals: 8 possibilities
+    B + (any of the three animal solutions, don't start with B) = 3
+    Y + (any of the three animal solutions) = 5
+
+    Five animals:
+    B + (any four animal not starting with B) = 5
+    Y + (any four animal solution) = 8
+
+    etc.
+    
+    Apparently a Fibonacci sequence: 2,3,5,8,13,21,34,55,89,144,233,377
+    Number of sections in the pole:  1,2,3,4,5, 6, 7, 8, 9, 10, 11, 12
+    
+    For n=12 the value is 377
+    
+    Generally: F(n) = F(n-2)+F(n-1)
+    F(-1)=F(0)=1
+    
+    We can solve the difference equation:
+    
+    F(n) = (1/2 + 3*sqrt(5)/10)*(1/2 + sqrt(5)/2)**n +
+           (1/2 - 3*sqrt(5)/10)*(1/2 - sqrt(5)/2)**n
+ 
+    I used sympy to to this since I can no longer do anything
+    remotely resembling algebra without making huge errors.
+    I did rearrange the terms to make them prettier.
+    
+    I also used maxima to get:
+    
+                                  n         n                n
+                     (sqrt(5) - 1)  c2 (- 1)    (sqrt(5) + 1)  c1
+    (%o12)           ------------------------ + -----------------
+                                 n                      n
+                                2                      2
+
+    With:
+    
+                           3 sqrt(5) + 5         3 sqrt(5) - 5
+    (%o11)           [c1 = -------------, c2 = - -------------]
+                                 10                    10
+
+
+    This appears to be the same thing.  At least they generate the same
+    sequence of numbers.
+    
+    Neither of these is as simple as I recall the solution to the Fibonnaci
+    sequence being -- but maybe my memory is fading or my idea of complexity
+    has changed.
+    
+    
+## Problem 3
+
+    Solve the following two cryptic
+    addition problems simultaneously,
+    that is, letters have the same values
+    in both cryptics. Each different
+    letter stands for a different digit.
+    The same letter always stands for
+    the same digit. There are no leading
+    zeros. An * can stand for any digit.
+
+    * * * * * *    * S E V E N * *
+    * * * * * *    * S E V E N * *
+    F O U R * *    ---------------
+    S E V E N *    F O U R T E E N
+    -----------
+    E L E V E N
+
+    What is the value of FOURTEEN?
+
+    -- An Enigma by Albert Haddad in New Scientist
+
+TODO
+
+    Never was able to solve this in the cryptic
+    arithmetic notebook.
+
+
+## Problem 4
+
+    "CRYPTOQUIP" is a puzzle in
+    a lot of newspapers. It consists of
+    a coded sentence or two with each
+    letter of the message represented
+    by a different unique letter of the
+    alphabet. If all 26 letters are used,
+    how many codes are possible?
+    Either a closed form equation or an
+    approximate numerical value is a
+    permissible answer.
+
+    -- Don A. Dechman, TX A A'57
+
+Solution:
+
+    I think the possible codes are just all the
+    permutations of the letters.  In the case all
+    of the letters are used: 26!.
+    
+        26! = 403291461126605635584000000
+
+    If only a subset of the 26 codes are used then
+    the value will be:
+    
+        C(26,n)*n!
+    
+    This is (at most) equal to 26! and may be far
+    less.  For example, with a single character
+    message we only have 26 difference choices.
+    For 2 characters we have 26*25 = 250, etc.
+
+    The Bent does not accept this solution.  They argue
+    that any arrangement with the letters in the "correct"
+    position is not a valid "derangement".  They give
+    a result that is ~ 26! / e.
+    
+    They look at the maximum case of 26! and note that
+    there are some codes in the "correct" location so you
+    need to subtract those out: C(n,1)*(n-1)! but this is
+    an over-correction so you need to add back in C(n,2)*(n-2)!
+    etc. in an alternating sequence.
+    
+        Finally: n! * (1 - 1/1! + 1/2! - 1/3! + ... (-1)^n/n!)
+    
+    As n->infinity, the quantity in brackets goes to 1/e.
+    
+
+## Problem 5
+
+    Consider a five-by-five array of
+    25 points, one cm apart horizontally
+    and vertically. Select five different
+    points, none of which lie on either
+    main diagonal of the array, such
+    that the distances between pairs of
+    points are all different. There are
+    multiple solutions, but you only need
+    to furnish one. Consider the array
+    as consisting of five rows by five
+    columns, each numbered 1 to 5, and
+    express your answer as five pairs of
+    numbers giving the row and column
+    of the selected points.
+
+    -- Puzzles 101: A PuzzleMaster's
+    Challenge by Nobuyuki Yoshigahara
+
+Solution:
+
+    The puzzle grid is shown below where
+    X is not permissible and . is allowed:
+    
+        1  2  3  4  5
+       --------------
+    1 | X  .  .  .  X
+    2 | .  X  .  X  .
+    3 | .  .  X  .  .
+    4 | .  X  .  X  .
+    5 | X  .  .  .  X
+
+    One proposed solution is shown below where
+    the selected points are shown with o:
+    
+        1  2  3  4  5
+       --------------
+    1 | X  o  .  o  X
+    2 | o  X  .  X  .
+    3 | .  .  X  .  o
+    4 | .  X  .  X  .
+    5 | X  .  o  .  X
+
+    The coordinates are:
+    
+        2,1
+        1,2
+        1,4
+        3,5
+        5,3
+        
+    This fails to work since the distance from the last
+    point to the second and third is identical.  Turns out
+    this is hard to solve by trial and error.  I think
+    exhaustive search might be easiest.
+    
+    There are only 16 permissible locations for the 5 dots.
+    This is only 4368 combinations to check
+    
+```{r}
+a=data.frame(row=c(1,1,1,2,2,2,3,3,3,3,4,4,4,5,5,5),
+             col=c(2,3,4,1,3,5,1,2,4,5,1,3,5,2,3,4))
+
+b=combinations(16,5)
+
+for (i in 1:nrow(b)) {
+# for (i in c(135)) {
+    d=c()
+    for (j in 1:4) {
+        for (k in (j+1):5) {
+            x1=a[b[i,j],1]; y1=a[b[i,j],2]
+            x2=a[b[i,k],1]; y2=a[b[i,k],2]
+            d=append(d,((x1-x2)^2+(y1-y2)^2))
+        }
+    }
+    if (length(unique(d))==10) {
+        print(i)
+    }
+}
+```
+
+Yields many, many solutions.  One is shown below:
+
+    > a[b[135,],]
+       row col
+    1    1   2
+    2    1   3
+    4    2   1
+    12   4   3
+    13   4   5
+
+        1  2  3  4  5
+       --------------
+    1 | X  o  o  .  X
+    2 | o  X  .  X  .
+    3 | .  .  X  .  .
+    4 | .  X  o  X  o
+    5 | X  .  .  .  X
+
+    The (squared) distances are:
+    
+        2, 5, 8, 18, 1, 10, 18, 9, 13, 4
+
+
+## Bonus
+
+    Given a three-by-three grid
+    of pigeonholes, fastened to a wall
+    with the middle hole covered, place
+    envelopes in any or all
+    of the outside holes so
+    that the sum of the
+    number of envelopes
+    on each of the four
+    sides has the same value, N. For
+    example, if N is 10, one solution is
+    shown in the accompanying figure.
+    How many ways, including reversals,
+    rotations, and reflections as different
+    arrangements, can this be done?
+    Express your answer as a function
+    of N.
+
+        1 9 0
+        7 * 8
+        2 6 2
+
+
+    -- The Canterbury Puzzles by H.E. Dudeney
+
+TODO
+
+    meh
+
+## Computer Bonus
+
+    Find two different ten-digit numbers,
+    each using the digits 0 through 9
+    exactly once, such that their square
+    roots are the reverses of each other.
+
+    -- You'd Better Be Really
+    Smart Brain Bafflers by
+    Tim Sole and Rod Marshall
+
+Solution:
+
+    Let's try exhaustive search for $200 Alex.
+    
+```{r}
+library(gmp)
+
+for (i in 31622:100000) {
+    n1=as.bigz(i)
+    n2=as.bigz(paste0(rev(strsplit(as.character(n1),"")[[1]]),collapse=""))
+    n1str=as.character(n1^2)
+    n2str=as.character(n2^2)
+    if ( (nchar(n1str)==10) && (nchar(n2str)==10) ) {
+        # Check for 10 distinct digits
+        if (length(unique(strsplit(n1str,"")[[1]]))==10) {
+            if (length(unique(strsplit(n2str,"")[[1]]))==10) {
+                if (n1str != n2str) {
+                    # Solution found
+                    print(paste0("n1 = ",n1))
+                    print(paste0("   n1^2 = ",n1str))
+                    print(paste0("n2 = ",n2))
+                    print(paste0("   n2^2 = ",n2str))
+                }
+            }
+        }
+    }
+}
+```
+
+Solution set is:
+
+    n1 = 54918  -->  n1^2 = 3015986724
+    n2 = 81945  -->  n2^2 = 6714983025
+
+    Just FYI: this is sooooo much easier in Python.

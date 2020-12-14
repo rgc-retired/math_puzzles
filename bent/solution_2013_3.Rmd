@@ -1,0 +1,433 @@
+---
+title: "Bent Fall 2013"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2013
+
+
+## Problem 1
+
+    At exactly noon, Bob left the Red Lion at
+    Upper Darby and set off by foot on the trail
+    to the Purple Cow in Lower Merion. At exactly
+    noon, Carl left the Purple Cow and set off by
+    bicycle on the same trail for the Red Lion.
+    When they met, Bob had covered 4 miles. After
+    a 10 minute chat, Carl gave Bob the bike and
+    walked on to the Red Lion, where he drank a
+    bottle of beer in 3 minutes and set off again
+    for the Purple Cow. Bob, as soon as Carl left
+    him, cycled on to the Purple Cow, drank a
+    bottle of beer in 3 minutes, and cycled off
+    again toward the Red Lion. This time they met
+    7 miles from the Purple Cow and discussed
+    football for 10 minutes. Then Bob
+    relinquished the bike and walked on to the
+    Red Lion, and Carl cycled on to the Purple
+    Cow. Each drank another bottle of beer, in
+    the same time as before, and off our heroes
+    went again with Carl still riding and Bob
+    afoot. They collided with each other 2 miles
+    from the Red Lion. If they each maintain
+    their own individual walking and riding rates
+    for the entire episode, how far is the Red
+    Lion from the Purple Cow?
+
+    -- A Tantalizer by Martin Hollis
+    in New Scientist
+
+TODO
+
+    may do this -- seems like fun.
+    
+
+## Problem 2
+
+    Ann collects stamps. She has half as many
+    from Canada as from Japan; one tenth as many
+    from France as from Denmark; one fifth as
+    many from Libya as from Egypt; five times as
+    many from Haiti as from France; two fewer
+    from Libya than from Canada; three times as
+    many from India as from Canada; half as many
+    from Australia as from Korea; one fewer from
+    Korea than from India; four times as many
+    from Brazil as from France; and twice as many
+    from Guatemala as from Libya. Ann has a total
+    of 303 stamps. How many Canadian stamps does
+    Ann have, and how many French stamps?
+
+    -- Logic Puzzles to Bend
+    Your Brain by Kurt Smith
+
+Solution:
+
+    The only integer solution is: C=13, F=4
+ 
+    All of the variables can be expressed in terms of C or F:
+ 
+    C = J/2  --> J = 2*C
+    F = D/10 --> D = 10*F
+    L = E/5  --> E = 5*L = 5*(C-2)
+    H = 5*F
+    L = C-2
+    I = 3*C
+    A = K/2  = (I-1)/2 = (3*C-1)/2 -> C is odd
+    K = I-1  = 3*C-1
+    B = 4*F
+    G = 2*L  = 2*(C-2)
+    C+J+F+D+L+E+H+I+A+K+B+G=303
+    
+    C=?   F=?
+
+    C+J   +L     + E       + I   + A         + K     + G
+    C+2*C +(C-2) + 5*(C-2) + 3*C + (3*C-1)/2 + 3*C-1 + 2*(C-2)
+    17*C-17+(3*C-1)/2
+    (17+3/2)*C - (17+1/2)
+    
+    F + D    + H   + B
+    F + 10*F + 5*F + 4*F
+    20*F
+    
+    37/2*C - 35/2 + 20*F = 303
+    
+    The only integer solution is: C=13, F=4
+    ---------------------------------------
+    A = (3*C-1)/2 = 19
+    B = 4*F = 16
+    C = 13
+    D = 10*F = 40
+    E = 5*(C-2) = 55
+    F = 4
+    G = 2*(C-2) = 22
+    H = 5*F = 20
+    I = 3*C = 39
+    J = 2*C = 26
+    K = 3*C-1 = 38
+    L = C-2 = 11
+
+
+## Problem 3
+
+    Consider all possible cryptic additions with
+    only two addends, where the addends may be
+    strings of any length. An example of such a
+    cryptic is: ABCA + DCDCD = ABCDE. The
+    solution to this cryptic is: 5275 + 47474 =
+    52746. We are concerned with cryptics that
+    have a unique, that is only one, solution in
+    base 10. For such a cryptic, define its
+    N-value as the number resulting from deleting
+    the + and = signs from its solution. For
+    example, the N-value of the above cryptic is
+    52,754,747,452,746. Cryptics, such as A + B =
+    C, with more than one solution, have no
+    N-value. Of all possible N-values, what are
+    the four smallest?
+
+    -- An Enigma by Keith Austin in New Scientist
+
+TODO
+
+    meh
+
+
+## Problem 4
+
+    What is the probability that a positive
+    integer, N, chosen at random, will have no
+    repeated prime divisors? That is, if p is a
+    prime divisor of N, then p^2 is not a divisor
+    of N?
+
+    -- A Biography of the World's
+    Most Mysterious Number
+    by Alfred S. Posamentier
+    and Ingmar Lehmann
+
+Solution:
+
+    OK - I gave up and looked at the Bent solution.
+    I would have never gotten it.
+    
+    Result: Pr = 6/pi^2 ~ 0.60793
+    
+    The argument goes like this:
+    
+    Given a prime number, p, the probability that N has
+    p as a prime factor is 1/p (every pth integer has p
+    as a prime factor).  The probability that p^2 is
+    a factor is 1/p^2.  So:
+    
+    Pr(N is not divisible by p^2) = 1-1/p^2
+    
+    If N has a number of prime factors, the probability
+    that none of them are repeated is:
+    
+    P = (1-1/p[1]^2)*(1-1/p[2]^2)*(1-1/p[3]^2)*...
+    
+    Invert both sides:
+    
+    1/P = 1/(1-1/p[1]^2) * 1/(1-1/p[2]^2) * 1/(1-1/p[3]^2) * ...
+    
+    But:
+            1/(1-x^2) = 1 + x^2 + x^4 + x^6 + ...
+            
+    So:
+    
+    1/P = 1/(1-1/p[1]^2) * 1/(1-1/p[2]^2) * 1/(1-1/p[3]^2) * ...
+
+        = (1+1/p[1]^2+1/p[1]^4+...) * 
+          (1+1/p[2]^2+1/p[2]^4+...) * 
+          (1+1/p[3]^2+1/p[3]^4+...) * ...
+
+    Letting p[1]=2, p[2]=3, p[3]=5, etc. we have:
+    
+    1/P = (1+1/2^2+1/2^4+...) * 
+          (1+1/3^2+1/3^4+...) * 
+          (1+1/p5^2+1/5^4+...) * ...
+    
+    Multiplying this out:
+    
+    1/P = (1 + 1/2^2 + 1/3^2 + 1/2^4 + 1/5^2 + 1/(2^2*3^2) + ...)
+        = (1 + 1/2^2 + 1/3^2 + 1/4^2 + 1/5^2 + 1/6^2 + ...)
+        = sum(1/n^2,n,1,inf)
+        = pi^2/6
+        
+    So:  P = 6/pi^2 ~ 0.6079271018540267
+
+    We can check it out with a small numerical test.  We will try
+    1000000 random samples from a range of 1-1e9.
+    
+```{r, eval=FALSE}
+library(gmp)
+
+x=sample(1000000000,1000000)
+n=sapply(x,function(x) {max(rle(as.numeric(factorize(x)))$lengths)==1})
+print(mean(n),digits=10)
+```
+
+One random trial -- amazingly close = 0.607675
+
+    
+## Problem 5
+
+    A young Tau Bate is contemplating her
+    financial future. Confident in her
+    engineering skills, she assumes that her
+    salary will increase 5% annually for an
+    indefinite time. On the advice of a financial
+    planner, she intends to invest 10% of her
+    total income (salary plus dividends) at the
+    end of each year in a respected mutual fund.
+    The fund pays out a flat annual dividend of
+    10% at the end of each year. The principle is
+    to remain invested indefinitely. For year 1,
+    her income is simply her starting salary S,
+    and she invests 10% of that. In year 2, her
+    total income is 1.05 S plus 10% of her
+    accrued investment, which is 0.1 S. At the
+    end of the year, she adds 10% of her year 2
+    income to her investment. Find closed
+    formulas for her total income for year N, and
+    for the total amount invested at the
+    beginning of that year.
+
+    -- Adapted from George Boole, 1860
+
+TODO
+
+    I think this is a rather standard investment
+    formula.  May need the sum of a couple of
+    terms.
+    
+
+## Bonus
+
+    Find positive integers a, b, c, and d
+    which simultaneously solve the following
+    two equations:
+
+    a^2 + b^3 = c^4
+    a^4 + b^6 = d^7
+
+    Find the solution with the smallest value of
+    d. Note that zero is not a positive integer.
+
+    -- Allan Gottlieb's Puzzle Corner
+    in Technology Review
+
+Solution:
+
+    I cheated and looked at their solution.
+    
+    Substitute multiples of another variable as:
+    
+        a=A*F^12, b=B*F^8, c=C*F^6, d=D*F^7
+        
+    into first equation:
+    
+        A^2*F^24 + B^3*F^24 = C^4*F^24
+        or:
+        A^2 + B^3 = C^4
+    
+    Substitute into the second equation:
+    
+        A^4*F^48 + B^6*F^48 = D^7*F^49
+        or:
+        A^4 + B^6 = D^7 * F
+        
+    Finally, wave a magic want and find a solution to the first
+    of these equations:
+    
+        A^2 + B^3 = C^4
+        
+    They magically come up with a solution as:
+    
+        A = 41472 = 2^9 * 3^4
+        B =  1728 = 2^6 * 3^3
+        C =   288 = 2^5 * 3^2
+
+    I have no idea how they came up with this solution.  There is a hint
+    in the exponents - but I don't understand it.
+    
+    Once this is known you can subsitute into the second equation:
+    
+        A^4 + B^6 = D^7 * F
+        2^36 * 3^16 + 2^36 * 3^18 = D^7 * F
+           = (2^35*3^14)*(2^1*3^2) + (2^35*3^14)*(2^1*3^4)
+           = (2^35*3^14)*(2^1*3^2 + 2^1*3^4)
+           = (2^5*3^2)^7 * (2*3^2 + 2*3^4)
+           = 288^7 * 180
+        D = 288
+        F = 180
+        
+    Finally, back-substituting:
+    
+        d = D*F^7 =  1763193692160000000
+        c = C*F^6 =  9795520512000000
+        b = B*F^8 =  1904249187532800000000
+        a = A*F^12 = 47976111050506371405143433281536
+
+
+## Computer Bonus
+
+    In a children's game called Beetle, the
+    object is to draw a beetle based on the
+    results of throwing a die. Each face of the
+    die allows adding a different part to the
+    beetle: 1-body, 2-head, 3-eye (two needed),
+    4-feeler (two needed), 5-leg (six needed),
+    6-tail. You must have a body before you can
+    add any other parts, and you must have a head
+    before you can add eyes or feelers. Calculate
+    the exact expected number of die tosses
+    required to complete the beetle.
+
+    -- World's Greatest Dice Games
+
+Solution:
+
+    May need to try Monte-Carlo?
+    
+```{r}
+ntrials=10000
+
+t1=Sys.time()
+set.seed(42)
+n_total=0
+for (trial in 1:ntrials) {
+    n=0
+    n_body=0
+    n_head=0
+    n_eye=0
+    n_feeler=0
+    n_leg=0
+    n_tail=0
+    # Get a body
+    while (n_body==0) {
+        s=sample(6,1)
+        n=n+1
+        if (s==1) {
+            n_body=1
+        }
+    }
+    # Add parts until done
+    while (TRUE) {
+        s=sample(6,1)
+        n=n+1
+        if (s==2) {
+            # Add the head
+            n_head=1
+        }
+        if (s==3) {
+            # Add an eye
+            if (n_head==1) {
+                n_eye=n_eye+1
+            }
+        }
+        if (s==4) {
+            # Add a feeler
+            if (n_head ==1) {
+                n_feeler=n_feeler+1
+            }
+        }
+        if (s==5) {
+            # Add a leg
+            n_leg=n_leg+1
+        }
+        if (s==6) {
+            # Add a tail
+            n_tail=1
+        }
+        # Check if done
+        if ((n_head==1) & (n_eye>=2) & (n_feeler>=2) & (n_leg>=6) & (n_tail>0)) {
+            break
+        }
+    }
+    n_total=n_total+n
+}
+t2=Sys.time()
+print(paste0("Total tosses = ",n_total))
+print(paste0("Mean  tosses = ",n_total/ntrials))
+print("Simulation time = ")
+t2-t1
+```
+
+
+Results of Monte-Carlo
+
+    Seed  Trials  Result
+    ---------------------
+    42    10K     44.3886
+    42    100K    44.30266
+    123   100K    44.19435
+    2020  100K    44.29614
+    1     100K    44.19622
+    42    1000K   44.254233
+    123   1000K   44.215643
+    2020  1000K   44.240336
+    
+
+The have a closed form solution in the Bent as:
+
+    44 + 1006625/3981312 tosses
+    
+    ~ 44.25284
+    
+They argue these are the state transitions in a FSM.
+As a caution, however, there are 141 states and the
+transition paths make it complicated to analyze.  They
+wrote a computer program to calculate the expected
+value (EV) and said it "converged" to the value given
+above.
+
+As an alternative, they suggested Monte-Carlo.
+

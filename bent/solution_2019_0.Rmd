@@ -1,0 +1,311 @@
+---
+title: "Bent Winter 2019"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2019
+
+
+## Problem 1
+
+    My elder son has just entered as a
+    freshman at Cornell University (NY
+    Delta). Being a California native, I was
+    naturally concerned how he would
+    adjust to his first chilly winter there
+    in Ithaca. Find a unique solution
+    to the following cryptarithm to
+    alleviate my fears:
+
+        CORNELL + STUDENT = ENDURES.
+
+    Standard rules apply: each different
+    letter stands for a different digit
+    and each different digit is always
+    represented by the same letter;
+    leading zeros are not allowed.
+
+    -- Jeffrey R. Stribling, CA A'92
+
+Solution: from the cryptic arithmetic notebook
+
+    Cryptic addition:
+
+      CORNELL + STUDENT = ENDURES
+
+    a=make_crypt_df('cornellstudentendures')
+    k=(make_num(a,'cornell')+make_num(a,'student') == make_num(a,'endures'))
+    k=k&(a$c!=0)&(a$s!=0)&(a$e!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+            c o r n e l s t u d
+    2007354 5 4 8 1 9 7 3 6 2 0
+
+
+## Problem 2
+
+    In the World of Bonkers, the ditty for
+    remembering the numbers of days in their
+    months runs as follows:
+
+    'Nineteen days hath Cucumber,
+    Strawberry too, and the number
+    of days there are in Tiddleywinks
+    is just the same as 'tis in Jinks,
+    which is seven whole days more
+    than the ten there are in Pinafore.
+    With the month of Collywobble,
+    diary makers have some trouble;
+    thirteen days if year is even,
+    forty-four if odd. And Stephen
+    quite the least of Bonkers' months,
+    in fact it's sometimes called the
+    runt, as you can easily understand,
+    since it hath but four days
+    and another two in years of Heaven
+    (that's if the year's date ends in
+    seven).'
+
+    There are five days in each week:
+    Joyday, Funday, Laughday,
+    Blissday, and Workday, in that
+    order.
+
+    In the year 17 a.b. (after bliss) the King of
+    Bonkers went off for his holiday on Funday,
+    Strawberry 17th and returned, just over 7
+    weeks later, on Blissday, Tiddleywinks 8th.
+    In the year 19 a.b., there were 41st to
+    Pinafore 7th. Note that Collywobble is the
+    first and most important month of the seven
+    which comprise the year.
+
+    What is the order of the seven months of the
+    Bonkers' year? Given Strawberry 13th was a
+    Workday in the year 21 a.b., what day of the
+    week was Collywobble 2nd?
+
+    -- Brain Puzzler's Delight
+    by E.R. Emmet
+
+TODO
+
+    meh
+
+
+## Problem 3
+
+    Find the smallest rational x for which x-5, x
+    and x+5 are all squares of rational numbers
+    (that is, each number can be written as some
+    p^2/q^2).
+
+    -- Mathematical Tournament from 1225
+
+TODO
+
+    Well I was flailing all over and was off on a
+    Wikipedia hunt of Diophantine equations and
+    Pythagorean triples and finally gave up.
+    Clearly I was going off the deep end.
+    
+    I looked at the Bent solution.
+    
+    It uses Diophantine equations and Pythagorean triples!
+
+    Basic idea:
+    
+        x = p^2/q^2 --> x +/- 5 = (p^2 +/- 5*q^2)/q^2
+        
+        Consider just the numerators:
+        
+        a^2 = p^2 - 5*q^2
+        b^2 = p^2
+        c^2 = p^2 + 5*q^2
+        
+        D = c^2-b^2 = b^2-a^2 = 5*q^2, or
+        
+        c^2 = b^2+D
+        a^2 = b^2-D
+        
+        Multiplying: (c*a)^2 + D^2 = (b^2)^2
+        
+        Which is the Pythagorean theorem (a Diophantine equation).
+        
+        As an aside -- for arbitrary m,n this generates Pythagorean triples:
+        
+            c*a = m^2-n^2
+            D   = 2*m*n
+            b^2 = m^2+n^2
+            
+        Let:
+        
+            b   = r^2 + s^2
+            m   = 2*r*s
+            n   = r^2 - s^2
+            
+        Then: for integer r, s:
+        
+            D   = 4*r*s*(r^2-s^2)  = 5*q^2
+            b^2 = (r^2+s^2)^2      = p^2
+
+        Need to find r,s to make smallest integer of
+        the form D = 5*q^2
+        
+        They assert either r=5 or s=5 (why?).
+        
+        If r=5, s=4 then D = 5*(16)(9) = 5*144 = 5*12^2
+        b^2 = (r^2 + s^2)^2 = 41^2 = p^2
+        
+        p/q = 41/12 --> x   = (p/q)^2  = (41/12)^2 = 1681/144
+                        x-5 = 961/144  = (31/12)^2
+                        x+5 = 2401/144 = (49/12)^2
+
+    Supposedly this solution was due to Fibonacci.
+
+
+## Problem 4
+
+    Primeministan County has a cluster of small
+    towns interconnected by a series of roads,
+    such that there is only a single route
+    between any two towns. Interestingly, when
+    sorted by distance, the ten routes in the
+    county (measured in km) are unique
+    consecutive primes. What is the minimal total
+    road length in Primeministan? How many towns
+    are there and how are the roads connected in
+    this topology?
+
+    -- Hunter W. Hagadorn, PA E'59
+
+TODO
+
+    meh
+
+
+## Problem 5
+
+    Start with a 10 cm square piece of paper and
+    color in a 3 mm wide red border on both sides
+    along and including all four edges. Fold the
+    paper so that no red shows, not even a corner
+    or an edge. Paper must either fully wrap
+    around an edge or the edge must be recessed
+    at least 3 mm from the outer perimeter of the
+    folded shape (and be covered) to be
+    considered hidden. If the paper has been
+    folded and a new fold makes more than one
+    crease, the new fold is considered as only
+    one fold. What is the minimum number of folds
+    required?
+
+    -- The Man in the Milk Carton by Stephen Barr
+
+TODO
+
+    meh -- I have trouble even visualizing this.
+    I would probably need to make a prop.
+
+
+## Bonus
+
+    Frank has a tablecloth covered with 1 cm
+    diameter black polka dots. The polka dots
+    form a square grid with 2 cm between
+    neighboring centers. He takes a flat 4 cm by
+    4 cm piece of clear plastic and paints four 1
+    cm diameter circles on it in the same pattern
+    as on the tablecloth. After laying the
+    tablecloth on a flat surface, he randomly
+    tosses the piece of plastic onto it. To three
+    significant figures, what is the probability
+    that none of the polka dots on the plastic
+    will overlap any portion of any of the polka
+    dots on the tablecloth?
+
+    --Don A. Dechman, TX A'57
+
+Solution:
+
+    I am positive I solved this before and wrote
+    code in many languages as a Monte-Carlo benchmark.
+    
+    Need to dig that out.
+
+    See files: c:\rgc\test\play\bent\2019\0_winter\old_pc
+    
+    A LOT of work done on this.
+
+
+## Computer Bonus
+
+    In the range from 1 to 1,000,000,000, what is
+    the longest string of consecutive integers
+    without a semiprime? A semiprime is an
+    integer that is the product of exactly two
+    (not necessarily different) primes. As an
+    example, 96 to 105 is a string of 10 integers
+    without a semiprime.
+
+    -- Howard G. McIlvried III, PA G'53
+
+Solution:
+
+    Brute force
+
+    Final solution:
+    
+    Maximum string without semiprime = 94 integers
+    First value = 981270903
+    Last value  = 981270996
+    
+    Through n=400e6 the longest string is 86.
+    The run time is very, very slow in R.
+    Not sure it would be any faster in a different language.
+    Still have to find the semiprimes!!!
+    
+    According to the Bent the solution should be 94 with the solution
+    near the end of the range (~981e6).
+
+    I let it run overnight and my results match the Bent.
+    
+    Preserved for posterity but will not run by default.
+
+```{r, eval=FALSE}
+library(gmp)
+
+m=0
+mmax=0
+lastval=0
+
+for (n in 1:1000000000) {
+    if (length(factorize(n))==2) {
+        m=0
+    } else {
+        m=m+1
+        if (m>mmax) { mmax=m; lastval=n }
+    }
+    if (n%%10000000 == 0) {
+        print(sprintf("Working for n = %f, mmax= %d",n/1e6,mmax))
+    }
+}
+
+print(mmax)
+print(lastval)
+
+```
+
+    Final solution:
+    
+    Maximum string without semiprime = 94 integers
+    First value = 981270903
+    Last value  = 981270996
+    

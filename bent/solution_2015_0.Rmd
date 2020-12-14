@@ -1,0 +1,541 @@
+---
+title: "Bent Winter 2015"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2015
+
+
+## Problem 1
+
+    Based on the following informa-
+    tion, find the values of A, B, C, and
+    D, which are unique positive inte-
+    gers, all less than five.
+    If A is 1, then B is not 3.
+    If B is not 1, then D is 4.
+    If B is 1, then C is 4.
+    If C is 3, then D is not 2.
+    If C is not 2, then D is 2.
+    If D is 3, then A is not 4.
+
+    -- Brain Workout IQ Challenges
+    by Terry Stickels and
+    J. J. Mendoza Fernandez
+
+Solution:
+
+    A=3, B=1, C=4, D=2
+
+    We can try to reason this out instead of throwing it
+    against the computer.
+    
+    If C = 3 then D != 2 but      \ Contradiction so C can't be 3
+    if C = 3 then C != 2 so D =2  /
+
+    What if B is 1 then C = 4.
+    Since C is not 2 --> D = 2.
+    A must be 3.
+    
+    What if B is 2 then D=4    \ Contradiction so B can't be 2
+    but if C is not 2 then D=2 /
+
+    What if B is 3 then A is not 1--> A=2, C=1 --> D=2 = Contradiction
+    D=4
+    
+    What if B is 4 then D=4 --> Contradiction
+    
+    
+## Problem 2
+
+    A point in the interior of a square
+    is exactly 2, 3, and 4 cm from suc-
+    cessive corners of the square. What
+    is the length of a side of the square,
+    expressed in exact terms?
+
+    -- adapted from The Canterbury
+    Puzzles by H.E. Dudeney
+
+Solution:
+
+    The situation is diagrammed below in ASCII art:
+    
+        1----------2
+        |          |
+        |          |
+        |   0      |
+        |          |
+        3----------4
+
+    The distance from 0-3 is 2, distance from 0-1 is 3 the
+    distance to one of the other two corners is 4.
+    
+    If the length of a side for the square is d then we can
+    call the angles:
+    
+        1-3-0 = theta
+        3-1-0 = alpha
+
+    Then:
+    
+        d = 2*cos(theta)+3*cos(alpha)
+        2/sin(alpha) = 3/sin(theta)
+    
+    Either:
+    
+        Distance from O to corner nearest length of 3
+        d1^2 = (3*cos(alpha))^2 + (d-3*sin(alpha))^2
+    or
+        Distance from O to corner nearest length of 2
+        d2^2 = (2*cos(theta))^2 + (d-2*sin(theta))^2
+    
+    We need to solve to make d1==4 or d2==4.
+    
+    This is getting ugly.
+
+    What if we just sweep the length of a side and look at the other two
+    distances.  This is complicated by the fact that we still don't know
+    the theta, alpha angles but we do have two equations and two unknowns.
+    
+    Can use the law of cosines for the SSS triangle:
+    
+    a,b,c = sides
+    A,B,C = angles opposite a,b,c
+    
+    cos(C) = (a^2+b^2-c^2)/(2*a*b)
+    cos(A) = (b^2+c^2-a^2)/(2*b*c)
+    cos(B) = (c^2+a^2-b^2)/(2*a*c)
+
+    For our problem we will use:
+    
+    a = 2
+    b = 3
+    c = d (side of square)
+    
+    cos(theta) = (d^2+2^2-3^2)/(2*2*d)
+    cos(alpha) = (d^2+3^2-2^2)/(2*3*d)
+    
+    
+```{r}
+
+# Note that foo1() and foo2() are identical except for the return values
+
+foo1 = function(d) {
+    theta=(d^2+2^2-3^2)/(2*2*d)
+    alpha=(d^2+3^2-2^2)/(2*3*d)
+    if (abs(theta)>1 || abs(alpha)>1) {
+        d1=NA
+        d2=NA
+    } else {
+        theta=acos(theta)
+        alpha=acos(alpha)
+        d1 = sqrt((3*cos(alpha))^2 + (d-3*sin(alpha))^2)
+        d2 = sqrt((2*cos(theta))^2 + (d-2*sin(theta))^2)
+    }
+    return(d1)
+}
+
+foo2 = function(d) {
+    theta=(d^2+2^2-3^2)/(2*2*d)
+    alpha=(d^2+3^2-2^2)/(2*3*d)
+    if (abs(theta)>1 || abs(alpha)>1) {
+        d1=NA
+        d2=NA
+    } else {
+        theta=acos(theta)
+        alpha=acos(alpha)
+        d1 = sqrt((3*cos(alpha))^2 + (d-3*sin(alpha))^2)
+        d2 = sqrt((2*cos(theta))^2 + (d-2*sin(theta))^2)
+    }
+    return(d2)
+}
+
+x=seq(1,5.0,0.1)
+y1=c()
+y2=c()
+for (d in x) {
+    d1=foo1(d)
+    d2=foo2(d)
+    y1=append(y1,d1)
+    y2=append(y2,d2)
+}
+
+d1=optimize(function(x) {abs(foo1(x)-4)},c(1,5))
+d2=optimize(function(x) {abs(foo2(x)-4)},c(1,5))
+
+print("To make distance=4 to corner nearest length 3")
+print(d1,digits=15)
+print("To make distance=4 to corner nearest length=2")
+print(d2,digits=15)
+```
+
+The solutions are for squares of side:
+
+    d = 4.23525477726028
+    d = 4.57935453145691
+
+The solution in the bent is closed form:
+
+    sqrt(10+3*sqrt(7)) ~ 4.2352395366961
+    
+Which matches the first solution (corners are literally ordered as 2, 3, 4)
+at least through 5 significant digits.
+
+The closed form solution is fairly easy to calculate and I probably
+should have tried that.  Put the corner connected to the distance of 3
+at the origin of the x-y coordinates.  The length of a side of the square
+is L and the location of the point is (x,y).  The distance to the three
+corners is then:
+
+    e1: x^2 + (L-y)^2 = 2^2
+    e2: x^2 + y^2     = 3^2
+    e3: (L-x)^2 + y^2 = 4^2
+
+Solving is fairly simple:
+
+    solve(e1-e2,y)
+    solve(e3-e2,x)
+    
+    substitute the results for x,y into e2 and solve double quadratic:
+    
+    L^4 - 20*L^2 + 37 = 0 --> L = sqrt(10 +/- 3*sqrt(7))
+    
+Note that they implicitly assumed the distance of 4 is to the corner
+nearest the distance of 3.  If, instead, the distance of 4 is to the
+corner nearest the distance of 2 we have:
+
+    e1: x^2 + (L-y)^2 = 3^2
+    e2: x^2 + y^2     = 2^2
+    e3: (L-x)^2 + y^2 = 4^2
+    
+Same solution technique:
+
+    x=(L^2-12)/(2*L); y=(L^2-5)/(2*L)
+    
+    2*L^4 - 50*L^2 + 169 = 0
+    
+    L^2 = (25+/-sqrt(287))/2
+    
+    L = +/- sqrt( (25 +/- sqrt(287))/2 )
+      ~ +/- 2.007352, +/- 4.57936
+      
+    Clearly the only feasibly solution is sqrt((25+sqrt(287))/2) ~ 4.57936.
+
+
+## Problem 3
+
+    A hexomino is a polygon consist-
+    ing of six unit squares joined edge
+    to edge along the full length of
+    their sides. There are 35 different
+    hexominos. How many of these can
+    be folded into a unit cube without
+    making any slits?
+
+    -- More BrainMatics Logic Puzzles
+    by Ivan Moscovich
+
+TODO
+
+    meh
+    
+
+## Problem 4
+
+    The game of 5-Spot consists of a
+    deck of cards with five capital let-
+    ters on each card. Between any two
+    cards, there is one, and only one,
+    matching letter. If each letter occurs
+    the same number of times in the
+    deck, what is the maximum number
+    of cards in the deck? What is one
+    such deck? Assume the letters are
+    consecutive, i.e., A, B, C, ... , and
+    present your answer as a sentence
+    of five-letter "words" with one word
+    for each card in the deck. Within
+    each word, the letters should be
+    in alphabetical order, and then the
+    words should also be in alphabetical
+    order.
+
+    -- Fred J. Tydeman, CA Delta '73
+
+TODO
+
+    meh
+    
+
+## Problem 5
+
+    Consider a ten-digit integer that
+    uses each of the digits 0 through 9
+    exactly once and has the proCperty
+    that the sum of adjacent digits is a
+    prime. The smallest such number
+    is 1203476589. In total, how many
+    numbers have this property? One is
+    not a prime number. No leading ze-
+    roes are allowed. You could use your
+    brain cells instead of a computer, but
+    it would be tedious.
+
+    -- adapted from Math-E-Magic
+    by R. Blum, A. Hart-Davis,
+    B. Longe, and D. Niederman
+
+Solution:
+
+    We will generate all the permutations but we can
+    short cycle as soon as we find a sum that is
+    not a prime.
+    
+    Yes - this is very ugly but it was quick to write.
+
+```{r}
+library(gmp)
+
+n=0
+for (i1 in 1:9) {
+    for (i2 in 0:9) {
+        if (i2 == i1) { next }
+        if (!isprime(i1+i2)) { next }
+        for (i3 in 0:9) {
+            if (i3 %in% c(i1,i2)) { next }
+            if (!isprime(i2+i3)) { next }
+            for (i4 in 0:9) {
+                if (i4 %in% c(i1,i2,i3)) { next }
+                if (!isprime(i3+i4)) { next }
+                for (i5 in 0:9) {
+                    if (i5 %in% c(i1,i2,i3,i4)) { next }
+                    if (!isprime(i4+i5)) { next }
+                    for (i6 in 0:9) {
+                        if (i6 %in% c(i1,i2,i3,i4,i5)) { next }
+                        if (!isprime(i5+i6)) { next }
+                        for (i7 in 0:9) {
+                            if (i7 %in% c(i1,i2,i3,i4,i5,i6)) { next }
+                            if (!isprime(i6+i7)) { next }
+                            for (i8 in 0:9) {
+                                if (i8 %in% c(i1,i2,i3,i4,i5,i6,i7)) { next }
+                                if (!isprime(i7+i8)) { next }
+                                for (i9 in 0:9) {
+                                    if (i9 %in% c(i1,i2,i3,i4,i5,i6,i7,i8)) { next }
+                                    if (!isprime(i8+i9)) { next }
+                                    for (i10 in 0:9) {
+                                        if (i10 %in% c(i1,i2,i3,i4,i5,i6,i7,i8,i9)) { next }
+                                        if (!isprime(i9+i10)) { next }
+                                        # print(c(i1,i2,i3,i4,i5,i6,i7,i8,i9,i10))
+                                        n=n+1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+print(n)
+```
+
+There are 845 numbers with this property (10 digit numbers with adjacent digit
+sums being primes).
+
+
+## Bonus
+
+    In the game of five card stud poker with
+    one-eyed jacks (the jacks of spades and
+    hearts) wild, what is the probability of
+    getting exactly one pair? Also, what is the
+    probabil- ity of getting a bust hand, i.e., a
+    hand with not even a pair? Assume that a wild
+    card is always used to maximize the value of
+    a hand. The two one-eyed jacks are in hearts
+    and spades.
+
+-- Howard G. McIlvried III, PA Gamma '53
+
+Solution:
+
+    Exhaustive enumeration will be as clear as working through the
+    combinatorics.
+
+```{r}
+library(gtools)
+
+poker_hand=combinations(52,5,0:51)
+```
+
+```{r}
+
+check_poker_hand = function(x, wild=c(41,42)) {
+    # Determine the result for a poker hand, x
+    # The values in x are simply integers in range 0-51
+    # trunc(x/4)+1 = pip value
+    # x%%4 = suit
+    #
+    # Wildcard codes are given by wild.
+    #
+    # Results are:
+    has_a_straight=1
+    has_a_flush=2
+    has_pair_or_better=3
+    has_wild_card=4
+    has_wild_cards=5
+    has_bust=0
+    has_one_pair=10
+    
+    k=x %in% wild
+    if (sum(k) == 0) {                    # no wildcard
+        pip=trunc(x/4)+1
+        if (length(unique(pip))==5) {     # no pair(s) or better
+            if (length(unique(x%%4))>1) { # no flush
+                s1=all(diff(sort(pip))==1) # no straight with aces low
+                s2=all(diff(sort(ifelse(pip==1,14,pip)))==1)  # aces high
+                if (!s1 & !s2) {
+                    return(has_bust)
+                } else {
+                    return(has_a_straight)
+                }
+            } else {
+                return(has_a_flush)
+            }
+        } else {
+            if (length(unique(pip))==4) {
+                return(has_one_pair)
+            } else {
+                return(has_pair_or_better)
+            }
+        }
+    } else {
+        # Need to make sure:
+        # Only one wild card, no flush, no straight, 4 distinct pip values
+        if (sum(k)>1) {
+            return(has_wild_cards)
+        }
+        y=x[!k]
+        pip=trunc(y/4)+1
+        suit=y%%4
+        if (length(unique(suit))==1) {
+            return(has_a_flush)
+        }
+        if (length(unique(pip))<4) {
+            return(has_pair_or_better)
+        }
+        # How do we check for straight?  Maximum gap is a 2 and can only be
+        # one of those.
+        d=sort(diff(sort(pip)))
+        s1=(d[length(d)]<3) & (d[length(d)-1]<2)
+        d=sort(diff(sort(ifelse(pip==1,14,pip))))
+        s2=(d[length(d)]<3) & (d[length(d)-1]<2)
+        if (s1 | s2) {
+            return(has_a_straight)
+        }
+        return(has_one_pair)
+    }
+}
+```
+
+Initial testing:
+
+    Total = 2598960
+
+    Case              Hands  Bent Solution
+    --------------------------------------
+    Wildcard         480200
+    Pair or better  1054312
+    Flush              4158
+    Straight           8160
+    Bust            1052130   1052130
+
+After adding the logic to properly interpret wild-cards and isolate distinct
+pairs:
+
+    Case               Hands  Probability
+    -------------------------------------
+    Straight           25548    
+    Flush               8998  
+    Better than pair  304032   
+    Two Wildcards      19600 
+    Bust             1052130   0.4048273
+    One pair         1188652   0.4573568
+
+
+## Computer Bonus
+
+    Some pairs of "mirror image" integer"
+    have mirror image squares. For example, consider 12
+    and 21 and their squares, 144 and 441. How many non-
+    palindromic four-digit mirror image pairs have mirror
+    image squares?
+
+    -- Technology Review
+
+TODO
+
+    Exhaustive search?
+    
+```{r}
+
+is_palindrome = function(n) {
+    x=strsplit(as.character(n),"")[[1]]
+    return(all(x == rev(x)))
+}
+
+is_mirror_image = function(n1,n2) {
+    x1=strsplit(as.character(n1),"")[[1]]
+    x2=strsplit(as.character(n2),"")[[1]]
+    if (length(x1) != length(x2)) {
+        return(FALSE)
+    }
+    return(all(x1==rev(x2)))
+}
+
+n=0
+for (i in 1000:9999) {
+    if (!is_palindrome(i)) {
+        j=as.numeric(paste0(rev(strsplit(as.character(i),"")[[1]]),collapse=""))
+        if (j>i) {
+            if (is_mirror_image(i*i,j*j)) {
+                n=n+1
+                print(c(i,j))
+            }
+        }
+    }
+}
+print(n)
+```
+
+There are 18 such number pairs:
+
+    1002 2001
+    1003 3001
+    1011 1101
+    1012 2101
+    1013 3101
+    1021 1201
+    1022 2201
+    1031 1301
+    1102 2011
+    1103 3011
+    1112 2111
+    1113 3111
+    1121 1211
+    1122 2211
+    1202 2021
+    1212 2121
+    2012 2102
+    2022 2202
+
+One subtlety to avoid double counting is to check j>i.  At first I
+was double counting.

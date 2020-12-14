@@ -1,0 +1,474 @@
+---
+title: "Bent Spring 2009"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2009
+
+
+## Problem 1
+
+    Scott, the astronaut, has landed on
+    Planet X, which has the same density
+    as Earth but only half the mass.
+    Finding no atmosphere, he decides
+    to leave; he fires his hyperdrive (that
+    has the ability to generate thrust
+    while consuming very little fuel) and
+    lifts off. Unfortunately, just as he
+    reaches half the escape velocity, his
+    engine shuts off prematurely. How
+    much time does Scott have to eject
+    in his escape pod before his ship is
+    pulled back to the planet's surface
+    by gravity and crashes? Assume
+    that the space ship has a constant
+    mass of 1,000 kg and that its engine
+    generates a constant thrust of 35,000
+    N as long as it is firing. Ignore the
+    effect of the planet's rotation and the
+    change in gravity with distance from
+    the surface of Planet X.
+
+    --Scott L. Bilker, NJ Gamma'90
+
+Solution:
+
+    t = 1217 seconds (about 20 minutes)
+
+    I don't think they really mean to ignore the change in gravity
+    with distance from the surface of Planet X or else I don't
+    understand escape velocity.  I think that admonition is just
+    referring to the last part of the calculation.
+
+    From Wikipedia the escape velocity for stationary object is:
+    
+        ve = sqrt(2*G*M/r) = sqrt(2*g*r)
+        
+        G = 6.67e-11 m^3 kg^-1 s^-2
+        M(earth) = 5.9736e24 kg
+
+    Note that all of this changes for rotating bodies.
+
+    When fired vertically at velocity, v, the maximum height is:
+    
+        h = R*x^2/(1-x^2), where x=v/ve
+
+    Assuming the planet is spherical with the same density as earth
+    we have:
+    
+        r(planet X) = r(earth)*(1/2^(1/3))
+        
+    So:
+    
+        ve = sqrt(2*G*1/2*M(earth)/(r(earth)*(1/2^(1/3)))
+           = sqrt(2*G*M(earth)/r(earth)*(1/2)/(1/2^(1/3)))
+           = ve(earth) * sqrt((1/2)/(1/2^(1/3)))
+           = ve(earth) / 2^(1/3)
+           ~ 0.7937 * ve(earth)
+           
+    ve(earth) = 11.186 km/sec --> ve(planet X) ~ 8.878 km/sec
+    
+    Question: how long does it take to accelerate to this speed?
+    
+    We have the rocket pushing up and gravity pulling down.
+    
+    g(planet X) = g(earth)*(1/2)/((1/2)^(2/3)) = g(earth)/2^(1/3)
+    
+    During lift-off:
+    
+        F = ma = +35000 N - 1000 * 9.80665 / (2^(1/3))
+            a = 27216.46 N / 1000 kg = 27.21646 m/s^2
+            
+    To reach 1/2 of the escape velocity:
+    
+        t = 1/2 * 8.878 * 1000 / 27.21646 = 163.1 seconds
+        
+    At this point the height will be:
+    
+        h = 1/2*a*t^2 = 362000 meters
+        
+    Velocity is upwards at:
+    
+        v0 = 1/2*8878 = 4439 m/s
+        
+    Falling from this height only under the acceleration of gravity:
+    
+        h = h0 + v0*t + 1/2*a*t^2
+        
+    To find h=0 we need to solve the quadratic with h0, v0, a given above.
+    
+        1/2*a = - 1/2 * (9.80665 / (2^(1/3))) = -3.891772 m/s^2
+        v0 = 1/2*8878 = 4439
+        h0 = 362000
+    
+        -3.891772*t^2 + 4439*t + 362000 = 0
+    
+        t = 1217 seconds (about 20 minutes)
+
+    
+## Problem 2
+
+    Students Al, Bill, Carl, Don, and
+    Ed live in rooms A, B, C, D, and E in
+    the dorm, although not necessarily
+    in that order. They have just taken
+    a test in which they each got a different
+    score. When questioned, they
+    made the following remarks:
+
+    Al   a1: Carl scored lower than Bill.
+         a2: Don is in Room D.
+
+    Bill b1: Ed scored lower than Carl.
+         b2: Don is in Room C.
+
+    Carl c1: Al is in Room C.
+         c2: The student in Room B did
+             not have the second-best score.
+
+    Don  d1: Carl is in Room E.
+         d2: Ed is not in Room D.
+
+    Ed   e1: I scored lower than Bill.
+         e2: Al got the highest score.
+
+    Remarks in which the first person
+    mentioned scored lower than the
+    speaker are true, while remarks in
+    which the first person mentioned
+    scored higher than the speaker are
+    false. Also, when making a remark
+    about himself, only those who scored
+    highest or next highest tell the truth.
+    How did the students rank in the
+    test, and what rooms are they in?
+
+    --Brain Puzzler's Delight by
+    E.R. Emmet
+
+TODO
+
+    Oh Joy - another logic problem ...
+
+
+## Problem 3
+
+    Solve the following cryptic division,
+    which results in a repeating
+    decimal.
+
+    TBPI/AAAAA = .ONANDONANDON...
+
+    We want the solution with the biggest
+    PI. The usual rules for cryptics
+    apply.
+
+    -- H.G. McIlvried III, PA Gamma'53
+
+Solution:  solved in the crypic arithmetic notebook
+
+    Cryptic division with repeating decimal:
+
+      TBPI / AAAAA = .ONANDONANDON ...
+      Want solution with largest value of PI
+
+    rewrite this to avoid the repeating decimal
+
+      TBPI / AAAAA = ONAND / 99999
+    or
+
+      TBPI * 99999 = ONAND * AAAAA
+
+```{r}
+source('rgc_lib.R')
+
+a=make_crypt_df('tbpiaaaaaonand')
+x_tbpi=make_num(a,'tbpi')
+x_aaaaa=make_num(a,'aaaaa')
+x_onand=make_num(a,'onand')
+k=(x_tbpi*99999 == x_onand*x_aaaaa)
+k=k & (a$t != 0) & (a$a != 0)
+print(paste0("Number of soutions = ",sum(k)))
+print(paste0("TBPI  = ",x_tbpi[k,]))
+print(paste0("AAAAA = ",x_aaaaa[k,]))
+print(paste0("ONAND = ",x_onand[k,]))
+print(paste(colnames(a),collapse=" "))
+print(paste(a[k,],collapse=" "))
+
+# x_tbpi[k]/x_aaaaa[k]
+# x_tbpi[k]*99999
+# x_aaaaa[k]*x_onand[k]
+```
+
+I originally overspecified the problem and required ONAND
+to start with a nonzero digit.  With that constraint there
+is only one solution  If you allow this to be zero
+then there are two solutions.  The one with the larger value of
+PI is:
+
+    TBPI = 1784
+    AAAAA = 33333
+    ONAND = 05352
+    
+    So: 1784/33333 = 0.05352...
+
+
+## Problem 4
+
+    Ignoring colons, a 24-hour digital watch
+    shows many palindromes during the day, e.g.,
+    1:01:01 and 23:55:32.  How many palindromes
+    show in 24 hours, what are the longest and
+    shortest times between palindromes, and what
+    two palindromes have a difference that is
+    closest to 12 hours?  A 24-hour clock goes
+    from 23:59:59 to 0:00:00.
+
+    -- Technology Review
+
+Solution:  We can make exhaustive search
+
+```{r}
+
+h=rep(0:23,each=3600)
+m=rep(0:59,each=60,times=24)
+s=rep(0:59,times=24*60)
+a=data.frame(h=h,m=m,s=s)
+a$t=apply(a,1,function(x) {paste0(x[1],sprintf("%02d",x[2]),sprintf("%02d",x[3]),collapse="")})
+a$t2=apply(a,1,function(x) {paste0(rev(strsplit(x[4],"")[[1]]),collapse="")})
+k=(a$t==a$t2)
+b=a[k,]
+print(paste0("Number of palindromes = ",nrow(b)))
+rownames(b)=seq(nrow(b))
+b$x=b$h*3600+b$m*60+b$s
+
+n=which.max(diff(b$x))
+print(paste0('Max difference (seconds) = ',b$x[n+1]-b$x[n]))
+print(sprintf("%d:%02d:%02d",b[n,'h'],b[n,'m'],b[n,'s']))
+print(sprintf("%d:%02d:%02d",b[n+1,'h'],b[n+1,'m'],b[n+1,'s']))
+n=which.min(diff(b$x))
+print(paste0('Min difference (seconds) = ',b$x[n+1]-b$x[n]))
+print(sprintf("%d:%02d:%02d",b[n,'h'],b[n,'m'],b[n,'s']))
+print(sprintf("%d:%02d:%02d",b[n+1,'h'],b[n+1,'m'],b[n+1,'s']))
+
+d=outer(b$x,b$x,"-")
+n=which(d==(12*3600))
+colnum=trunc(n/nrow(b))+1
+rownum=n%%nrow(b)
+print("12 hour time difference:")
+print(sprintf("%d:%02d:%02d",b[colnum,'h'],b[colnum,'m'],b[colnum,'s']))
+print(sprintf("%d:%02d:%02d",b[rownum,'h'],b[rownum,'m'],b[rownum,'s']))
+
+```
+
+There are 660 palindromes.
+
+The maximum time between palindromes is from 15:55:51 to 20:00:02, 14651 seconds
+The minimum time between palindromes is from  9:59:59 to 10:00:01, 2 seconds
+
+Palindromes at 1:33:31 and 13:33:31 are precisely 12 hours apart
+
+
+## Problem 5
+
+    What is the probability of getting a royal flush
+    (A-K-QJ- 10 in the same suit in any order)
+    in seven-card stud poker played with a 53-card
+    deck (standard 52-card deck plus a joker), if
+    the joker is wild and can be used to represent
+    any card?
+
+    -- F.J. Tydeman, CA Delta'73
+
+Solution:  I wonder if Monte-Carlo is up to the task or if
+this takes too many trials to be practical?  We shall see:
+
+```{r}
+# Deck of 53 cards
+# 1 = Joker
+# 1xx = A-K of diamonds
+# 2xx = A-K of hearts
+# 3xx = A-K of spades
+# 4xx = A-K of clubs
+cards=c(1,seq(101,113),seq(201,213),seq(301,313),seq(401,413))
+
+ntrials=1000000
+
+zzz=matrix(ncol=7)
+set.seed(42)
+win=0
+winj=0
+for (trial in 1:ntrials) {
+    s=sample(cards,7)
+    # Check for a possible royal flush
+    if (1 %in% s) {
+        # evaluate with the joker
+        for (j in 1:4) {
+            hand=s[trunc(s/100)==j] %% 100
+            if (sum(c(10,11,12,13,1) %in% hand)>3) {
+                winj=winj+1
+                zzz=rbind(zzz,s)
+            }
+        }
+    } else {
+        for (j in 1:4) {
+            hand=s[trunc(s/100)==j] %% 100
+            if (all(c(10,11,12,13,1) %in% hand)) {
+                win=win+1
+                zzz=rbind(zzz,s)
+            }
+        }
+    }
+}
+
+print(paste0("Winning hands = ",win+winj))
+print(paste0("   Without joker = ",win))
+print(paste0("   With    joker = ",winj))
+print(paste0("Total   hands = ",ntrials))
+print(paste0("Pr(winning)   = ",(win+winj)/ntrials))
+```
+
+Results seem reasonable.  Adding the joker
+increases the likelihood of a royal flush
+by about a factor of 5.
+
+The Monte-Carlo results with 1e6 trials are:
+
+    Seed   Wins   No_Joker  Joker   Pr
+    ----------------------------------------
+    42     160    23        137     0.000160
+    123    176    29        147     0.000176
+    2020   186    28        158     0.000186
+    1      163    24        139     0.000163
+
+The Monte-Carlo results with 1e7 trials are:
+
+    Seed   Wins   No_Joker  Joker   Pr
+    ----------------------------------------
+    42     1743   296       1447    0.0001743
+
+
+The Bent solution is actually not too bad:
+
+    To get a royal flush without the joker:
+    
+        4 suits
+        choose(5,5) ways to get royal flush
+        choose(48,2) ways to get other two cards
+    
+        Total = 4512
+    
+    To get a royal flush with the joker
+    
+        4 suits
+        choose(5,4) ways to get 4 of the cards in 5 
+        1 way to get the joker
+        choose(47,2) ways to get the other two cards
+        
+        Total = 21620
+        
+        note this is choose(47,2) since you can't draw
+        the 5th card of the royal flush?
+    
+    The total number of hands
+    
+        choose(53,7) = 154143080
+        
+    Pr = (4512+21620)/154143080 = 139/819910
+       ~ 0.0001695308
+
+
+    Still not convinced about the choose(47,2).  If you
+    use choose(48,2) you get Pr = 0.000175629
+    
+    This is more in line with the Monte-Carlo result
+    with 1e7 trials.
+    
+
+## Bonus
+
+    Alice's doctor has prescribed that every
+    morning she is to take one each of k different
+    pills. The pills all look identical except
+    that each medicine type has a unique color.
+    In preparation for an n-day trip, Alice put n
+    pills from each of her k bottles into one larger
+    bottle to save space. As a result Alice, who is
+    totally color blind but forgot that fact while
+    packing, was forced each morning during the trip
+    to withdraw randomly k pills from the bottle and
+    take them.  What is the overall probability that
+    every day of the trip Alice indeed took exactly
+    what her doctor prescribed? Present your answer
+    as a function of n and k.
+
+    -- Toby Berger, CT Alpha'62
+
+Solution:
+
+    At the start of the trip there are n*k pills.
+    
+    On the first day the probability of getting
+    exactly the correct k pills is:
+    
+    p1 = n/(n*k) * n/(n*k-1) * ... * n/(n*k-(k-1))
+    
+       = n^k /( (n*k)*(n*k-1)*...*(n*k-(k-1)))
+       
+       = n^k / (choose(n*k,k)*factorial(k))
+       
+    For the second day we have:
+    
+    p2 = (n-k)^k / (choose(n*k-k,k)*factorial(k))
+    
+    etc.
+    
+    The product of the n terms is the overall probability:
+    
+    product((n-m)**k/(binomial(n*k-m*k,k)*factorial(k)),(m,0,n))
+    
+    which sympy does not simplify very much.
+    
+    
+    The Bent is able to simplify this as:
+    
+    factorial(n)^k * factorial(k)^n / factorial(n*k)
+    
+    They don't have a real clear explanation of how you get there.
+    
+    What is this numerically?
+    
+    What if we have a 10 day trip and 5 different pills:
+    
+    n=3, k=2  --> Pr = 0.4
+    n=3, k=6  --> Pr = 0.00272
+    n=4, k=10 --> Pr = 1.35e-8
+    ...
+    n=10, k=5 --> Pr = 1.281e-11
+
+    Generally Pr->0 really fast!
+    
+
+## Double Bonus
+
+    The sequence 29, 149, 269, 389, 509 contains five
+    consecutive primes having a common difference of
+    120; however, the next member of the sequence
+    629 is composite.  In a sequence of positive
+    integers having a common difference of 210, what
+    is the maximum possible number of consecutive
+    terms that are all primes? Give an example of
+    such a sequence.
+
+    -- Technology Review
+
+TODO
+
+

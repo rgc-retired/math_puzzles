@@ -1,0 +1,655 @@
+---
+title: "Bent Spring 2006"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2006
+
+The prequel has a plea to stop using the computer and
+start exercising the gray cells.
+
+## Problem 1
+
+    A 10-digit number consists of two
+    4s, two 3s, two 2s, two 1s, and two 0s.
+    The 4s are separated by four digits,
+    the 3s by three digits, the 2s by two
+    digits, the 1s by one digit, and the 0s
+    by no digits. What are the smallest
+    and largest such numbers? Leading
+    zeros are not allowed.
+
+    -- Adapted from The Mathematics Teacher
+
+Solution:
+
+        1 2 1 4 2 3 0 0 4 3  --> smallest number
+        4 1 3 1 2 4 3 2 0 0  --> largest number
+
+
+    These are like rigid puzzle pieces that must
+    fit together.  The pieces are:
+    
+        4 - - - - 4
+        3 - - - 3
+        2 - - 2
+        1 - 1
+        0 0
+        
+    In attempting to make the largest number we will
+    start with 4.  In this case, the next digit can
+    not be 3 since the trailing 3 will fall on top of the
+    trailing 4.  Let's try a 2 instead:
+    
+        4 2 - - 2 4
+
+        3 - - - 3
+        1 - 1
+        0 0
+
+    Unfortunately, there is no way forward.  The 00 could
+    fill the gap but then the 3---3 makes for an 11 digit
+    number.
+    
+    Try 41:
+    
+        4 1 - 1 - 4
+
+        3 - - - 3
+        2 - - 2
+        0 0
+
+    The 3 can fill the first empty slot:
+    
+        4 1 3 1 - 4 3
+        2 - - 2
+        0 0
+
+    The 2 can fill the next slot:
+    
+        4 1 3 1 2 4 3 2
+        0 0
+
+    The 00 can be placed at the end:
+    
+        4 1 3 1 2 4 3 2 0 0  --> largest number
+        
+    In attempting to make the smallest number we will
+    start with 1.  In this case the next digit can not
+    be 0 since it will overlap with the trailing 1. so try 2:
+    
+        1 2 1 - 2
+
+        4 - - - - 4
+        3 - - - 3
+        0 0
+    
+    The empty slot can not be 0 or a 3.  If it is 3 then the
+    string starting with 4 will result in 11 digits. So:
+    
+        1 2 1 4 2 - - - 4
+
+        3 - - - 3
+        0 0
+    
+    Filling in the final digits:
+    
+        1 2 1 4 2 3 0 0 4 3 --> smallest number
+
+
+## Problem 2
+
+    Lay out a line of length 2 along
+    the x-axis of a coordinate system,
+    with the center of the line at the
+    origin. Above this line, construct an
+    isosceles triangle with the line as a
+    base and base angles of 75 deg. Below
+    the line construct another isosceles
+    triangle (with its vertex pointing
+    down) with the line as a base and
+    base angles of 45 deg. What is the radius
+    of the inscribed circle of the lanceolate
+    figure formed by the sides of the
+    two triangles, and where is its center
+    (distance from the origin along the yaxis)?
+    Express your answer exactly
+    in terms of surds.
+
+    -- Technology Review
+
+Solution:  need a picture to visualize this:
+
+    Symbolically:
+    
+        y0 = (2*sin(75)-sqrt(2))/(2*cos(75)+sqrt(2))
+           = 2-sqrt(3)
+           
+        d  = sqrt(2)*(sin(75)+cos(75))/(sqrt(2)+2*cos(75))
+           = (3-sqrt(3))/sqrt(2)
+
+    Numerically:
+        y0 = 0.2679492
+        d = radius = 0.8965755
+
+
+    Height/1 = tan(theta)
+    Height = tan(theta)
+    
+    Upper triangle has height of tan(75)
+    Bottom triangle has height of -tan(45)
+
+
+```{r}
+
+# Make an empty region to plot on
+plot(c(-3,3),c(-2,4),type='n',asp=1)
+
+# Base of the triangle
+lines(c(-1,1),c(0,0),lwd=3)
+
+# Upward pointing triangle
+y_top=tan(75*pi/180)
+lines(c(-1,0),c(0,y_top))
+lines(c(1,0),c(0,y_top))
+
+# Downward pointing triangle
+y_bot=tan(45*pi/180)
+lines(c(-1,0),c(0,-y_bot))
+lines(c(1,0),c(0,-y_bot))
+
+# Draw in the circle after solving the problem
+if (T) {
+    x0=0
+    y0 = 2-sqrt(3)
+    r = (3-sqrt(3))/sqrt(2)
+
+    theta=seq(0,2*pi,length=100)
+    x=x0+r*cos(theta)
+    y=y0+r*sin(theta)
+    polygon(x,y,border='red',lwd=2)
+}
+
+```
+
+Need to find a point that is equi-distance from the long sides of
+the two triangles.  By symmetry this is somewhere along the y-axis.
+The distance to the lines will then be the radius of the inscribed
+circle.
+
+Given a point: x0,y0 and a line y=m*x+b what is the distance from the
+point to the line?
+
+[Wikipedia has the answer](https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line)
+
+    Turns out this is a bit ugly.
+    
+    if a*x+b*y+c = 0 then the distance to (x0,y0) is:
+    
+        d = |a*x0+b*y0+c|/sqrt(a^2+b^2)
+
+    We know the center of the circle is at (0,y0):
+
+    For the upper triangle, left side:
+    
+        y = tan(75)*x + tan(75) --> tan(75)*x + (-1)*y + tan(75) = 0
+        
+        d = |tan(75)*0 + (-1)*y0 + tan(75)|/sqrt(tan(75)^2+1)
+          
+          = (3.732051 - y0) / 3.863703
+
+    For the lower triangle, left side:
+    
+        y = -tan(45)*x - tan(45) --> tan(45)*x + (1)*y + tan(45) = 0
+        
+        d = |tan(45)*0 + (1)*y0 + tan(45)|/sqrt(tan(45)+1)
+
+          = (1+y0) / sqrt(2)
+          
+    These two must be the same:
+    
+        (3.732051 - y0) / 3.863703 = (1+y0) / sqrt(2)
+        
+        y0 = (3.732051/3.863703-1/sqrt(2))/(1/sqrt(2)+1/3.863703)
+           = 0.2679493
+           
+    The radius of the circle is just the distance to the line:
+    
+        d = radius = 0.8965756
+        
+    Doing this symbolically instead:
+    
+        y0 = (2*sin(75)-sqrt(2))/(2*cos(75)+sqrt(2))
+           = 2-sqrt(3)
+           
+        d  = (1+2-sqrt(3))/sqrt(2)
+           = (3-sqrt(3))/sqrt(2)
+
+
+## Problem 3
+
+    A and B each put 10 coins in the
+    pot. A then takes a coin from the pot
+    and tosses it, while B calls heads or
+    tails. If B's call is correct, he takes
+    the coin and keeps it; otherwise, A
+    keeps the coin. B then takes a coin
+    from the remaining pot and tosses it
+    while A calls heads or tails. The play
+    continues in this way until one player
+    has accumulated 10 coins, whereupon
+    he wins the game and takes all the
+    coins remaining in the pot. At one
+    point in the play, A has six coins,
+    while B has only four. What is A's
+    probability of winning? When the
+    situation occurs in a game such that
+    one player has won six coins while
+    his opponent has won four coins,
+    what is the expected value of the
+    winnings (net number of coins) of the
+    player with six coins?
+
+    -- Attributed to the Chevalier de Mere,
+    a 17th century gambler
+
+Solution:
+
+    The pot initially has 20 coins.
+    
+    When A=6, B=4 there are 10 coins remaining.
+    
+    What is the probability that A reaches 10 first?
+    
+    We will try Monte-Carlo and then think about analytics:
+    
+```{r}
+ntrials=100000
+
+win=0
+win_sum=0
+for (trial in 1:ntrials) {
+    A=6
+    B=4
+    while(T) {
+        s=sample(c(0,1),1)
+        if (s==0) {
+            A=A+1
+            if (A==10) {
+                win=win+1
+                win_sum=win_sum+(20-A-B)
+                break
+            }
+        } else {
+            B=B+1
+            if (B==10) {
+                break
+            }
+        }
+    }
+}
+print(paste0("Pr(win) = ",win/ntrials))
+print(paste0("Mean(winnings) = ",win_sum/win))
+```
+
+Monte-Carlo results:
+
+    Pr(win) = 0.74501
+    Mean(winnings) = 3.320103
+
+Note that these winnings only occur if A actually wins.  The times when
+A does not win the winning are 0.  Weighting this gives:
+
+    0.74501*3.320103 = 2.4735 ???
+    
+According to the Bent this should be 2.000.
+The Bent does everything using combinatorics.
+
+
+## Problem 4
+
+    You have two two-liter bottles,
+    one (marked W) containing one liter
+    of pure water and one (marked A)
+    containing one liter of pure alcohol.
+    The two things you can do are to
+    pour liquid from either bottle down
+    the drain or pour liquid from one
+    bottle into the other, but you must
+    always keep at least one liter of liquid
+    in bottle A. What is the minimum
+    alcohol concentration that can be
+    achieved in bottle A? Assume that
+    there is no volume change on mixing
+    water and alcohol.
+
+    -- Daryl Cooper
+
+Solution:
+
+    If we add 1/m L Water to Alcohol and then dump the
+    excess A+W back to 1L each time:
+    
+    In the limit as m->infinity this approaches exp(-1).
+
+
+    The obvious answer is you can get 50% by pouring
+    all the water into the alcohol.  Of course this
+    is quite boring.
+    
+    What if we try some things:
+    
+    1. Add half the water to alcohol
+       Throw away 1/3 of the A+W mixture
+       Remaining alcohol = 2/3
+       Add the remainder of the water:
+            Alcohol concentration =  (2/3)/(1+1/2) = (2/3) / (3/2) = 4/9 < 1/2
+            
+    2. Add 1/4L the water to the alcohol
+       Throw away 1/5 of the A+W mixture
+       Remaining alcohol = 4/5
+       
+       Add 1/4L water
+       throw away 1/5 of the mixture
+       Remaining alcohol = (4/5)^2
+       
+       then (4/5)^3 finally (4/5)^4 = 0.4096
+       
+     ...
+     
+     m=integer
+     
+     In general, add 1/m L water to alcohol
+     Remove 1/m L of the mixture --> remaining is m/(m+1)
+     ...
+     repeat this m times
+     ...
+     Final result = (m/(m+1))**m
+
+    In the limit as m->infinity this approaches exp(-1)
+
+
+## Problem 5
+
+    A modern aluminum sculpture
+    consists of a hollow cylinder that is
+    capped on one end by a solid hemisphere.
+    The cylinder has an outer
+    diameter of 100 cm and thickness of
+    1 cm, and the hemisphere has the
+    same diameter as the outside of the
+    cylinder. If, on a level surface, the
+    sculpture balances in stable equilibrium
+    at any point on its hemispherical
+    surface, how long is the cylinder, and
+    what is the minimum ceiling height
+    in the museum to permit the sculpture
+    to assume any stable position?
+
+    -- R. Wilson Rowland, MD B '51
+
+Solution:
+
+    Cylinder height: L = 177.667 cm
+    The maximum distance will be when they line up = 234.569 cm.
+    This is the minimum ceiling height.
+
+
+    As the sculpture is tipped to one side ...
+    The balance point of the hemisphere and the floor
+    can be used as the reference.  The amount of mass
+    the left/right of this reference must be equal.
+    Clearly, the easiest condition to understand is
+    when the cylinder is perfectly vertical.  This will
+    be stable and will define the minimum ceiling
+    height.
+    
+    Need a picture to show this.
+
+    When the scupture is tilted to one side will this
+    really be a stable position?  Iff the mass balance
+    works out.  The unstable part comes if the center
+    of mass goes outside the possible balance point.
+    
+    Where is the center of mass of a hemisphere?
+    
+    If we measure from the flat side of the hemisphere then
+    the center of mass is at: 3/8*R
+    
+    The mass of the hemisphere is: rho*2/3*pi*R**3
+    
+    We can think of all the mass of the hemisphere to be
+    located at precisely this location.
+    
+    When the cylinder is tilted at an angle of theta from
+    the vertical the center of mass is moved off center
+    by:
+    
+        3/8*R*sin(theta)
+        
+    This creates a moment of mass * distance:
+    
+        M_hemisphere = rho*2/3*pi*R**3 * (3/8)*R*sin(theta)
+
+    Meanwhile, the cylinder has defined radii with a total mass
+    of:
+    
+        Mass = pi*(R**2-(Rinner**2))*rho*L
+        Center of Mass = L/2
+        
+        When inclined by theta: Moment = L/2*sin(theta)*rho*L*pi*(R**2-(Rinner**2))
+        
+    This will balance when:
+    
+        2/3*R**3*(3/8)*R = L/2*L*(R**2-Rinner**2)
+
+        1/4*R**4 = 1/2*L**2*(R**2-Rinner**2)
+        
+        R=100 cm / 2 = 50 cm
+        Rinner = 49 cm
+        
+        L = 177.667 cm
+        
+    The longest possible dimension is from the outside of the hemisphere to an
+    outside upper edge of the cylinder.
+    
+    From the point where the center of the cylinder joins the hemisphere the distance
+    to the outside upper edge of the cyclinder is:
+    
+        sqrt(50^2 + 177.667^2) = 184.569 cm
+        
+    The distance from this point to the outside of the hemisphere = 50 cm.
+    
+    The maximum distance will be when they line up = 234.569 cm.
+    
+    If you want to allow for any angle you need to support this height.
+    
+## Bonus
+
+    Select three points at random
+    from within a right circular cone
+    of altitude h. What is the expected
+    value of the distance of the closest
+    point from the base?
+
+    -- John W. Langhaar, PA A '33
+
+Solution:
+
+    I think they multiplied the derived probability by three to
+    account for the fact that there are three possible points that
+    might be the lowest.  It is the only thing that makes sense.
+
+    Given a height, y, above the base of the cone, the volume above
+    that height is:
+
+        Vtop = 1/3*pi*(R*y/h)**2*(h-y)
+
+    The total volume is:
+    
+        V = 1/3*pi*R**2*h
+        
+    The ratio is the probability of picking a point in the top volume:
+    
+        Pr = Vtop/V = (y/h)**2*(h-y) / h
+
+    Given an arbitrary set of altitudes: y1, y2, y3
+    
+    What is the probabiity that y2>y1 and y3>y1?
+    
+        YUCK!
+        
+Here is what they did in the Bent:
+
+    Consider a (differential) circular disk at a height h above the base.
+    
+    The probability of a point being in this disk is:
+    
+        Pr = pi*(R*(h-y)/h)**2*dy / (1/3*pi*R**2*h)
+           = 3*(h-y)**2/h**3
+        
+    So -- the probability of being between y and the top of the cone is:
+
+        Pr = integrate(3*(h-tau)**2/h**3,(tau,y,h))
+        Pr =  (h-y)**3 / h**3
+           =  (1-y/h)**3
+           
+    The probability of two points being higher:
+    
+        Pr = (1-y/h)**6
+        
+    Total probability is then:
+    
+        Pr(point is in the disk)*Pr(both other points are higher)
+        
+        = 3*(h-y)**2/h**3 * (1-y/h)**6
+        
+    The expected value is:
+    
+        integrate(y * 3*(h-y)**2/h**3 * (1-y/h)**6, (y,0,h))
+        
+        = h/30
+        
+    This does NOT match the result from the Bent: h/10
+    
+    I am going to hand-wave that there are three points so this Pr applies
+    to all three.  The total probability is then:
+    
+        3*Pr = h/10
+    
+    The Bent makes the following derivation:
+    
+    differential slice of the cone with diameter = x at distance of y from base
+    
+    Pr(in slice) = pi*(x/2)**2*dy / (1/3*pi*(D/2)**2*h)
+                 = 3*x**2/ (D**2*h) * dy
+                 
+    Also: x/D = (h-y)/h --> x=D*(h-y)/h = D*(1-y/h)
+    
+    Pr (point being above y) = x**2 * (h-y)/(D**2 * h) (ratio of two cones)
+    
+        = (1-y/h)**3 (substitute for x = f(y))
+        
+    For two points: Pr = (1-y/h)**6
+    
+    Expected value is then (presented without any explanation):
+    
+        E = (9/D**2) * integrate(x**2*y*(1-y/h)**6,(y,0,h))
+        
+    I understand Pr(in slice) = 3*x**2/(D**2*h)
+    
+    I would write this based on results above as:
+    
+        integrate(3*x**2/(D**2*h)*y*(1-y/h)**6,(y,0,h))
+        
+        = integrate(3/h * (x/D) **2 * y * (1-y/h)**6, (y,0,h))
+        = integrate(3/h * (1-y/h)**2 * y * (1-y/h)**6, (y,0,h))
+        = integrate(3/h * y * (1-y/h)**8,(y,0,h))
+        = h/30
+        
+        which is the same result I got.
+        
+    I think they snuck in the factor of 3 without any explanation.
+
+I can try to verify this by Monte-Carlo.  We will arbitrarily use a cone with
+base radius = 1 and height = 1.
+
+```{r}
+ntrials=10000
+
+# Sample random points in x,y until we get a point inside the cone
+# Do this until we get 3 points.
+
+zzz=c()
+for (trials in 1:ntrials) {
+    # Get three points
+    x=c()
+    y=c()
+    n=0
+    while(T) {
+        x0=runif(1); y0=runif(1)
+        if ((1-y0)>=x0) { x=c(x,x0); y=c(y,y0); n=n+1}
+        if (n==3) { break }
+    }
+    zzz=c(zzz,min(y))
+}
+hist(zzz)
+print(summary(zzz))
+```
+
+Interestingly, the median is about h/10 (0.1097) but the mean is 
+signficiantly higher (0.14312) due to long upper tail.
+
+So -- what the heck does expected value really mean?
+
+
+## Double Bonus
+
+    For many years,
+    the Roman Catholic church used the
+    Julian calendar, which has a leap year
+    every year that is divisible by four,
+    making the average calendar year
+    longer than the sidereal year and
+    causing the date of the first day of
+    spring to change gradually. To correct
+    this, Pope Gregory decreed that
+    Thursday, October 4, 1582, would be
+    followed by Friday, October 15. He
+    also declared that years divisible
+    by 100 would be leap years only if
+    divisible by 400. For any year since
+    1582, if one printed two 12-month
+    calendars, one Julian and the other
+    Gregorian, with dates for the days
+    of the month, at least some of the
+    dates would not fall on the same day
+    of the week. What is the first year
+    for which each day of each month will
+    fall on the same day of the week for
+    both calendars?
+
+    -- Colin Singleton in New Scientist
+
+
+TODO
+
+I don't really care but the Bent explanation is
+that the two calendars will be in sync iff the
+number of days between them is divisible by 7.
+
+They were forced 10 days apart in 1582.
+
+The two calendars are the same except in years
+that are divisible by 100 (by not 400).  This
+occurs in 1700,1800,1900, and 2100 to make the
+total number of days different = 14.  So, in
+the first non-leap year (2101)  the two will
+be in sync and stay there until 2200.
+

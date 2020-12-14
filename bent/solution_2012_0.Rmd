@@ -1,0 +1,235 @@
+---
+title: "Bent Winter 2012"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2012
+
+
+## Problem 1
+
+    How many primes appear in the following
+    sequence: 9; 98; 987; 9,876; ...;
+    9,876,543,210; 98,765,432,109;
+    987,654,321,098; and so on?
+
+    -- Daryl Cooper
+
+Solution:
+
+    None.
+    
+    The only ones that can be prime are the ones that
+    end in 9, 7, 3, or 1.
+    
+    9           SOD = 9  --> divisible by 3
+    987         SOD = 24 --> divisible by 3
+    9876543     SOD = 42 --> divisible by 3
+    987654321   SOD = 45 --> divisible by 3
+    
+    All the other numbers are prepended by 9876543210 which
+    has a SOD = 45 so these are also divisible by 3.
+
+
+## Problem 2
+
+    Find two three-digit integers that sum to a
+    four-digit integer such that each of the
+    digits 0 through 9 is used, with no leading
+    zeros. What are the maximum and minimum
+    values for the four-digit integer?
+
+    -- The Playful Brain by
+    Richard Restak and Scott Kim
+
+TODO
+
+    Doesn't seem like much fun.
+
+
+## Problem 3
+
+    Bill has a problem. He has locked his Tau
+    Beta Pi pin in a strong box and forgotten the
+    combination. The lock uses all the digits 1
+    through 6 in some order. He has tried the
+    following three combinations: 4-5-6-1-3-2
+    which has one digit correct; 6-2-3-4-5-1
+    which has two digits correct; and 2-3-1-6-4-5
+    which has three digits correct. What is the
+    combination?
+
+    -- The Everything Brain Strain Book by Jake Olefsky
+
+TODO
+
+    meh - logic.
+
+## Problem 4
+
+    Mac is idly tossing two dice when he decides
+    to see how many tosses it would take to go
+    from 1 to 6 in order. The rules are to toss
+    the two dice until one or the other or both
+    show a 1. Then, toss until a 2 shows.
+    However, if both a 1 and a 2 show at the same
+    time, both can be used. He then tosses for a
+    3 and similarly for other numbers. What is
+    the expected number of tosses to go from 1 to
+    6? Once you have the answer, get a couple of
+    dice and play the game a few times to see how
+    closely the average matches your answer.
+
+    -- Howard G. McIlvried III, PA Gamma'53
+
+Solution:
+
+    This seems to be begging for Monte Carlo
+    
+```{r}
+ntrials=100000
+n=0
+
+set.seed(42)
+for (trial in 1:ntrials) {
+    target=1
+    while(T) {
+        s=sample(6,2,replace=T)
+        n=n+1
+        # if (trial == 1) { print(c(n,target,s)) }
+        if (target %in% s) {
+            target = target+1
+            if (target %in% s) {
+                target = target+1
+            }
+        }
+        if (target>6) { break }
+    }
+}
+
+print(paste0("Number of rolls = ",n))
+print(paste0("E(n) = ",n/ntrials))
+```
+
+My solution did not agree with the Bent.  OOOps - my sampling
+was not correct -- needed replace=T.  After making the correction
+things seem to match:
+
+    For set.seed(42)   with ntrials = 100K, E(n) = 17.04754
+    For set.seed(123)  with ntrials = 100K, E(n) = 16.99581
+    For set.seed(2020) with ntrials = 100K, E(n) = 17.01562
+    
+    The Bent has 17.0414 using combinatorics
+    
+I will try one sim of 1e6 trials to see the result:
+
+    For set.seed(42)   with ntrials = 1000K, E(n) = 17.036943
+
+Well - this is close enough to their answer that they seem
+equivalent.
+
+
+## Problem 5
+
+    A distinct positive integer has been assigned
+    to each letter of the alphabet such that the
+    letters of PLUTO add to 40; URANUS 36;
+    NEPTUNE 29; SATURN 33; JUPITER 50; MARS 32;
+    Earth 31; MOON 36; VENUS 39; MERCURY 33; and
+    SUN 18. What is the value of PLANETS? Get a
+    pencil and paper and solve this one without
+    computer help!
+
+    -- C. W. Haigh in New Scientist
+
+TODO
+
+    Tried this before and couldn't solve it.
+    
+
+## Bonus
+
+    Start with a checker in the center of a 5x5
+    checkerboard. The objective is to move the
+    checker from square to square so that each
+    square is visited exactly once, except the
+    center square to which you must return on
+    your 25th move. The only legal moves are to a
+    square that is two squares away diagonally or
+    to a square that is three squares away
+    horizontally or vertically. How many unique
+    paths can the checker trace? Rotations,
+    reflections, path reversals, and combinations
+    thereof, are not considered different paths.
+    This problem can be solved without computer
+    help.
+
+    -- William W. Verkuilen, WI B'92
+
+TODO
+
+    Don't care
+    
+
+## Computer Bonus
+
+    Beginning with any multi-digit number, N,
+    start a sequence by writing its digits in
+    order, starting with the left-most digit. The
+    next number in the sequence is the sum of the
+    digits of N. Continue with a Fibonacci-like
+    process, where the next term in the series is
+    the sum of the previous n terms, where n is
+    the number of digits in N. If N appears in
+    this sequence, then N is a Keith number,
+    named after Michael Keith, who discovered
+    them. For example, 197 is a Keith number
+    because 1, 9, 7, 17, 33, 57, 107, 197, ...
+    contains N. The four smallest Keith numbers
+    that are also prime numbers are 19, 47, 61,
+    and 197. What is the next smallest prime
+    Keith number?
+
+    -- Fred J. Tydeman, CA Delta'73
+
+Solution:
+
+    Exhaustive search ... this takes a little while to run.
+    Suppressed evaluation for html version.
+    
+```{r eval=FALSE}
+library(gtools)
+library(gmp)
+
+is_keith = function(N) {
+    x=baseOf(N)
+    n=length(x)
+    while(TRUE) {
+        m=sum(x)
+        if (m==N) { return(T) }
+        if (m>N)  { return(F) }
+        x[1:(n-1)]=x[2:n]
+        x[n]=m
+    }
+}
+
+N=197
+while(T) {
+    N=nextprime(N)
+    if (is_keith(N)) {
+        print(paste0("Prime Keith = ",N))
+        break
+    }
+}
+
+
+```
+
+The next smallest Prime Keith = 1084051
+

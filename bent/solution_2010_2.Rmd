@@ -1,0 +1,372 @@
+---
+title: "Bent Summer 2010"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2010
+
+These problems all seem familiar.  I think I worked on
+some of them previously.
+
+## Problem 1
+
+    Find all primes of the form A^4+4B^4,
+    where A and B are positive integers.
+
+    -- Puzzle Corner by Allan Gottlieb
+    in Technology Review
+
+TODO
+
+    I couldn't solve it last time either.
+
+    After looking at the Bent here it is:
+    
+    A^4 + 4*B^4 = (A^2 + 2*A*B + 2*B^2)*(A^2 - 2*A*B + 2*B^2)
+    
+    But: if this is a prime then one of the factors above must
+    be a 1, otherwise it would be composite.  Only the second
+    term can ever equal 1 and this only occurs when A=1, B=1
+    which makes the first term = 5, so:
+    
+        A^4 + 4*B^4 = 1+4 = 5
+
+    Sort of clever if you noted the factorization trick.
+
+
+## Problem 2
+
+    Algernon, Bertie, and Clarence had so
+    often expressed their opinion about Professor
+    Popoff that when he was found
+    murdered (stabbed with a dagger, but
+    in a thoroughly gentlemanly way) it was
+    natural that they should be suspected.
+    In fact, for reasons into which we need
+    not now go, it may be taken as certain
+    that one of them is guilty. They made
+    statements as follows:
+    Algernon:
+    1: I hadn't seen Popoff or had any
+    contact with him for a week before his
+    unfortunate demise.
+    2: Everything Bertie says is true.
+    3: Everything Clarence says is true.
+    Bertie:
+    1: I have never handled a dagger.
+    2: Everything Algernon says is false.
+    3: Everything Clarence says is false.
+    Clarence:
+    1: Algernon was talking to Popoff just
+    before he was killed.
+    2: Bertie has handled a dagger.
+    3: I have for a long time thought more
+    of Popoff than is generally realized.
+    Looking back on the tragic event
+    now, it is interesting to see that
+    Algernon and Bertie both made the
+    same number of true statements. (This
+    number can be anything from 0 to 3,
+    inclusive).
+    Who killed Popoff?
+
+    -- Brain Puzzler's Delight
+    by E.R. Emmet
+
+TODO
+
+    meh - Logic
+    
+
+## Problem 3
+
+    At its main base, the Patagonian navy
+    had 16 Class I gunboats with 5 guns
+    apiece, some Class II gunboats with 4
+    guns apiece, and some Class III gunboats
+    with 3 guns apiece, when the admiral
+    was ordered to crush a revolt that
+    had broken out simultaneously on seven
+    scattered islands. After some thought,
+    he split his fleet into seven flotillas of 6
+    ships each, with each flotilla having at
+    least one gunboat of each class but a
+    different number of guns. How many
+    Class II gunboats were there?
+
+    -- Tantalizer by Martin Hollis
+    in New Scientist
+
+Solution:
+
+    Might be fun to attach this with random sampling.
+    
+    Total of 42 ships with 16 Class I gunboats.  Must have
+    at least one ship of each class in each flotilla.
+    
+    Class I, 16 boats, 5 guns each
+    Class II, ?? boats, 4 guns each
+    Class III, ?? boats, 3 guns each
+    
+    Could generate random flotilla distributions and see
+    if we can find a solution.  Alternately, we can limit
+    the possibilities by noting:
+    
+    1. Each flotilla has 6 ships with at least one of
+       each class I, II, and III.  Assume each flotilla
+       starts with exactly 1 of each class then each
+       flotilla has the same firepower.  We need the
+       next three ships to differentiate.
+       
+    2. The remaining three ships can vary from 3 ships
+       of class III (9 guns) to 3 ships of class I (15 shots).
+       There are only 7 combinations so each flotilla has
+       precisely one different combination of ships.
+       
+    3. The total number of class I ships is 16.  This
+       means that in the final 3 ships of each flotilla
+       we must include 9 ships of class I.
+       
+    Possibilities for the final three ships in each flotilla:
+    
+    Guns = 9  = 3, 3, 3
+         = 10 = 3, 3, 4
+         = 11 = 3, 3, 5 or 3, 4, 4
+         = 12 = 3, 4, 5 or 4, 4, 4
+         = 13 = 5, 5, 3 or 5, 4, 4
+         = 14 = 5, 5, 4
+         = 15 = 5, 5, 5
+
+    There is only one way to get 9, 10, 14, or 15 guns so these
+    are required.  This uses up 5 of the 9 remaining class I ships.
+    In order to use up the other 4 ships we must pick the
+    combinastions for 11, 12, and 13 guns that use class I ships.
+    
+    The final flotilla configurations are:
+    
+    3,4,5,3,3,3 = 21 guns --> 1 class II ship
+    3,4,5,3,3,4 = 22 guns --> 2 class II ships
+    3,4,5,3,3,5 = 23 guns --> 1 class II ship
+    3,4,5,3,4,5 = 24 guns --> 2 class II ships
+    3,4,5,5,5,3 = 25 guns --> 1 class II ship
+    3,4,5,5,5,4 = 26 guns --> 2 class II ships
+    3,4,5,5,5,5 = 27 guns --> 1 class II ship
+    
+    A total of 16 class I   ships
+    A total of 10 class II  ships
+    A total of 16 class III ships
+
+
+## Problem 4
+
+    I dreamed that I lived in a large,
+    vertical, rectangular painting, where
+    everything was located by its x-z
+    coordinates. My mail always landed
+    right at my house, at coordinates (1,0),
+    from an airplane flying at a constant
+    speed of 1 m/sec along the path
+    z = x^2. The falling mail was subjected to
+    an acceleration due to "gravity" of 1
+    m/sec/sec downward, perpendicular to
+    the x-axis. What was the x coordinate
+    of the release point when the plane was
+    flying in (1) the positive direction and
+    (2) the negative direction? Ignore "air"
+    resistance. Assume the initial velocity
+    of the mail when it is dropped is the
+    same as the airplane.
+
+    -- Byron R. Adams, TX A'58
+
+Solution:
+
+    Assume +x is to the right and +z is up.
+    
+    Consider flying in the positive x direction:
+    
+    The flight angle/slope is dz/dx = 2*x
+    
+    Assume release at point x0.
+    
+    v0 = 1 m/sec (speed of plane)
+    
+    x0 = x0
+    z0 = x0^2
+    
+    Flight angle = theta = atan(2*x0)
+    vx0 = v0*cos(theta)
+    vz0 = v0*sin(theta)
+
+    a_x = 0
+    a_z = -1 m/s/s
+    
+    In the x direction:  x = x0 + vx0*t
+    
+    When x=1: t=(1-x0)/vx0
+    
+    In the z direction:  z = z0 + vz0*t + 1/2*a_z*t^2
+    
+    Solving yields: x0 = 0.205579750059980
+
+    When flying in the negative direction the only thing that
+    changes is the sign on the initial x,z velocity.
+    
+    Solving yields: x0 = 1.42421701014688
+
+    It might be interesting to look at mail trajectories based
+    on the release point of the package.
+    
+```{r}
+# Consider flying in +x direction
+# When package is released it will rise to a peak, stall, and fall
+v0=1
+x=c()
+y=c()
+for (x0 in seq(0.01,1,0.01)) {
+    z0=x0^2
+    theta=atan(2*x0)
+    vx0=v0*cos(theta)
+    vz0=v0*sin(theta)
+    a_x=0
+    a_z=1
+    # t1 = time for projectile to reach max height
+    # z1 = max height
+    t1=vz0/a_z
+    z1=z0+vz0*t1-1/2*a_z*t1^2
+    # t2 = time to fall to ground
+    t2=sqrt(2*z1/a_z)
+    # t = total flight time
+    # xf = final x location
+    xf=x0+vx0*(t1+t2)
+    x=c(x,x0)
+    y=c(y,xf)
+}
+plot(x,y,type='b',xlab='Release Point',ylab='Impact Point',main="Positive Flight")
+grid()
+```
+
+```{r}
+# Consider flying in -x direction in the +x area
+# When package is released it will launch with a negative velocity in x,z
+v0=1
+x2=c()
+y2=c()
+for (x0 in seq(0.01,2,0.01)) {
+    z0=x0^2
+    theta=atan(2*x0)
+    vx0=-v0*cos(theta)
+    vz0=-v0*sin(theta)
+    a_x=0
+    a_z=-1
+    # t = time for projectile to reach ground
+    #
+    # 0=z0+vz0*t+1/2*a_z*t^2
+    # t = (-vz0 +/- sqrt(vz0^2-4*1/2*a_z*z0))/(2*1/2*a_z)
+    #
+    # If vz0<0 and a_z<0 then need + sign for negative t, - sign for positive
+    t = (-vz0 - sqrt(vz0^2-4*0.5*a_z*z0))/a_z
+    xf=x0+vx0*t
+    x2=c(x2,x0)
+    y2=c(y2,xf)
+}
+plot(x2,y2,type='b',xlab='Release Point',ylab='Impact Point',main="Negative Flight")
+grid()
+```
+
+```{r}
+plot(x,y,type='b',
+     xlim=range(x,x2),
+     ylim=range(y,y2),
+     xlab='Release Point',ylab='Impact Point')
+lines(x2,y2,col='red')
+points(x2,y2,col='red')
+grid()
+```
+
+
+## Problem 5
+
+    A vertical belt sander is being used
+    to polish rolling pins. The rolling pin,
+    with a diameter of 5 cm and a length
+    of 100 cm, is rotated at 100 rpm about
+    a horizontal fixed axis while being
+    pressed against the belt with a force
+    of 10 Newtons perpendicular to the
+    belt, which is traveling at 2 m/s. If the
+    coefficient of friction is 0.5, how many
+    watts are being dissipated as friction
+    when (1) the rotation of the rolling pin
+    is opposite to the direction of the belt
+    and (2) the rotation of the rolling pin is
+    in the same direction as the belt.
+
+    -- John W. Langhaar, PA A'33
+
+Solution:
+
+    If the pin has a diameter of 5 cm and a rotational
+    speed of 100 rpm the surface of the pin is moving
+    at:
+    
+        100*2*pi/60*0.025 m/s = 0.2617994 m/s
+        
+    The friction force = 5 N
+    
+    The relative speed between the belt and the pin is:
+    
+        2 +/- 0.2618
+        
+    The Power dissipation is: 5*(2 +/- 0.2618) = 11.309 W or 8.691 W
+    
+
+## Bonus
+
+    George is building a rectangular
+    patio, which will be covered
+    with one-foot-square concrete slabs of
+    seven different colors. He has divided
+    the patio into seven rectangular zones,
+    each to be covered by slabs of a single
+    color, with five different colors appearing
+    around the perimeter of the patio
+    and four different colors at the corners.
+    The seven zones are all different sizes,
+    but all have the same perimeter, which
+    is less than 60 feet. What are the dimensions
+    of the patio, and what are the
+    dimensions of the seven zones?
+
+    -- Enigma by Colin Singleton
+    in New Scientist
+
+TODO
+
+    I peeked at the solution.  Way too complicated
+    and still results in trial and error at the
+    end.
+    
+    Not a good problem.
+
+
+## Double Bonus
+
+    Given the lengths of the N sides of an irregular
+    polygon, how should the sides be arranged to maximize
+    the enclosed area? Prove your answer.
+
+    -- Puzzle Corner by Allan Gottlieb in Technology Review
+
+Solution:
+
+    Make a path as close as possible to a circle.  Put all
+    the vertices on a circle for best result.
+    
+    Not sure how to prove this.

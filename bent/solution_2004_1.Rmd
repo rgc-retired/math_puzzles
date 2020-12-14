@@ -1,0 +1,533 @@
+---
+title: "Bent Spring 2004"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2004
+
+
+## Problem 1
+
+    Lance wants to prepare a set of
+    building blocks, consisting of wooden
+    cubes, for his daughter. He decides to
+    paint all the faces of all the cubes, each
+    face with a single color with no two
+    adjacent faces having the same color.
+    As he starts work, he discovers that
+    the only colors of paint he has are
+    red, orange, yellow, green, and blue.
+    If no two blocks are to be exactly
+    alike, what is the maximum number
+    of blocks that can be in the set?
+
+    -- nearly impossible Brain Bafflers
+    by Tim Sole and Rod Marshall
+
+Solution:
+
+    I finally gave up and looked at the solution.  They claim
+    it is 55 different blocks.  The cases to consider are:
+
+    1. One set of opposite sides the same - chosen 5 ways.  The other
+       four sides can be chosen in 4!/(4*2)=3 ways.  The 4! accounts for
+       all the permutations of 4 colors.  The division by 4 accounts
+       for rotations.  The division by 2 accounts for reflections.
+
+        Total of 5*3 = 15 ways
+
+    2. Two sets of opposite sides the same.  There are
+       choose(5,2) ways for this to happen = 10 ways.
+       Remaining 2 sides chosen from 3 colors: choose(3,2) = 3 ways
+
+       Total = 10*3 = 30
+
+    3. Three sets of opposite sides the same: choose(5,3) = 10 ways
+
+    Grand Total = 15+10+30 = 55
+
+
+Details of random synapse firing:
+
+    Try some constructions.  The six faces are shown
+    below:
+
+        1
+       2345
+        6
+
+    Each side is adjacent to 4 of the 5 remaining sides.
+    The sides that are not adjacent (and can be the same color)
+    are:
+
+        1-6
+        2-4
+        3-5
+
+    Colors = ROYGB
+
+    There are 6 sides with 5 colors.
+    Enumerate and check for conflicts.
+
+    Allowing duplicates (e.g. rotations) yields 1620 combinations.
+
+    How do I eliminate rotations of the same block?
+
+    Clearly there are 4 rotations about the z-axis (into the page)
+    Four more rotations about the x and y axes
+
+    Total of 12 copies of each block
+
+    Reducing the total by factor of 12 yields 135 blocks.
+
+
+    Another way?
+
+    At each vertex there are three faces that must be different colors.
+    This yields choose(5,3)*factorial(3) = 10 combinations -> 60 permutations.
+
+
+
+## Problem 2
+
+    Solve the following four
+    simultaneous equations:
+
+    x = 25 - 24*cos(A)
+    x = 34 - 30*cos(B)
+    x = 41 - 40*cos(C)
+    A + B + C = 2*pi
+
+    All angles are positive and measured
+    in radians. Express x as an algebraic
+    number, that is, as an expression
+    involving only rational numbers and
+    surds of rational numbers.
+
+    -- Joseph S. Brock
+
+TODO
+
+    I read over the solution but I still don't think I could
+    do this.  They conclude x = 25 +/- 12*sqrt(3).
+
+    They were able to convert this into a cubic equation with
+    some substitutions and they had a geometric interpretation
+    with some triangles -- all a bit confusing.
+
+    I tried the numerical solution with R (optim) and I get
+    a reasonable result:
+
+    A = 2.617994
+    B = 1.974493
+    C = 1.690699
+    x = 45.784611 (approx. 25+12*sqrt(3))
+
+    Need to be careful about optim() running out of iterations.
+    Check the convergence result to ensure you are getting a final
+    solution.
+
+    Sympy can't solve this symbolically.
+
+    I keep thinking this has something to do with a triangle
+    inscribed inside a circle with the three angles adding
+    up to a full circle.
+
+    Need to think about this some more.
+
+
+## Problem 3
+
+    After four rounds of the golf
+    tournament, Ann, Betty, Carol, and
+    Donna were tied, even though the
+    individual scores for the 16 rounds
+    they played were all different. The
+    16 scores were all in the 60s and 70s.
+    Each of Ann's four scores was a
+    prime. Betty's four scores were each
+    a semiprime (the product of two
+    primes). None of Carol's or Donna's
+    scores was either prime or semiprime.
+    Carol's lowest round was
+    better (that is, lower) than Donna's
+    lowest round, and Carol's worst
+    round was better than Donna's
+    worst round. What were the scores
+    of each of the golfers for the four
+    rounds?
+
+    -- Richard England in New Scientist
+
+Solution:
+
+    Final Solution totals = 278:
+
+        Ann   : 61   67   71   79   All-prime
+        Betty : 62   65   74   77   All-semiprime
+        Carol : 63   68   72   75   Better than Donna, nonprime/semiprime
+        Donna : 64   66   70   78   Worse than Carol, nonprime/semiprime
+
+
+    In the 60-79 range the following values are prime:
+
+        61, 67, 71, 73, and 79
+
+    The following values are semi-prime
+
+        62 (2*31)
+        65 (5*13)
+        69 (3*23)
+        74 (2*37)
+        77 (7*11)
+
+    Ann   = 61, 67, 71, 73, 79 (4 of these)
+
+                            Total
+        61   67   71   73   272
+        61   67   71   79   278 <-- Common with Betty
+        61   67   73   79   280
+        61   71   73   79   284
+        67   71   73   79   290
+
+        Possible scores = 272,278,280,284,290
+
+    Betty = 62, 65, 69, 74, 77 (4 of these)
+
+                            Total
+        62   65   69   74   270
+        62   65   69   77   273
+        62   65   74   77   278 <-- Common with Ann
+        62   69   74   77   282
+        65   69   74   77   285
+
+        Possible scores = 270,273,278,282,285
+
+    The sum must be 278 based on Ann and Betty.
+
+    Carol
+    Donna = 60, 63, 64, 66, 68, 70, 72, 75, 76, 78 (8 of these)
+
+    Carol's lowest round < Donna's lowest round
+    Carol's highest round < Donna's highest round
+
+    sum(Ann) = sum(Betty) = sum(Carol) = sum(Donna)
+
+    The sum must be 278 based on Ann and Betty.
+
+    There are 8 possibilities for Carol and Donna:
+
+        Case
+        1     60   64   76   78
+        2     60   68   72   78
+        3     60   70   72   76
+        4     63   64   75   76
+        5     63   68   72   75
+        6     64   66   70   78
+        7     64   66   72   76
+        8     64   68   70   76
+
+    Carol does not have the highest score
+    Donna does not have the lowest score
+
+    Carol possibilities:
+
+        case 1 - no (Carol does not have highest score)
+        case 2 - no (Carol does not have highest score)
+        case 3 - maybe, Donna must be case 6
+        case 4 - maybe, Donna must be case 6
+        case 5 - maybe, Donna could be case 6, 7, or 8
+        case 6 - no (Carol does not have highest score)
+        case 7 - no (Carol should have lowest score)
+        case 8 - no (Carol should have lowest score)
+
+    Possible solution:
+        case 3: 60   70   72   76  Carol
+        case 6: 64   66   70   78  Donna --> Illegal duplicate of 70
+
+        case 4: 63   64   75   76  Carol
+        case 6: 64   66   70   78  Donna --> Illegal duplicate of 64
+
+        case 5: 63   68   72   75  Carol
+        case 6: 64   66   70   78  Donna --> Feasible
+        case 7: 64   66   72   76  Donna --> Illegal duplicate of 72
+        case 8: 64   68   70   76  Donna --> Illegal duplicate of 68
+
+    Final Solution totals = 278:
+
+        Ann   : 61   67   71   79   All-prime
+        Betty : 62   65   74   77   All-semiprime
+        Carol : 63   68   72   75   Better than Donna, nonprime/semiprime
+        Donna : 64   66   70   78   Worse than Carol, nonprime/semiprime
+
+## Problem 4
+
+    If m points on one parallel line are
+    joined with straight-line segments to
+    n points on a second parallel line in all
+    possible ways, what is the maximum
+    number of points of intersection in
+    the area between the two parallel
+    lines, not counting the original m plus
+    n points?
+
+    -- George Chrystal (1851-1911)
+
+TODO
+
+    I can't draw this with ascii art.  I could generate some points and then
+    plot them to see the patterns.
+
+    I looked at the solution = m*n*(m-1)*(n-1)/4
+
+
+## Problem 5
+
+    Lou, Mac, and Neil were having
+    lunch with their friend Zoey, when
+    they began reminiscing about the
+    past soccer season. Neil remarked,
+    "Among the three of us, we scored
+    PQ goals last season." "How many
+    did you score?" asked Zoey. "All but
+    RS of them," Neil replied. "Lou
+    scored QR (which is all but QP of the
+    total), and Mac scored SR." If P, Q,
+    R, and S each represent a different
+    nonzero decimal digit, how many
+    goals did each man score? Note that
+    PQ represents a two digit number,
+    not the product of two digits.
+
+    -- New Scientist
+
+Solution:
+
+    P Q R S
+    -------
+    7 3 6 2
+
+    This is a cryptic arithmetic problem after
+    some manipulation:
+
+    Neil = PQ - RS     (implied that Neil > 0)
+    Lou  = QR = PQ-QP  (Condition 1)
+    Mac  = SR
+
+    PQ = SR+QR+PQ-RS --> RS = SR+QR  (Condition 2)
+
+    So:
+
+    P, Q, R, S are distinct digits
+
+    Only three permutations meet these two conditions
+
+    P Q R S
+    -------
+    3 1 8 6
+    5 2 7 4
+    7 3 6 2
+
+    Since PQ is the total this implies that PQ>QR and PQ>SR.
+    This eliminates the first row:
+
+    P Q R S
+    -------
+    5 2 7 4
+    7 3 6 2
+
+    Since Neil must score a positive number - PQ >= RS
+    This only leaves the final row.
+
+    P Q R S
+    -------
+    7 3 6 2
+
+    Neil score = 73 - 62 = 11
+    Lou  score = 36
+    Mac  score = 26
+
+## Bonus
+
+    We are interested in finding
+    a sequence of 2n + 1 consecutive
+    positive integers, such that the sum
+    of the squares of the first n + 1
+    integers equals the sum of the
+    squares of the last n integers. The
+    simplest such sequence is 3^2 + 4^2 = 5^2.
+    Give a formula in terms of n for the
+    first integer in such a sequence.
+
+    -- The Numerology of Dr. Matrix
+    by Martin Gardner
+
+Solution:
+
+    Let m = first integer in the sequence, then
+
+    <------ n+1 terms ---------->   <---- n terms -------->
+    m^2 + (m+1)^2 + ... + (m+n)^2 = (m+n+1)^2+...+(m+n+n)^2
+
+    Using sympy:
+
+    Left side = m**2*(n + 1) + m*n*(n + 1) + n**3/3 + n**2/2 + n/6
+    Right side = n*(6*m**2 + 18*m*n + 6*m + 14*n**2 + 9*n + 1)/6
+
+    Solving:
+
+    m = n*(2*n+1)
+
+
+
+## Computer Bonus
+
+    Find a 4 x 4
+    magic square in which all the
+    elements are different prime
+    integers less than 100. In a magic
+    square, the sum of every row, every
+    column, and the main diagonals are
+    each the same number, known as the
+    magic sum. Remember, 1 is not a
+    prime number. There are many such
+    magic squares, but we want one that
+    has a magic sum of 202.
+
+    -- Numbers: Fun & Facts
+    by J. Newton Friend
+
+Solution:
+
+    I have a problem with the search algorithm.  It is just too slow.
+    I tried with R and LuaJIT and it still takes a very long time to process
+    each potential grid.  The basic approach I was taking:
+
+    1. Identify all the possible permutations of 4 primes that sum to 202.
+       There are 3120 of these 4-tuples.
+    2. Try each of these as the first row of the grid and then attempt to fill
+       in the rest of the grid (various approaches).
+
+    The time to try each one of the permutations as the first row takes multiple
+    minutes.  This means the solution time is several days.
+
+    Maybe there is something special about magic squares that makes for more
+    efficient searches?
+
+    I looked at their solution.  There is not much in the solution that
+    suggests any particular algorithm.  The solution they offer is:
+
+    11   5  89  97
+    83  79  17  23
+    67  47  59  29
+    41  71  37  53
+
+    I think my program should have found this but it did not.
+    I confirmed that my program eliminated this first row - why?
+
+    Confirmed typo in checking the elements on the anti-diagonal after
+    filling in first three rows and first two columns of matrix.
+    Fixed the typo and I am running it again.
+
+    OK -- it now confirms the solution.  I would have found this one.
+
+    Still not satisfied with the run time -- should re-implement in a faster
+    language to see how much better it is.
+
+    Details:
+
+    There are 25 primes less than 100:
+
+    2  3  5  7  11 13 17 19 23 29 31 37
+    41 43 47 53 59 61 67 71 73 79 83 89
+    97
+
+    We need to find groups of 4 that sum to 202.
+    There are choose(25,4) = 12650 combinations
+    to assess.  For construction of the magic square, however,
+    order actually matters to we need to consider all the
+    permutations = 12650 * 4! = 303600 possible rows.
+
+    There are 3120 of these that total 202.
+
+    If we choose from these results all of the possible
+    permutations of 4 rows we can then check the columns.
+    This is a total of 9.5e13 grids -- seems excessive.
+
+    We can try generating some random grids and see if we
+    get lucky.
+
+    We got lucky -- almost -- forgot to check that all the
+    values are distinct.
+
+         [,1] [,2] [,3] [,4]
+    [1,]   67    7   97   31  \
+    [2,]   67   59    5   71  | only 12 distinct values!
+    [3,]   31   89   71   11  |
+    [4,]   37   47   29   89  /
+
+    Added that check and didn't find any in the first 1e6 grids
+    Tried another 1e7 grids and did not find any solutions.
+    This search took 4.9 minutes.  Tried a total of 31e6
+    random row grids without success.
+
+    Switch to a smarter parsing of the input data.
+
+    Basic idea -- once you pick the first row this limits the
+    choices for columns 1-4.  Picking a second row really limits
+    this and the search might be very rapid.  I'll try this if 
+    I don't get lucky.
+
+    OK - time to try this.
+
+    This still takes a really, really long time.  Each of the
+    3120 possible selections for the first row is taking about 2 minutes
+    to process.  This is about 4 days of CPU time.  I need a more
+    efficient algorithm or a different language to perform this
+    processing.
+
+    Consider a different algorithm: try to maximize the number of
+    constraints at each step to end the search as quickly as possible.
+
+    Try the following sequence:
+
+    1. Pick the first row (from a)
+    2. Pick a first column based on the first element (possibilities = c)
+        First element must match
+        Last three elements must not match any element in the grid
+    3. Pick the anti-diagonal based on the first/last element (possibilitiies = d)
+        First element must match last element in first column
+        Last element must match last element in the first row
+        Middle two elements must not match any element in the grid
+
+    At this point the grid looks like this:
+
+        X X X X
+        X . X .
+        X X . .
+        X . . .
+
+    4. Pick the second row based on first/third element (possibilities = e)
+        First element must match second element of first column
+        Third element must match second element of third column
+        Second and fourth elements must not match any element in grid
+
+    At this point the grid looks like this:
+
+        X X X X
+        X X X X
+        X X . .
+        X . . .
+
+    5. Pick the second column based on the first three elements (possibilities = f)
+        First three elements must match grid
+        Last element must not match any element in grid
+
+    Not sure this is much faster than before.
+

@@ -1,0 +1,800 @@
+---
+title: "Bent Summer 2017"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2017
+
+
+## Problem 1
+
+    At lunch one day, math Prof. Lohwater
+    mentioned to economics Prof. Baird that he
+    had to go pick up a birthday present for his
+    daughter, Tatiana. Baird knew that Lohwater
+    had three children of different ages, but did
+    not recall which was which and asked her age.
+    Lohwater, being in a puzzling mood, wrote on
+    a paper napkin a polynomial f(x) with integer
+    coefficients and said, "Tatiana's age is the
+    only positive integer which is a zero of this
+    polynomial." Baird was not much impressed and
+    not in the mood for algebra, but decided to
+    give it the old college try. More or less at
+    random, Baird picked 7, but was told f(7) =
+    77. Then he tried a larger integer n, which
+    gave f(n) = 85. Lohwater exclaimed that his
+    daughter was older than n. How old is
+    Tatiana?
+
+    -- The Surprise Attack in Math- ematical
+    Problems by L.A. Graham
+
+Solution:
+
+    The polynomial can be written as:
+    
+    f(x) = (x-t)*f2(x)
+    
+    We know:
+    
+        f(t) = 0
+        f(7) = 77 = (7-t)*f2(7)
+        f(n) = 85 = (n-t)*f2(n)
+        t>n>7
+
+    I think there are an infinite number of solutions?
+    Do we make some assumption about the degree of the
+    polynomial?  What does the constraint that t is the
+    only positive integer zero of the polynomial mean?
+
+    I gave up and peeked at the solution.
+    
+    They argued that f(n)-f(7) must be divisible by (n-7).
+    (I need to confirm this -- it isn't blatantly obvious to me)
+    
+    Consider an arbitrary poly: f(x) = sum(a_i * x^i)
+    
+    Then: f(n1) = sum(a_i*n1^i)
+          f(n2) = sum(a_i*n2^i)
+          
+    f(n1)-f(n2) = sum(a_i*(n1^i-n2^i))
+    
+    I can't prove this is a multiple of n1-n2 analytically for any i
+    but I did test it for several different values of i and it generates
+    integer quotients -- the coefficients are the binomial coefficients.
+    
+    Let's just accept that the diff of like powers is dvisible by the
+    difference.
+    
+    If so - then:
+    
+    (85-77) / (n-7) = 8 /(n-7) --> n-7 = 1, 2, 4, 8 --> n=8,9,11,15
+    
+    Also -- since f(t) = 0 we know:
+    
+    (77-0) / (7-t) = 77/(7-t) --> 7-t = 11, 7, 77 --> t=-4,0,-70 ???
+    
+    I don't understand them -- because they use t-7 instead.  Apparently
+    the order of the terms are interchangeable.  This leads to:
+    
+        t-7 = 11, 7, 77 --> t = 14, 18, 84
+        
+    Finally, use f(t) and f(n) then:
+    
+    f(n)/(t-n) = integer --> 85/(t-n) = 1, 5, 17, 85
+    
+    or
+    
+    t-n = 85,17, 5, 1
+    
+    select one from each set of parens:
+    
+        (14, 18, 84) - (8, 9, 11, 15) = (1, 5, 17, 85)
+    
+    The only combination that works is: 14-9 = 5, so
+    
+        t = 14
+        n =  9
+
+
+## Problem 2
+
+
+    Inside a hemispherical building is a
+    concentric hemispherical atrium. Each floor
+    of the building is an annulus which extends
+    from the outside of the atrium to the inside
+    of the outside wall. On each floor, a regular
+    geometric figure has been painted. On the top
+    floor, the outside wall circumscribes an
+    equilateral triangle which circumscribes the
+    atrium. Similarly, on the floor immediately
+    below the top floor, a painted square
+    inscribes the outer wall and circumscribes
+    the atrium. One floor down, the figure is a
+    regular pentagon, and the figure is a regular
+    hexagon on the level below that. The top
+    floor is 5 m higher above ground level than
+    the floor below it, and the painted square is
+    60 m on a side. What is the area of the floor
+    with the painted hexagon, what is its outside
+    perimeter and its height above ground?
+
+    -- Cecil T. Ho, NY Beta'68
+
+Solution:
+
+    I floundered around on this for a while but I probably
+    would have figured it out eventually.  I did peek at
+    their solution but they didn't have anything I didn't
+    already know.  Basically I wasn't sure if the distance
+    between all floors was 5m or just the square-triangle.
+    Turns out it was just the square-triangle.
+    
+    Basic solution:
+    
+    Each floor is in the form of an annulus with inner
+    radius, r1, and outer radius, r2.  The radii are related
+    by the inscribed/circumscribed relationship with a polyon
+    of n sides.  Consider a polygon of n sides:
+    
+    theta = angle of each pie slice = 2*pi/n
+    alpha = theta/2 = pi/n
+    L = length of a side of the polygon
+    
+    For inscribed circle:
+    
+        (L/2)/r1 = tan(alpha) = sin(alpha)/cos(alpha)
+        
+    For circumscribed circle:
+    
+        (L/2)/r2 = sin(alpha)
+
+    Taking the raio:
+    
+        r2/r1 = 1/cos(alpha) --> r1=r2*cos(alpha)
+        
+    The area of each floor:
+    
+    Consider a vertical cross section of the building.
+    Let R1 = radius of inside hemisphere (atrium), R2 = radius of
+    outside hemisphere.  Let y = height of a particular floor.
+    
+        y^2 + r1^2 = R1^2
+        
+        y^2 + r2^2 = R2^2
+        
+    Equating the two expressions for y^2 gives:
+    
+        r2^2 - r1^2 = R2^2 - R1^2
+        
+    Since R1,R2 are constants (independent of floor) this is a constant.
+    The area of each floor is just:
+    
+        Area = pi*r2^2 - pi*r1^2 = pi*(r2^2 - r1^2)
+    
+    We know something about the floor with the square.  The side of the
+    square is 60m and there are 4 sides to the polygon.  The inscribed
+    circle has a radius of 30m, the circumscribed is 30*sqrt(2) m.
+    
+        Area = pi*(30^2 * 2 - 30^2) = 900*pi m^2
+        
+    For the floor with the hexagon we have:
+    
+        r1 = r2*cos(pi/6) = r2*sqrt(3)/2
+        
+        pi*(r2^2 - r2^2 * 3/4) = 900*pi
+        
+        r2^2 = 4*900 = 3600  --> r2 = 60m, Perimeter = 2*pi*r2
+
+    The height above the ground requires use of the triangle-square
+    floor distance of 5m.
+    
+    For the triangle floor:
+    
+        r1 = r2*cos(pi/3) = r2/2
+        
+        pi*(r2^2 - r2^2 * 1/4) = 900*pi
+        
+        r2^2 = 4/3*900 = 1200 --> r2 = 20*sqrt(3), r1=10*sqrt(3)
+        
+    For the square floor:
+    
+        r1 = 30, r2=30*sqrt(2)
+        
+    We know:
+    
+        y^2 + r1^2 = R1^2
+        
+        y^2 + r2^2 = R2^2
+        
+    Let the height of the square floor be y=h.
+    
+        h^2 + 30^2 = R1^2
+        
+        h^2 + (30*sqrt(2))^2 = R2^2
+        
+    The height of the triangle floor is y=h+5.
+    
+        (h+5)^2 + (10*sqrt(3))^2 = R1^2
+        
+        (h+5)^2 + (20*sqrt(3))^2 = R2^2
+
+    Solving either one yields:
+    
+        h = 115/2 = 57.5m for height of square floor
+        
+    Substituting back into the given equations gives:
+    
+        R1 = 5/2*sqrt(673), R2 = 5/2*sqrt(817)
+        
+    For the hexagon floor:
+    
+        h^2 + (30*sqrt(3))^2 = (5/2*sqrt(673))^2
+        
+        h = 5/2*sqrt(241) ~ 38.81m
+
+    In summary:
+    
+        Area of each floor = 900*pi m^2         (~ 2827   m^2)
+        Perimeter of hexagon floor = 120*pi m   (~  377   m)
+        Height of hexagon floor = 5/2*sqrt(241) (~  38.81 m)
+
+    Just out of curiosity, the height of some other floors:
+    
+    Triangle:  h^2 + (10*sqrt(3))^2 = (5/2*sqrt(673))^2
+               h = 125/2 = 62.5
+    
+    Square:    h = 57.5 as noted above
+    
+    Pentagon:  r1=r2*cos(pi/5) --> r2^2*(1-cos(pi/5)^2) = 900
+        Solution is ugly:
+        r2 = 51.03904850112239
+        r1 = 41.29145761413522
+        h = 50.01265367984459
+        
+    Hexagon:   h = 5/2*sqrt(241) ~ 38.81
+
+    Next floor: r1=r2*cos(pi/7) --> r2^2*(1-cos(pi/7)^2) = 900
+        r2 = 69.14294612887468
+        r1 = 62.29564189717018
+        h = 18.04170171074603
+        
+    The next one is below ground so I quit.
+
+
+## Problem 3
+
+    Give me an integer that, when divided by the
+    product of its digits yields a quotient of 3,
+    and if you add 18 to the integer, its digits
+    are reversed.
+
+    -- Little Man Tate, 1991
+
+Solution: Brute force?
+
+```{r}
+
+n=1
+while (T) {
+    digits=as.numeric(strsplit(sprintf("%d",n),"")[[1]])
+    p=prod(digits)
+    if (3*p == n) {
+        digits2=as.numeric(strsplit(as.character(n+18),"")[[1]])
+        if (all(digits2 == rev(digits))) {
+            print(n)
+            break
+        }
+    }
+    n=n+1
+}
+
+```
+
+Didn't take much brute or force.
+
+    Solution is n=24
+    Product of digits = 8, 24/8 = 3
+    
+    For n+18 we get 42 == rev(24)
+
+    They assert that it is obvious the solution has two digits but
+    that wasn't obvious to me.  If I knew it was only two digits
+    I would have done it algebraically.
+    
+    They argue that since adding 18 reverses all the digits the
+    original number can only have 2 digits.  Really?
+
+
+## Problem 4
+
+    A data entry service has assigned a different
+    code number in the inclusive range of 1
+    through 10 to each of the days of the week:
+    SUN, MON, TUE, WED, THU, FRI, and SAT. It
+    turns out that the code numbers for a pair of
+    days have a common factor greater than 1
+    if -- and only if -- the abbreviations for the days
+    have at least one letter in common. In
+    addition, if one substitutes code numbers for
+    days, MON + TUE < WED + THU < FRI + SAT. In
+    the order SUN through SAT, what are the code
+    numbers of the days of the week?
+
+    -- Susan Denham in New Scientist
+
+Solution: exhaustive search
+
+    Condition is for gcd > 1 for lots of cases.
+    Build the permutation matrix and then do the
+    testing.
+    
+```{r}
+library(gtools)
+library(gmp)
+
+dow=c('sun','mon','tue','wed','thu','fri','sat')
+
+a=permutations(10,7)
+a=data.frame(a)
+colnames(a)=dow
+k=rep(T,nrow(a))
+for (n1 in 1:6) {
+    for (n2 in (n1+1):7) {
+        i=dow[n1]
+        j=dow[n2]
+        print(sprintf("Checking %s vs %s",i,j))
+        if (any(strsplit(i,"")[[1]] %in% strsplit(j,"")[[1]])) {
+            k=k&(gcd(a[,i],a[,j])>1)
+        } else {
+            k=k&(gcd(a[,i],a[,j])==1)
+        }
+    }
+}
+n1=a[,'mon']+a[,'tue']
+n2=a[,'wed']+a[,'thu']
+n3=a[,'fri']+a[,'sat']
+k=k&(n1<n2)&(n2<n3)
+
+print(a[k,])
+
+```
+ 
+ Solution:
+ 
+            sun mon tue wed thu fri sat
+    575356  10   5   6   9   4   7   8
+
+
+## Problem 5
+
+    Five Tau Bates, who understand not a word of
+    Chinese, enter a restaurant in China, where
+    none of the staff speak any English.
+    Undaunted, they sit down and look at the
+    menu, which has nine items listed, each
+    identified by a Chinese symbol, but which,
+    for the sake of simplicity, we will call A,
+    B, C, D, E, F, G, H, and I. They each order
+    one item from the menu by pointing to it.
+    When the server brings the five dishes, he
+    sets them in the middle of the table so that
+    the diners can share. The same thing happens
+    for the next two nights. However, by the time
+    they return on the fourth day, they have
+    deduced what culinary item each letter
+    represents, and each is able to order his
+    favorite meal with total confidence. What
+    dishes did they order each night? Present
+    your answer as three strings, each with five
+    letters.
+
+    -- Hard-to-Solve Brainteasers by Jaime and
+       Lea Poniachik
+
+TODO
+
+    meh
+
+
+## Bonus
+
+    The ancient Egyptians had a unique way of
+    depicting rational numbers when the numerator
+    was greater than 1; they expressed such
+    fractions as the sum of a series of unit
+    fractions, that is fractions with a numerator
+    of 1. Furthermore, in a so-called Egyptian
+    fraction, none of these unit fractions could
+    be repeated. For example, 5/6 could be
+    written as 1/2 + 1/3, and 7/12 as 1/2 + 1/12
+    or 1/3 + 1/4 or 1/4 + 1/6 + 1/8 + 1/24, but
+    not as 1/4 + 1/4 + 1/12.  In ancient Egypt,
+    five women went into a bakery to buy bread,
+    but only three identical loaves were left.
+    The baker said not to worry as she and her
+    two apprentices would each take a loaf and
+    divide it into pieces which were unit
+    fractions of a whole loaf. Each loaf would be
+    cut into the same number of pieces, but the
+    pieces from each loaf would form a different
+    Egyptian fraction. That is, no two loaves
+    were cut into exactly the same set of pieces,
+    although the Egyptian fractions for the three
+    loaves may have had some sizes in common.
+    The baker was more skilled with a knife than
+    the apprentices, as she was capable of
+    cutting off a slice as small as 1/100 of a
+    loaf, but the smallest piece the apprentices
+    were competent to slice off was 1/50 of a
+    loaf. The pieces would be distributed to the
+    five customers in such a way that each would
+    get the same number of pieces, the volume of
+    the pieces for each customer would total 3/5
+    of a loaf, and each buyer's pieces would form
+    a different Egyptian fraction. What size
+    pieces did each woman get?  We want the
+    answer with the fewest pieces. Present your
+    answer as five different series of unit
+    fractions. For simplicity, the answers need
+    only list the denominators of the unit
+    fractions.
+
+    -- Ancient Puzzles-The Greatest Puzzles Ever
+       Solved, by Tim Dedopulos
+
+
+Solution:
+
+    If each loaf is cut into n pieces then we have
+    a total of 3*n pieces to be distributed to the
+    five women.  This must be an integer so:
+    
+        m = 3*n/5 = integer
+        
+        n = 5/3*m --> m = 3, 6, 9, ... multiples of 3
+        
+    We can do an exhaustive search for m=3 and then
+    look for the fractions that sum to 1 with only
+    one denominator > 50.
+    
+        Need 1/a + 1/b + 1/c = 3/5 with a<b<c
+        
+    If a solution can be found for m=3 then there is
+    no need to look at m=6, ... since it will result
+    in more pieces and the problem requests minimum pieces.
+    
+```{r}
+library(gmp)
+
+solution=c()
+for (a in 1:98) {
+    for (b in (a+1):99) {
+        for (c in (b+1):100) {
+            if(as.bigq(1,a)+as.bigq(1,b)+as.bigq(1,c) == as.bigq(3,5)) {
+                solution=append(solution,c(a,b,c))
+            }
+        }
+    }
+}
+solution=matrix(solution,ncol=3,byrow=T)
+print(solution)
+
+```
+
+    There are six fraction combinations that add to 3/5.
+    Two of the fractions include 1/60 which can only be
+    done by the baker.  We will arbitrarily pick the first
+    one and see if we can rearrange the pieces to form
+    three whole loaves using proper Egyptian fractions:
+
+             [,1] [,2] [,3]
+        [1,]    2   12   60  <-- pick this
+        [2,]    2   14   35
+        [3,]    2   15   30
+        [4,]    3    4   60  <-- omit this
+        [5,]    3    5   15
+        [6,]    3    6   10
+    
+    So the challenge is to rearrange the 15 values into
+    three sets of 5 that sum to 1 without any duplicated
+    fractions.
+    
+        2   12   60
+        2   14   35
+        2   15   30
+        3    5   15
+        3    6   10
+    
+    Since there are three fractions of 1/2 we need one for each
+    loaf.  There are two fractions of 1/3 that must be in separate
+    loaves and two fractions of 1/15 that must be in separate loaves.
+    
+    The known denominators must be: 2, 2, 2, 60
+    
+        Baker: 2, 60
+        Asst1: 2
+        Asst2: 2
+    
+    Remaining pieces:
+    
+        3, 3, 5, 6, 10, 12, 14, 15, 15, 30, 35
+    
+    We know the baker must have 1/2 and 1/60 and either 1/3 or 1/15 or both.
+    We can try various combinations until we find a solution that sums to 1.
+    
+    We need to find a combination of 3 of these that yields a total of 1.
+
+```{r}
+
+baker=as.bigq(1,2)+as.bigq(1,60)
+
+a=combinations(9,3,c(3,5,6,10,12,14,15,30,35))
+k=apply(a,1,function(x) {as.numeric(baker+as.bigq(1,x[1])+as.bigq(1,x[2])+as.bigq(1,x[3]))})
+
+print(a[k==1,])
+```
+
+    The only combination that works is:
+
+        Baker: 2, 3, 12, 15, 60
+    
+    This leaves the following for the assistants:
+
+        Asst1: 2, 4 more pieces
+        Asst2: 2, 4 more pieces
+    
+    Remaining pieces: 3, 5, 6, 10, 14, 15, 30, 35
+
+    These need to be partitioned into two groups where each
+    one sums to 1/2.
+
+```{r}
+asst=as.bigq(1,2)
+
+a=combinations(8,4,c(3,5,6,10,14,15,30,35))
+k=apply(a,1,function(x) {as.numeric(asst+as.bigq(1,x[1])+as.bigq(1,x[2])+as.bigq(1,x[3])+as.bigq(1,x[4]))})
+
+print(a[k==1,])
+```
+
+    The two assistants and the baker are:
+
+    Asst1: 2, 3, 14, 15, 35
+    Asst2: 2, 5,  6, 10, 30
+    Baker: 2, 3, 12, 15, 60
+
+    At the start of this problem we arbitrarily picked
+    one of the two solutions that required the skill of
+    the baker.  What if we had picked the other one?
+    Would a solution still be possible?
+    
+    e.g. what if our original sets were:
+    
+        2   14   35
+        2   15   30
+        3    4   60  <-- must be baker for 1/60 loaf
+        3    5   15
+        3    6   10
+    
+    All three must use a piece of 1/3 and then choose from the
+    remaining pieces:
+    
+    Then the baker starting point is:
+    
+        baker: 3, 60,  three more pieces
+
+    We search for a feasible solution of three pieces from the remainders:
+    
+```{r}
+
+baker=as.bigq(1,3)+as.bigq(1,60)
+
+a=combinations(9,3,c(2,4,5,6,10,14,15,30,35))
+k=apply(a,1,function(x) {as.numeric(baker+as.bigq(1,x[1])+as.bigq(1,x[2])+as.bigq(1,x[3]))})
+
+print(a[k==1,])
+``` 
+
+    There is no feasible solution with this choice for the baker.
+    
+    Conclude: the ony solution is the one found above.
+    The solution is repeated here for convenience.
+
+    The two assistants and the baker are:
+
+    Asst1: 2, 3, 14, 15, 35
+    Asst2: 2, 5,  6, 10, 30
+    Baker: 2, 3, 12, 15, 60
+
+
+## Computer Bonus
+
+    Many states have license plates with a format
+    consisting of three letters followed by four
+    digits. Assume each such license plate
+    represents an integer in the lowest possible
+    base greater than 10, with a = 10, b = 11, c
+    = 12, . . ., z = 35. For example, the license
+    plate TBP1885 would represent an integer in
+    base 30, the lowest base where T is a valid
+    digit, and its base 10 equivalent would be
+    21,428,584,445 (base-10). Exactly four of these
+    license plates, when expressed in their base
+    10 equivalent, can be expressed as x^y, where
+    x and y are positive integers (y > 3). One of
+    these plates is BBG1802 which is in base 17;
+    its base 10 equivalent is:
+    
+        282,475,249 (base 10) = 
+        49^5 =
+        7^10. 
+        
+    In license plate format, what are the other
+    three integers?
+
+    -- Dakota Ebersold, son of member
+
+Solution:  Can probably enumerate all the solutions.  Warning that this runs very
+slow.  A much more efficient solution follows.
+
+```{r, eval=FALSE}
+
+is_solution = function(x) {
+    b=max(x)+1
+    n=0
+    for (i in x) { n=b*n+i }
+    # n = license plate number in base 10
+    # How do I check if n = x^y ???  with y>3
+    xmax=round(n^(1/3.8))
+    y=log(n)/log(2:xmax)
+    k=which.min(abs(y-trunc(y)))
+    x=(2:xmax)[k]
+    y=round(log(n)/log(x))
+    if (y>3) {
+        return(x^y == n)
+    }
+    return(FALSE)
+}
+
+t1=Sys.time()
+for (n1 in 10:35) {
+    print(sprintf("Checking n1 = %d",n1))
+    print(Sys.time()-t1)
+    t1=Sys.time()
+    for (n2 in 10:35) {
+        for (n3 in 10:35) {
+            for (d1 in 0:9) {
+                for (d2 in 0:9) {
+                    for (d3 in 0:9) {
+                        for (d4 in 0:9) {
+                            plate=c(n1,n2,n3,d1,d2,d3,d4)
+                            if (is_solution(plate)) {
+                                print("Solution set:")
+                                print(plate)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+```
+
+Solutions:
+
+    11 11 16  1  8  0  2 --> BBG1802
+    11 13 10  8  7  7  9 --> BDA8779
+    12 14 14  2  7  4  4 --> CEE2744
+    18 29 18  0  8  0  1 --> ITI0801
+
+Run time ~ 78 minutes
+
+The Bent calls this the naive brute force approach.  They suggest that it
+is more efficient to look for the combinations of x^y with y>=4 that are
+feasible.  In particular they note that the largest value is ZZZ9999 (base 36).
+This value is 78362916381 which is just slightly larger than 529^4.  This means
+that any solution to this problem can be expressed as x^y with x in the
+range of 2:529 and y>4.  Increase the value of y until you reach the max value.
+
+They don't really say what to do with the x,y pairs once you get them but it
+seems like you need to convert this value with each different number base and
+see if it meets the template for a licence plate (three letters + four numbers).
+
+We can try that:
+
+```{r}
+
+int_to_digits = function(n,b=10,num_digits=7) {
+    a=c()
+    for (i in 1:num_digits) {
+        m=n%%b
+        n=trunc(n/b)
+        a=append(a,m)
+    }
+    if (n != 0) {
+        a=rep(b-1,num_digits)
+    } else {
+        a=rev(a)
+    }
+    return(a)
+}
+
+digits_to_int = function(a,b=10) {
+    n=0
+    for (i in a) { n=b*n+i }
+    return(n)
+}
+
+t1=Sys.time()
+
+# The largest possible licence plate value
+# No need to search for x^y > pmax
+pmax=digits_to_int(c(35,35,35,9,9,9,9),36)
+
+# Create a vector of all the feasible x^y quantities
+numlist=c()
+for (x in 2:529) {
+    y=4
+    while (T) {
+        m=x^y
+        if (m<pmax) {
+            numlist=append(numlist,m)
+            y=y+1
+        } else {
+            break
+        }
+    }
+}
+# Remove redundant entries
+numlist=unique(numlist)
+
+# Check each value against the 26 possible bases.
+# If the pattern matches the letters+digits of a
+# licence plate then add it to the solutions.
+solutions=c()
+for (n in numlist) {
+    for (b in 11:36) {
+        a=int_to_digits(n,b)
+        if (all(a[1:3]>9) & all(a[4:7]<10) & (b==(max(a)+1))) {
+            print(sprintf("base = %d   n = %.0f",b,n))
+            print(a)
+            solutions=append(solutions,a)
+        }
+    }
+}
+solutions=matrix(solutions,ncol=7,byrow=T)
+t2=Sys.time()
+
+print(solutions)
+print(t2-t1)
+```
+
+    OMG -- the solution time is about 1 second!!!
+
+    I did the factorization manually and added it to the table below:
+
+
+         [,1] [,2] [,3] [,4] [,5] [,6] [,7]
+    [1,]   11   11   16    1    8    0    2   282475249    7^10 (base 17)
+    [2,]   18   29   18    0    8    0    1   13841287201  7^12 (base 30)
+    [3,]   12   14   14    2    7    4    4   148035889    23^6 (base 15)
+    [4,]   11   13   10    8    7    7    9   90224199     39^5 (base 14)
+    > print(t2-t1)
+    Time difference of 1.025259 secs
+
+    The original brute force solution took over an hour.
+    
+    I guess algorithms are important.
+
+

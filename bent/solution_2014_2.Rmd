@@ -1,0 +1,438 @@
+---
+title: "Bent Summer 2014"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2014
+
+
+## Problem 1
+
+    Our local baseball park is rather
+    oddly shaped. It is exactly 260 feet
+    from first and third bases to the foul
+    poles and from second base to the
+    fence in dead center field. The out-
+    field fence itself is in the form of an
+    arc of a circle. In order to improve
+    the production of home runs, it has
+    been decided to reconstruct this
+    fence so that the fair ball portion
+    of the field will be in the shape of a
+    quadrant of a circle with a radius of
+    350 feet (distance from home plate to
+    the outfield fence). Thus, the dis-
+    tance from home plate to the fence
+    along the foul lines will be the same
+    as before, but the distance from
+    home to the center field fence will
+    be shorter. How much area will be
+    removed from the fair ball portion
+    of the park? Express your answer to
+    the nearest square foot.
+
+    -- Larry M. Lesser, son of member
+
+Solution:
+
+    Need to determine the location of the center and
+    the radius of the original circle.  If we know
+    the coordinates of the three points on the circle
+    we should be able to project perpindicular
+    bisectors and find the intersection.
+    
+    I am going to assume the foul lines are 90 degrees
+    apart and the infield is a square -- is that known?
+    
+    If so then the three points are located at:
+    
+    Point 1: x=90+260=350, y=0
+    Point 2: x=0,          y=90+260=350
+    Point 3: x=y=(90*sqrt(2)+260)/sqrt(2)
+    
+    Midpoint 1-3: x13=(x1+x3)/2, y13=(y1+y3)/2
+    Slope 1-3: m13=(y3-y1)/(x3-x1)
+    Midpoint 2-3: 
+    Slope 2-3: m23=(90*sqrt(2)+260-350)/(90*sqrt(2)+260)
+    
+    For the perpindicular bisector the slopes are -1/m13, and -1/m23.
+    
+    We have point and slope -- need equation of line:
+    
+    y0=m*x0+b --> b=(y0-m*x0) ==> y=m*x+(y0-m*x0)
+    
+    Line 1: y=-1/m13*x+(y13+1/m13*x13)
+    Line 2: y=-1/m23*x+(y23+1/m23*x23)
+    
+    Point of intersection = center of circle:
+    
+    -1/m13*xc+(y13+1/m13*x13) = -1/m23*xc+(y23+1/m23*x23)
+    xc*(1/m23-1/m13) = (y23+1/m23*x23)-(y13+1/m13*x13)
+    xc = ((y23+1/m23*x23)-(y13+1/m13*x13))/(1/m23-1/m13)
+    yc = -1/m13*xc+(y13+1/m13*x13)
+    
+    radius of circle:
+    
+    r = sqrt((x1-xc)^2+(y1-yc)^2)
+
+    This is all rather ugly but should be sufficient:
+    
+    First circle centered at xc,yc and radius=r
+    Second circle centered at 0,0, and radius=350
+    
+    Find the area between first and second circles.
+    This is the same as finding the fair area of the original
+    field and the fair area of the second field and the difference.
+
+    Could do this symbolically or numerically.
+    
+```{r}
+# Point 1
+x1=350; y1=0
+x2=0;   y2=350
+x3=(90*sqrt(2)+260)*cos(pi/4)
+y3=(90*sqrt(2)+260)*sin(pi/4)
+
+x13=(x1+x3)/2; y13=(y1+y3)/2; m13=(y3-y1)/(x3-x1)
+x23=(x2+x3)/2; y23=(y2+y3)/2; m23=(y3-y2)/(x3-x2)
+
+xc=((y23+1/m23*x23)-(y13+1/m13*x13))/(1/m23-1/m13)
+yc= -1/m13*xc+(y13+1/m13*x13)
+
+r1=sqrt( (x1-xc)^2 + (y1-yc)^2 )
+r2=sqrt( (x2-xc)^2 + (y2-yc)^2 )
+r3=sqrt( (x3-xc)^2 + (y3-yc)^2 )
+
+print(sprintf("Right Field Foul Pole: x1 = %10.4f   y1 = %10.4f",x1,y1))
+print(sprintf("Left  Field Foul Pole: x2 = %10.4f   y2 = %10.4f",x2,y2))
+print(sprintf("Dead Center Field:     x3 = %10.4f   y3 = %10.4f",x3,y3))
+
+print("Original layout - center of circle")
+print(sprintf("xc = %10.4f   yc = %10.4f",xc,yc))
+
+print("Original layout - radius of circle")
+print("Distance to Foul poles and dead center should all be the same")
+print(sprintf("Right Field   r1 = %10.4f",r1))
+print(sprintf("Left  Field   r2 = %10.4f",r2))
+print(sprintf("Center Field  r3 = %10.4f",r3))
+
+# We have center and radius of original circle
+#
+# Calculate area of original field
+# Calculate area of new field
+# Calculate difference
+
+# Area of the original field
+# This is shaped like an ice cream cone
+# Need area of circular arc and the two triangles
+# on either side.  The circular arc extends beyond
+# 90 degrees so we need to calculate the total angle:
+theta1=asin(xc/r1)
+theta2=pi/2+2*theta1
+area1=(r1^2/2)*theta2
+# Each triangle goes down fowl line out to xc,yc
+area2=1/2*350*xc
+area_original=area1+2*area2
+
+# Area of the revised field is just a quarter circle
+# with the new radius
+area_new=pi*350^2/4
+
+print(paste0("Original area = ",area_original))
+print(paste0("Revised  area = ",area_new))
+print(paste0("Reduction = ",area_original-area_new))
+```
+
+    Summary of Solution:
+    
+    Original fence defined by circle centered at: 69.514,69.514
+    with a radius of 288.9716.
+    
+    Original fair area = 110200.775
+    Revised  fair area =  96211.275
+    Reduction          =  13989.5003
+
+
+## Problem 2
+
+    A jeweler dies and bequeathes
+    his hoard of 45 jewels (9 diamonds,
+    9 rubies, 9 sapphires, 9 opals, and
+    9 zircons) to his five children. The
+    diamonds are worth $1,000 each,
+    the rubies $750, the sapphires $500,
+    the opals $250, and the zircons are
+    worthless. His will specifies that the
+    jewels be divided so that each child
+    gets the same total value and the
+    same total number of jewels. Fur-
+    thermore, each child gets at least one
+    of each kind of gem, but that no two
+    children get identical combinations of
+    gems. Finally, each kind of gem is to
+    be distributed as evenly as possible.
+    That is, the total number of three-
+    of-a-kinds among the five children
+    is to be a minimum. How should the
+    jewels be distributed?
+
+    -- Mathematical Recreations,
+    by Maurice Kraitchik
+
+TODO
+
+    meh
+
+## Problem 3
+
+    On the game show What's in a
+    Name?, N contestants write their
+    names on slips of paper and drop
+    them into a bowl. The slips are
+    mixed, and each person draws a slip.
+    If a contestant gets his own name,
+    he drops out. The remaining contes-
+    tants put their slips back in the bowl,
+    and the process is repeated. The
+    prize money is split evenly among
+    those going out on the last round
+    (which leaves no players). What is
+    the expected number of rounds for
+    everyone to have dropped out? For
+    large values of N, what is the prob-
+    ability that the total prize is split
+    between exactly two contestants?
+
+    -- Mathematics Magazine
+
+Solution:
+
+    We can try Monte-Carlo with specific values of N and
+    try to generalize to a formula or just use a plot.
+    
+```{r}
+ntrials=10000
+
+x=c()
+y=c()
+z=c()
+for (N in seq(10,100,10)) {
+  n=0
+  m_final=0
+  for (trial in 1:ntrials) {
+    m=N
+    while(T) {
+      s=sample(m)
+      prev_m=m
+      m=sum(s != 1:m)
+      n=n+1
+      if (m==0) {
+        m_final=m_final+(prev_m==2)
+        break
+      }
+    }
+  }
+  x=append(x,N)
+  y=append(y,n/ntrials)
+  z=append(z,m_final/ntrials)
+}
+
+plot(x,y,type='b')
+plot(x,z,type='b')
+```
+
+    It appears the expected number of rounds for N contestants is N rounds.
+    About 80% of the time the final round consists of two contestants.
+    
+    The Bent said they wrote a program to calculate the precise probability
+    as 0.80189.  Close enough.
+    
+
+## Problem 4
+
+    Four logicians went on a camping
+    trip. Among their supplies were 11
+    donuts. At their evening campfire,
+    each logician ate one donut. During
+    the night, one or more of the logi-
+    cians, unbeknownst to the others,
+    raided the donuts, so that in the
+    morning the box was empty. The
+    following exchange then took place.
+    Ann asked, "Beth, did you eat more
+    donuts than I did?" Beth replied,
+    "I don't know. Carol, did you eat
+    more donuts than I did?" Carol an-
+    swered, "I don't know." Diane then
+    remarked, "Now I know how many
+    donuts each of us ate." If no logician
+    asked a question to which she knew
+    the answer, how many donuts did
+    each logician eat? Assume the logi-
+    cians are honest, at least when it
+    comes to answering questions truth-
+    fully.
+
+    -- Hard-to-Solve Brainteasers,
+    by Jaime and Lea Poniachik
+
+TODO
+
+    meh
+
+
+## Problem 5
+
+    Consider six one-ohm resistors
+    that are connected to form a tetrahe-
+    dron. What is the resistance between
+    any two vertices?
+
+    -- Allan Gottlieb's Puzzle Corner
+    in Technology Review
+
+Solution:
+
+    The network is shown below:
+    
+         +------+------+
+         |      |      |
+         |      R      |
+         R      |      R
+         |  +-R-+-R-+  |
+         |  |       |  |
+         +--+---R---+--+
+
+    If I could remember how to do delta-wye
+    transformation this would be trivial.  Maybe
+    I should look into that.
+    
+    If I knew how to do that I would transform this
+    to:
+    
+         +------+------+-------
+         |      |      |
+         |      R      |
+         R      |      R     <== R seen from here
+         |      +      |
+         |      Ry     |
+         +--Ry--+--Ry--+-------
+    
+    R seen from right side is:
+    
+    Req = ((R+Ry)//(R+Ry)+Ry)//R = R/3*(R+3*Ry)/(R+Ry)
+
+
+    So -- how do we do the delta-wye transformation?
+
+        +---------------- A     +------------- A
+        |                       |
+        +---R---+               Ry
+        |       |               |
+        R       +-------- B     +-----Ry------ B
+        |       |               |
+        +---R---+               Ry
+        |                       |
+        +---------------- C     +------------- C
+        
+    We want to choose Ry such that the impedances are the same
+    on the two networks.
+    
+    From Wikipedia: Ry = R/3 when all the R are equal.
+    
+    So: substituting into the above we have:
+    
+    Req = ((R+Ry)//(R+Ry)+Ry)//R = R/2 = 1/2 Ohm
+
+    They had a more elegant answer in the Bent.  Go
+    back to the original diagram:
+ 
+               
+         +------+---------------+
+         |      |               |
+         |      +------A        |
+         |      R       <=      |
+         R      +------B        R
+         |      |               |
+         |  +-R-+-R-+           |
+         |  |       |           |
+      C--+--+---R---+-----------+--D
+                ^   
+                +--- By symmetry - no current in this R
+                     No current means it is open circut
+
+    Then this reduces to:
+    
+         +---+---+-----
+         |   |   |
+         2R  2R  R   <=
+         |   |   |
+         +---+---+-----
+
+    Req = 1/(1/R+1/(2*R)+1/(2*R)) = R/(1/1+1/2+1/2) = R/2 = 1/2 Ohm
+
+
+## Bonus
+
+    Two Tau Bates play a game.
+    They start with a sheet of paper
+    on which are written the integers
+    from 1 to 100 (inclusive). They take
+    turns crossing off numbers. Once a
+    number is crossed off, it is dead and
+    cannot be used again. Other than the
+    opening move, the chosen number
+    must be either an exact divisor of the
+    previous choice or an exact multiple
+    of it. For example if one player chose
+    45, the other player could choose 1,
+    3, 5, 9, 15, or 90 (provided they were
+    still available). The opening move
+    must be an even number. The first
+    player who cannot follow the rules
+    loses. Can the player crossing off the
+    first number force a win? If so, what
+    opening move should be made?
+
+    -- Professor Stewart's Hoard of
+    Mathematical Treasures,
+    by Ian Stewart
+
+TODO
+
+    meh
+
+
+## Computer Bonus
+
+    Arrange the integers from one to N in
+    alphabetical order. To avoid ambiguity, use
+    no hyphens or and's.  Consider spaces to
+    alphabetically precede all letters. For
+    example, 837,301 would be spelled eight
+    hundred thirty seven thousand three hundred
+    one; also, 1,807 is one thousand eight
+    hundred seven, not eighteen hundred seven.
+    Define F(n,m) as the mth integer in the
+    alphabetical list of the integers from one to
+    n, and define G(n,m) as the position of the
+    integer m in this list.  (a) What are the
+    values of F(n,m) and G(n,m) when n =
+    1,000,000 and m = 1,000? When n = m =
+    1,000,000?  (b) What are the ten smallest
+    values of n for which F(n,n) = G(n,n) = n?
+
+    -- Allan Gottlieb's Puzzle Corner
+    in Technology Review
+
+TODO
+
+
+    I thought about doing this but I really don't
+    see the point.

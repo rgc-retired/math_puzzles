@@ -1,0 +1,398 @@
+---
+title: "Bent Winter 2016"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2016
+
+
+## Problem 1
+
+    Given one red cube and a supply of green
+    cubes of the same size, what is the maximum
+    number of green cubes that can simultaneously
+    touch the red cube on at least part of a face
+    under the condition that the surface of the
+    red cube is completely covered by the
+    touching green cubes? Touching means contact
+    over a finite area; contact at only a corner
+    or an edge is not considered touching.  
+
+    -- Wheels, Life and Other
+    Mathematical Amusements
+    by Martin Gardner
+
+TODO
+
+    meh
+
+
+## Problem 2
+
+    Joan has drawn a right triangle on a 76.2 mm
+    x 127 mm (standard 3"x5") index card and cut
+    it out. She then cut the triangle into two
+    right triangles and further cut each of those
+    triangles into two right triangles. She
+    discovered that all 12 sides of the four
+    triangles were integral numbers of
+    millimeters long. What was the size of the
+    original triangle?
+
+    -- An Enigma by Bob Walker
+    in New Scientist
+
+Solution:
+
+    Generate all the right triangles that can fit
+    on the card and then see how many can be split
+    into triangles that are also on the list.
+    
+    Repeat this for each of the two triangles.
+    
+    Question: how do you partition a right
+    triangle into two right triangles?  One
+    way is to start at the right angle and
+    create a line perpindicular to the hypotenuse.
+    Are there any other ways?
+    
+```{r}
+triangle=c()
+for (a in 1:76) {
+    for (b in a:127) {
+        c=round(sqrt(a^2+b^2))
+        if ((a^2+b^2)==c^2) {
+            # add it to the list
+            triangle=append(triangle,c(a,b,c))
+        }
+    }
+}
+triangle=matrix(triangle,ncol=3,byrow=T)
+print(dim(triangle))
+
+```
+
+The legs of the original triangle (e.g. the first two columns)
+must become the hypotenuse of the new triangle.
+
+```{r}
+
+k=apply(triangle,1,function(x) {(x[1] %in% triangle[,3]) & (x[2] %in% triangle[,3])})
+
+print(sum(k))
+```
+
+Of these 13 triangles, only 5 can be parsed such that they produce two
+right triangles with integer sides.  They are all multiples of 3,4,5 as
+shown below:
+
+    15   20   25  -->  9,12,15 and 12,16,20
+    30   40   50  --> 18,24,30 and 24,32,40
+    45   60   75  --> 27,36,45 and 36,48,60
+    60   80  100  --> 36,48,60 and 48,64,80
+    75  100  125  --> 45,60,75 and 60,80,100
+    
+In order to divide the triangles a second time, the values in the decomposition
+list must also be one of the five possible dissectable triangles.  The only
+triangle that meets this constraint is the last one.  The solution is then:
+
+    75,100,125
+        45,60,75
+            27,36,45
+            36,48,60
+        60,80,100
+            36,48,60
+            48,64,80
+            
+Interestingly, two of the final four triangle are identical.
+
+
+## Problem 3
+
+    For dates from January through September, a
+    digital 24-hour watch displays the date
+    (month and day) and time as M:DD:hh:mm:ss.
+    Occasionally, such as at 23:46:57 on August
+    19, each of the digits 1 through 9 is used
+    exactly once. How many times does this occur
+    each year?
+
+    -- Puzzles 101: A PuzzleMaster's
+       Challenge by Nob Yoshigahara
+
+Solution:
+
+    Exhaustive enumeration is reasonable.  There are
+    less than 24 million seconds in 3/4 of a year.
+
+    The critical part is getting the number of days
+    right in each month:
+
+    I tried direct brute force and it was not good.
+    Very slow.
+    
+    Try something else.  Find the times during the
+    day when there are 6 distinct digits in the
+    range 1:6.
+    
+    Can marry these with month/day separately.
+
+```{r}
+
+month_length = c(31,28,31,30,31,30,31,31,30)
+
+n=1
+times=c()
+for (hour in 0:23) {
+    for (minute in 0:59) {
+        for (second in 0:59) {
+            t1=sprintf("%02d%02d%02d",hour,minute,second)
+            t2=strsplit(t1,"")[[1]]
+            if (length(unique(t2))==6 && !any(t2=='0')) {
+                times=append(times,t1)
+                n=n+1
+            }
+        }
+    }
+}
+print(sprintf("Number of cases with 6 distinct time digits = %d",n))
+
+nfinal=0
+tfinal=c()
+for (month in seq_along(month_length)) {
+    print(sprintf("Checking month = %d",month))
+    for (day in 1:month_length[month]) {
+        d=sprintf("%d%02d",month,day)
+        d2=strsplit(d,"")[[1]]
+        if (length(unique(d2))==3 && !any(d2=='0')) {
+            for (t1 in times) {
+                x=c(d2,strsplit(t1,"")[[1]])
+                if (length(unique(x))==9) {
+                    nfinal=nfinal+1
+                    tfinal=append(tfinal,x)
+                }
+            }
+        }
+    }
+}
+tfinal=matrix(tfinal,nrow=9)
+print(sprintf("Number of cases with 9 distinct date/time digits = %d",nfinal))
+```
+
+There are 768 times where this occurs.  The first such occurrence is:
+
+    3/26 17:48:59
+
+The last such occurrence is:
+
+    9/28 17:56:43
+
+It might be interesting to try to visualize this.
+
+
+## Problem 4
+
+    Find three three-digit integers that meet the
+    following conditions.  The nine digits making
+    up the three integers are all different. At
+    least one of these integers is divisible by
+    two, at least one is divisible by three, at
+    least one by four, at least one by five, at
+    least one by six, at least one by seven, at
+    least one by eight, at least one by nine; and
+    all three integers are divisible by eleven.
+    What are the three integers?
+
+    -- An Enigma by Susan Denham
+    in New Scientist
+
+Solution:
+
+    Seems like a candidate for exhaustive search.
+    Yes - the code is ugly but it was quick to write.
+    Only multiples of 11 are tried so there is no
+    explicity check for divisibility by 11.
+    
+    This leads to a total of 85320 combinations to consider.
+    Of this total only 312 have 9 distinct digits.
+    The remaining nested loops only get executed for these cases.
+
+```{r}
+
+for (n1 in seq(110,968,11)) {
+    for (n2 in seq(n1+11,979,11)) {
+        for (n3 in seq(n2+11,990,11)) {
+            n=c(n1,n2,n3)
+            if (length(unique(strsplit(paste0(n,collapse=""),"")[[1]])) != 9) {
+                next
+            }
+            if (sum((n%%2)==0)>0) {
+                if (sum((n%%3)==0)>0) {
+                    if (sum((n%%4)==0)>0) {
+                        if (sum((n%%5)==0)>0) {
+                            if (sum((n%%6)==0)>0) {
+                                if (sum((n%%7)==0)>0) {
+                                    if (sum((n%%8)==0)>0) {
+                                        if (sum((n%%9)==0)>0) {
+                                            print(n)
+                                        } # divisible by 9
+                                    } # divisible by 8
+                                } # divisible by 7
+                            } # divisible by 6
+                        } # divisibile by 5
+                    } # divisibile by 4
+                } # divisible by 3
+            } # divisible by 2
+        } # for n3
+    } # for n2
+} # for n1
+
+```
+
+The solution is: 165, 308, 792
+
+
+## Problem 5
+
+    Place the integers 1 through 12 on a regular
+    hexagon such that six of these integers are
+    at the vertices and the other six are at the
+    midpoints of the sides, and each of these
+    midpoint integers is the sum of the two
+    adjacent vertex integers. How many different
+    ways can this be done? Now, repeat for the
+    integers 1 through 16 on a regular octagon.
+    How many different ways can this be done for
+    the octagon? Rotations and reflections are
+    not considered to be different arrangements.
+
+    -- An Enigma by Bob Walker in New Scientist
+
+TODO
+
+    meh
+
+
+## Bonus
+
+    A Bingo card consists of a 5 by 5 grid with
+    numbers in each cell, except for the center
+    square, which is marked "Free." The five
+    columns are labeled B, I, N, G, and O and
+    contain, respectively, numbers in the ranges
+    1 through 15, 16 through 30, 31 through 45,
+    46 through 60, and 61 through 75. The caller
+    has 75 balls, numbered 1 through 75, and
+    randomly draws balls and calls numbers until
+    someone yells "Bingo!" Bingo is achieved when
+    a player fills in a column, row, or major
+    diagonal. Consider the case of a single
+    player with a single card. With seven or
+    fewer numbers having been called, what is the
+    exact ratio of the probability of getting a
+    Bingo using the "Free" cell to the
+    probability of getting a Bingo not using the
+    "Free" cell?
+
+    -- D.A. Dechman, TX A'57 and
+    F.J. Tydeman, CA Delta'73
+
+TODO
+
+    meh
+
+
+## Computer Bonus
+
+    Using the ten digits, 0 through 9, once and
+    only once, create four integers A, B, C, and
+    D such that A * B = C * D = N, where N is a
+    minimum. Then, find four other integers where
+    N is a maximum. Leading zeroes are not
+    allowed. An apparent solution is 86 * 259 =
+    74 * 301 = 22274, but this is not correct
+    because 22274 is neither the minimum nor the
+    maximum value of N.
+
+    -- The Canterbury Puzzles by H. E. Dudeney
+
+Solution:
+
+    I could do this with exhaustive enumeration.  All
+    of the permutations of the 10 digits give 10! = 3628800
+    rows.  For each row need to consider all the possible
+    numbers of digits = 210 total combinations.
+    
+    The grand total is 762e6 conditions to consider.
+    
+    The vast majority will fail the multiplication test.
+    
+```{r}
+library(gtools)
+
+digits=permutations(10,10,0:9)
+
+```
+
+    Now we need to partition these into the integers and check
+    the conditions noted above.  This takes a LONG time to run
+    so it has been commented out:
+    
+```{r, eval=FALSE}
+
+to_int = function(x) {
+    n=0
+    if (x[1]==0) { return(999999) }
+    for (i in x) { n = 10*n+i }
+    return(n)
+}
+
+check_digits = function(x) {
+    n=c()
+    for (alen in 1:7) {
+        for (blen in 1:(8-alen)) {
+            for (clen in 1:(9-(alen+blen))) {
+                a=to_int(x[1:alen])
+                b=to_int(x[(alen+1):(alen+blen)])
+                c=to_int(x[(alen+blen+1):(alen+blen+clen)])
+                d=to_int(x[(alen+blen+clen+1):10])
+                if (a*b == c*d) {
+                    if (a*b < 6970) {
+                        print(c(a,b,c,d,a*b))
+                    }
+                    n=append(n,c(a,b,c,d,a*b))
+                }
+            }
+        }
+    }
+    return(n)
+}
+
+n=c()
+m=0
+for (i in 1:nrow(digits)) {
+    n=append(n,check_digits(digits[i,]))
+    m=m+1
+    if ((m%%100000) == 0) { print(sprintf("Checking m = %d  n = %d",m,length(n))) }
+}
+print(sprintf("Number of solutions = %d",length(n)))
+```
+
+
+The range of solutions is: 2716 to 58560
+
+According to the Bent the range is: 6970 to 58560.
+
+Why do I find lower values?  It appears that the problem does not
+allow for leading zeros.  Of course, this is clearly stated but I
+missed it.
+
+If we eliminate the cases of leading zeros then the solution
+range is: 6970 to 58560.
+

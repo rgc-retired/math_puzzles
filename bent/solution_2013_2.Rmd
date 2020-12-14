@@ -1,0 +1,367 @@
+---
+title: "Bent Summer 2013"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2013
+
+
+## Problem 1
+
+    What conclusions (about shingles, happiness,
+    Klingon, Ph.D. candidate, mom, and mixed
+    dominance) can be drawn from these eight
+    premises?
+
+    1. Everyone who works in the Reliable
+       Data Dump has shingles.
+    2. All hippies are unhappy.
+    3. No one whose mother is, or has been a
+       shaman suffers simultaneously from
+       shingles and mixed dominance.
+    4. Christopf L. Biggleswade works in the Reliable Data Dump.
+    5. All hippies are fluent in Klingon.
+    6. Christopf L. Biggleswade is a hippy.
+    7. Everyone fluent in Klingon is a
+       candidate for the Ph.D. degree, or else
+       his mother is, or has been, a shaman.
+    8. No one who is unhappy can be a candidate for the Ph.D.
+
+-- Professor H. Webb
+
+TODO
+
+    meh
+    
+
+## Problem 2
+
+    You have an eight-pint jug full of wine and
+    want to give exactly half to your friend.
+    However, all you have is a three-pint jug and
+    a five-pint jug, both empty. How do you
+    arrive at four pints in each of the five-pint
+    and eight-pint jugs by just pouring wine from
+    one jug to another (in the minimum number of
+    pours)? Show your answer as the state of each
+    jug after each pour.
+
+    -- Master Book of Mathematical Recreations by Fred Schuh
+
+Solution:
+
+    Start with pour into 5
+    
+    8   5   3
+    =========
+    8   0   0
+    3   5   0
+    3   2   3
+    6   2   0
+    6   0   2
+    1   5   2
+    1   4   3
+    4   4   0
+
+
+## Problem 3
+
+    A, B, C and D all played each other once at
+    soccer. Some of the figures in the table of
+    results (in which they are not necessarily
+    arranged in the order of points scored) are
+    given below.
+
+                               Goals  Goals
+    Played  Won  Lost  Drawn   For    Against
+    -----------------------------------------
+    A 3                                5
+    B 3      3                  4
+    C 3
+    D 3                  1      0      3
+
+    With the additional information that the
+    match between A and C was a draw (3-3) and
+    that A scored more than 5 goals altogether,
+    please fill in the table, and provide the
+    scores of each game.
+
+    -- Brain Puzzler's Delight by E.R. Emmet
+
+TODO
+
+    meh
+    
+
+## Problem 4
+
+    Find 10 primes in arithmetic progression,
+    that is find an expression of the form a +
+    n*b, which generates primes for values of n
+    from 0 through 9 inclusive. We want the
+    expression where a + 9*b is the smallest.
+
+    -- Penguin Dictionary of Curious and
+    Interesting Numbers by David Wells
+
+Solution:
+
+    I did not understand this problem.  I thought
+    the primes had to be sequential.  That is not
+    what they were looking for.
+    
+    The solution is 199+210*N
+    
+    From the Bent:
+    
+    Number theory tells us that the difference
+    between consecutive terms in an arithmetic
+    sequence of primes is the product of the 
+    prime numbers that are less than the required 
+    number of terms in the sequence.
+    
+    In this case, for 10 terms: 2*3*5*7 = 210
+    
+    So we know we are looking for values that are
+    
+    a + 210*b for b=1,2,...,9 and a is prime
+    
+    We should be able to find a fairly easily:
+    
+```{r}
+library(gmp)
+
+n=2
+while(T) {
+    s=n+210*(1:9)
+    if (all(isprime(s)==2)) {
+        print(n)
+        break
+    }
+    n=nextprime(n)
+}
+```
+   
+This runs almost instantly.
+
+The first value in the sequence is 199.  The full
+sequence is:
+
+    199  409  619  829 1039 1249 1459 1669 1879 2089
+    
+Original - misguided attempt
+
+    Exhaustive search looking at the diff between
+    adjacent primes.  If the diff is constant for
+    9 diffs then we have a solution.
+    
+    NOTE - THIS CODE IS FOR REFERENCE ONLY -- NOT THE SOLUTION
+    FOR THE CORRECT PROBLEM!!!
+    
+```{r, eval=FALSE}
+library(gmp)
+
+n1=2
+ndiff=0
+currdiff=-1
+while(T) {
+    n2=nextprime(n1)
+    if ((n2-n1) == currdiff) {
+        ndiff=ndiff+1
+        if (ndiff == 9) {
+            # Done
+            print(as.character(n2))
+            print(as.character(n1))
+            print(as.character(n1-currdiff))
+            print(as.character(n1-2*currdiff))
+            break
+        }
+    } else {
+        currdiff = (n2-n1)
+        ndiff=1
+    }
+    n1=n2
+}
+```
+
+
+## Problem 5
+
+    Solve the following cryptic addition problem
+    with the largest TIGER.  Usual rules: Base
+    ten, no leading zeros, different letters are
+    different digits, same letter is same digit
+    throughout.
+
+        B E A V E R
+     +    T I G E R
+        -----------
+        R A B B I T
+
+    -- 150 Puzzles in Crypt-Arithmetic by Maxey
+    Brooke
+
+Solution: from the cryptic arithmetic notebook
+
+    Cryptic addition with constraint
+
+      BEAVER + TIGER = RABBIT
+
+      TIGER should have largest possible value
+
+    a=make_crypt_df('beavertigerrabbit')
+    x_beaver=make_num(a,'beaver')
+    x_tiger=make_num(a,'tiger')
+    x_rabbit=make_num(a,'rabbit')
+    k=(x_beaver+x_tiger == x_rabbit)
+    k=k & (a$b != 0) & (a$t != 0) & (a$r != 0)
+    > a[k,]
+           b e a v r t i g
+    446833 2 5 1 4 3 6 0 7
+    447565 2 5 1 7 3 6 0 4
+
+    First solution has maximum TIGER = 60753
+
+
+## Bonus
+
+    There are three pegs located on the
+    circumference of a circle: peg A is at 12
+    o'clock; peg B is at 4 o'clock; and peg C is
+    at 8 o'clock. Initially, there are N disks
+    (all different sizes) on peg A, stacked in
+    size from largest at the bottom to smallest
+    at the top. Find the minimum number of moves
+    to transfer all of the disks to peg B, one at
+    a time, never having a larger disk on top of
+    a smaller one. Only clockwise moves (to
+    adjacent peg) are permitted. Also, what is
+    the minimum number of moves to transfer all
+    the disks to peg C (from peg A) with the same
+    rules? We want direct (not recursive)
+    formulas. As a check, fill in the following:
+
+        N 0 1 2 3 4 5 6 7 8 9
+        B 0 1 5
+        C 0 2
+
+    where, N is the number of disks on the A peg,
+    B is the number of moves to move those N
+    disks to the B peg, and C is the number of
+    moves to move those N disks to the C peg
+    (from the A peg).
+
+    -- Allan Gottlieb's Puzzle Corner
+    in Technology Review
+
+TODO
+
+    Isn't this just the Tower of Hanoi?
+    
+    Yes - with the cyclic move constraint.  They even
+    mention this in the Bent and refer people to the
+    OEIS for the formula.
+
+
+## Computer Bonus
+
+    A bingo card consists of a 5 x 5 grid with
+    numbers in each cell, except the center,
+    which is marked FREE. The five columns are
+    labeled B, I, N, G, and O. Column B consists
+    of five different numbers in the range 1
+    through 15, column I of five different
+    numbers from 16 through 30, N of four numbers
+    between 31 and 45, G of five numbers between
+    46 and 60, and O of five numbers between 61
+    and 75. The caller has 75 balls, numbered 1
+    to 75, and randomly calls numbers (without
+    replacement) until someone calls "Bingo."
+    Bingo is scored by getting five numbers (or
+    four numbers and the FREE cell) in a row,
+    vertically, horizontally, or two main
+    diagonals. What is the expected number of
+    calls to get Bingo on an arbitrarily selected
+    Bingo card?
+
+    -- H.G. McIlvried III PA Gamma'53
+
+Solution:
+
+    Monte-Carlo?
+    
+    We can make random cards and then play games until
+    we win.
+    
+```{r}
+ntrials=10000
+
+set.seed(42)
+total_moves=0
+for (trial in 1:ntrials) {
+    # Make a random bingo card
+    b = sample(1:15,5)
+    i = sample(16:30,5)
+    n = sample(31:45,5); n[3]=-1
+    g = sample(46:60,5)
+    o = sample(61:75,5)
+    # print(b); print(i); print(n); print(g); print(o)
+    # Check the numbers until winner found
+    s=sample(1:75)
+    for (j in seq_along(s)) {
+        m=s[j]
+        num_moves=j
+        # Change the value in the card to -1
+        b[b==m]=-1
+        i[i==m]=-1
+        n[n==m]=-1
+        g[g==m]=-1
+        o[o==m]=-1
+        # Check for a win
+        # Down the columns
+        if (all(b==-1) | all(i==-1) | all(n==-1) | all(g==-1) | all(o==-1)) {
+            break
+        }
+        r1 = c(b[1],i[1],n[1],g[1],o[1]); if (all(r1 == -1)) { break }
+        r2 = c(b[2],i[2],n[2],g[2],o[2]); if (all(r2 == -1)) { break }
+        r3 = c(b[3],i[3],n[3],g[3],o[3]); if (all(r3 == -1)) { break }
+        r4 = c(b[4],i[4],n[4],g[4],o[4]); if (all(r4 == -1)) { break }
+        r5 = c(b[5],i[5],n[5],g[5],o[5]); if (all(r5 == -1)) { break }
+        d1 = c(b[1],i[2],n[3],g[4],o[5]); if (all(d1 == -1)) { break }
+        d2 = c(b[5],i[4],n[3],g[2],o[1]); if (all(d2 == -1)) { break }
+    }
+    # print(b); print(i); print(n); print(g); print(o)
+    total_moves=total_moves+num_moves
+}
+
+print(paste0("Total number of moves = ",total_moves))
+print(paste0("Mean  number of moves = ",total_moves/ntrials))
+
+```
+
+Monte-Carlo summary:
+
+    Seed   Trials   Result
+    42     10K      41.4080
+    123    10K      41.4165
+    2020   10K      41.4490
+    42     100K     41.39153
+    42     1000K    41.373945
+    
+The Bent, unbelievably, also uses Monte-Carlo.  Their
+estimate is 41.37 but they do not list the number of
+trials or any other measure of variability.  One
+interesting note:
+
+    Since the card and draws are random there is no
+    need to generate a random card every time.
+       
+I am wondering if this observation could be used to
+speed up the solution.
+

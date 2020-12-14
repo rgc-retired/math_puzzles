@@ -1,0 +1,500 @@
+---
+title: "Bent Winter 2011"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2011
+
+
+## Problem 1
+
+    Find the smallest positive integer
+    that has a remainder of 1 when divided
+    by 2, a remainder of 2 when divided by
+    3, a remainder of 3 when divided by 4,
+    a remainder of 4 when divided by 5, a
+    remainder of 5 when divided by 6, and
+    a remainder of 6 when divided by 7.
+
+    -- Christopher R. Oliver, AL E'08
+
+Solution:
+
+    I think this has something to do with the
+    Chinese remainder theorem - but brute
+    force will probably work.
+    
+```{r}
+divisors=c(2,3,4,5,6,7)
+remainders=c(1,2,3,4,5,6)
+n=7
+while(TRUE) {
+    if (all(n%%divisors == remainders)) {
+        print(n)
+        break
+    }
+    n=n+2
+}
+```
+
+The solution is 419.
+
+
+## Problem 2
+
+    Five pirates find a chest containing
+    100 gold pieces and decide to divide
+    them according to the following
+    scheme. In order of seniority, each
+    pirate proposes a distribution of the
+    gold pieces. All of the pirates then
+    vote, and if half or more of the pirates
+    accept the proposal, the gold pieces
+    are divided as proposed. If not, then
+    the proposer must walk the plank and
+    drown, and they start the process over
+    again with the next most senior pirate
+    making a proposal. Assuming the pirates
+    are very intelligent, greedy, and
+    interested in surviving, how does the
+    senior pirate propose to split the 100
+    gold pieces?
+
+    -- How to Ace the Brain Tickler
+    Interview by John Kador
+
+TODO
+
+    See the Bent description.  It involves
+    the head pirate giving a token amount
+    to the two pirates who can never
+    get anything if the pirate count
+    gets too low (e.g. the most junior
+    pirate and the third in line).
+
+
+## Problem 3
+
+    My wife and I recently attended a
+    party at which there were four other
+    married couples, and various people
+    shook hands. No one shook hands with
+    himself or herself or with his or her
+    spouse, and no one shook hands with
+    the same person more than once. After
+    the handshakes were over, I asked
+    each person, including my wife, how
+    many hands he or she had shaken. To
+    my surprise, each had shaken a different
+    number of hands. How many hands
+    did my wife shake?
+
+    -- Knotted Doughnuts and Other
+    Mathematical Entertainments
+    by Martin Gardner
+
+TODO
+
+    meh - logic
+
+## Problem 4
+
+    Professor Asterisk treated his
+    friend, Professor Scalene, to a ride
+    on the local bus. He asked the driver
+    for two transfer tickets, which had
+    consecutive five-digit serial numbers.
+    He mentally added the ten digits and
+    informed Professor Scalene that the
+    sum was 62. Professor Scalene asked
+    if the sum of the digits of the serial
+    number on either of the tickets were
+    in the range of 29 to 39, inclusive. After
+    Professor Asterisk answered, Professor
+    Scalene remarked, "I now know
+    what the two serial numbers are."
+    What were the serial numbers?
+
+    -- Hard-to-Solve Brainteasers
+    by Jaime and Les Poniachik
+
+TODO
+
+    Exhaustive search would work.
+    
+
+## Problem 5
+
+    A sparrow, flying horizontally in a
+    straight line, is 20 m directly below an
+    eagle and 40 m directly above a hawk.
+    Both the eagle and the hawk always
+    fly directly at the sparrow, and they
+    reach it simultaneously. If the sparrow
+    is flying at a speed of 15 m/s and the
+    hawk is flying at 30 m/s, how fast is the
+    eagle flying?
+
+    -- Chases and Escapes
+    by Paul J. Nabin
+
+Solution:
+
+    I had fun with this.
+
+    At t=0 the sparrow is at the origin:
+    
+        xs=0, ys=0
+        
+    At t=0 the hawk is on the negative y-axis:
+    
+        xh=0, yh=-40
+
+    The position of the sparrow is given by:
+    
+    xs = 15*t
+    
+    We need to calculate the time for the hawk to
+    reach the sparrow.
+    
+    The angle of attack between the hawk and the
+    sparrow is given by:
+    
+    theta = atan((0-yh)/(xs-xh))
+    
+    The x,y components of the hawk's speed is:
+    
+    vxh = dxh/dt = vh*cos(theta)
+    vyh = dyh/dt = vh*sin(theta)
+    
+    if tan(theta) = -yh/(xs-xh) this gets ugly fast.
+    
+    Isn't there a clever way to solve this other than coupled
+    differential equations?
+
+    I can solve this numerically but I would like a more elegant
+    result.
+    
+    The Bent has a solution but I don't know if I would call it
+    more elegant.  Here is there methodology.
+    
+    Assume hawk starts at origin and sparrow is flying vertically
+    along a line x=x0.  At time=t we know:
+    
+        Position of sparrow = (x0,vs*t)
+        Position of hawk    = (x,y)
+        
+    The attack angle of the hawk:
+    
+        dy/dx = p = (vs*t-y)/(x0-x)
+        
+    Solve this for t:
+    
+        t = p*(x0-x)/vs + y/vs
+        
+    So far - no problem.  The next step is to note:
+    
+        vh*t = S = integrate(sqrt(1+p**2),(tau,0,x))
+        
+    Where vh=30 (speed of hawk) and S = path length on hawk's trajectory.
+    We can also solve this for t:
+    
+        t = (1/vh)*integrate(sqrt(1+p**2),(tau,0,x))
+        
+    Equating to the previous expression for t:
+    
+        t = p*(x0-x)/vs + y/vs = (1/vh)*integrate(sqrt(1+p**2),(tau,0,x))
+    
+    Differentiating both sides:
+    
+        dp/dx*(x0-x)/vs + p*(-1)/vs + dy/dx*(1/vs) = (1/vh)*sqrt(1+p**2)
+        
+        dp/dx*(x0-x)/vs + (p*(-1)/vs + p * (1/vs))   =
+        
+        dp/dx*(x0-x)/vs = (1/vh)*sqrt(1+p**2)
+        
+    Rearranging:
+    
+        dp/sqrt(1+p**2) = (vs/vh)*(1/(x0-x))*dx
+        
+    Now for the mind blowing part:  integrate the left side from 0 to p
+    and the right side from 0 to x:
+    
+        asinh(p) = vs/vh*(log(-vh*x0) - log(vh*x - vh*x0))
+    
+    Since I have no idea what asinh(p) means (from sympy) I had to go to
+    Wikipedia to see how to write it in logs:
+    
+        log(p+sqrt(p**2+1)) = vs/vh*log(x0/(x0-x))
+    
+    exponentiating both sides:
+    
+        p + sqrt(p**2+1) = (x0/(x0-x))^(vs/vh)
+        
+    Mind continuing to blow:  replace p by dy/dx and then multiply by dx
+    
+        ( dy/dx + sqrt(p**2+1) ) * dx = (x0/(x0-x))^(vs/vh) * dx
+        
+    Here it comes:
+    
+        dy + dS = (x0/(x0-x))^(vs/vh) * dx
+        
+    Now - integrate this all from 0 to x0:
+    
+        yc + Sc = x0/(1-(vs/vh))
+        
+    where yc = y value where hawk captures sparrow
+    
+    But yc=vs*tc, Sc=vh*tc so
+    
+        vs*tc + vh*tc = x0/(1-(vs/vh))
+        
+    or:
+    
+        tc = x0/((1-(vs/vh))*(vs+vh))
+
+           = vh*x0 / (vh^2 - vs^2)
+           
+    For the case of vh=30, vs=15, x0=40 we have:
+    
+        tc = 1.777778 seconds (?????)
+        
+    The same logic applies to the eagle except for the starting
+    condition.  The tc value must be the same so we can calculate
+    the required speed:
+    
+        x0 = 20, vs=15, tc=1.777777
+        
+        tc = ve*x0 / (ve^2 - vs^2)
+        
+        1.777778 = ve*20 / (ve^2 - 15^2)
+        
+        ve = 21.645 m/s
+        
+    Compared to: vs=15 ms, vh = 30 ms.
+    
+    As a comparison let's try a  numerical solution.
+    
+    We will use the same convention (hawk starts at origin).
+    
+    We can use the optimizer to find when the distance between
+    the hawk-sparrow or eagle-sparrow is minimized.
+
+```{r}
+library('deSolve')
+
+# Calculate speed in x,y directions
+#
+# Assume state vector has two compoents:
+#
+# x[1] = xh (x position of the hawk)
+# x[2] = yh (y position of the hawk)
+#
+# Input parameters have two components:
+#
+# parms[1] = speed of attacker
+# parms[2] = initial separation
+foo = function(t,x,parms) {
+    vh=parms[1]   # Speed of the predator
+    xs=parms[2]   # Initial separation between predator/prey
+    ys=15*t       # Speed of prey is constant
+    xh=x[1]       # x location of predator
+    yh=x[2]       # y location of predator
+    # Angle of attack
+    theta = atan((ys-yh)/(xs-xh))
+    # Speed in each axis
+    vh_x = vh*cos(theta)
+    vh_y = vh*sin(theta)
+    # Return these as the derivatives
+    # The ODE solver requires a list
+    return(list(c(vh_x,vh_y)))
+}
+
+# Function to find the capture time of the hawk
+# The speed/separation of the hawk is passed as c(30,40)
+# and the unknown we are searching for is the length of
+# time it takes to reach a particular state.
+# The state is the minimum distance between predator-prey
+shoot = function(tfin) {
+    t=seq(0,tfin,length=1000)
+    x=ode(c(0,0),t,func=foo,c(30,40))
+    dx=40-x[nrow(x),2]
+    dy=15*tfin-x[nrow(x),3]
+    d=dx^2+dy^2
+    return(d)
+}
+
+# Function to find the speed of the eagle
+# The speed/separation of the eagle is passed as c(ve,20)
+# We are searching for the optimum value of ve to make
+# the final location of the eagle match the hawk/sparrow.
+shoot2 = function(ve) {
+    t=seq(0,topt$minimum,length=1000)
+    x=ode(c(0,0),t,func=foo,c(ve,20))
+    dx=(20-x[nrow(x),2])
+    dy=(15*topt$minimum-x[nrow(x),3])
+    d=dx^2+dy^2
+    return(d)
+}
+
+# Find the capture time
+topt=optimize(shoot,c(0,5))
+
+# Calculate the optimal trajectory
+t=seq(0,topt$minimum,length=500)
+x=ode(c(0,0),t,func=foo,c(30,40))
+
+# Make some plots for the hawk pursuit
+plot(x[,1],x[,2],xlab='Time',ylab='X-Position')
+abline(h=40,col='red')
+
+plot(x[,1],x[,3],xlab='Time',ylab='Y-Position')
+lines(x[,1],15*x[,1],col='red')
+
+plot(x[,2],x[,3],xlab="Hawk X-Position",
+     ylab="Hawk Y-Position",
+     main="Hawk-Sparrow Pursuit Trajectory")
+abline(v=x[nrow(x),2],col='red')
+abline(h=x[nrow(x),3],col='red')
+
+# Now that we know the time for capture we can try to find
+# the speed of the eagle.  It must be faster than the
+# sparrow and slower than the hawk:
+
+veagle=optimize(shoot2,c(15,30))
+
+print(paste0("Speed of eagle = ",veagle$minimum))
+
+```
+
+ Numerically:
+ 
+    Speed of eagle = 21.645022 m/s
+
+Compared to analytical result = 21.645007 m/s
+
+Awfully close to the same thing.
+
+```{r}
+# Plot hawk and eagle trajectories on the same axes
+# and use the correct orientation.  We need to swap
+# the x-y axis and apply some offsets.
+#
+# The sparrow is on the +x axis
+# The hawk starts 40m below
+# The eagle starts 20m above
+
+# Calculate the optimum trajectory for eagle
+x2=ode(c(0,0),t,func=foo,c(veagle$minimum,20))
+
+# Make the plots and annotations
+plot(c(0,30),c(-40,20),type='n',
+     xlab='X-Position',
+     ylab='Height',
+     main="Predator-Prey Pursuit Trajectories")
+lines(x[,3],x[,2]-40,col='blue')
+points(x[,3],x[,2]-40,col='blue')
+lines(x2[,3],20-x2[,2],col='green')
+points(x2[,3],20-x2[,2],col='green')
+lines(x2[,1]*15,rep(0,nrow(x2)),col='red',lwd=3)
+text(6,14,"Eagle @ 21.6 m/s")
+text(6,-28,"Hawk @ 30 m/s")
+text(6,-3,"Sparrow @ 15 m/s")
+grid()
+abline(v=tail(x[,3],1),lty='dashed')
+text(29,0,'Capture')
+
+```
+ 
+
+## Bonus
+
+    A regular dodecahedron has
+    12 faces in the shape of regular pentagons.
+    If some, including none or all, of
+    the faces are painted red and the rest
+    are painted blue, how many dodecahedrons
+    that are distinguishable from
+    each other are possible?
+
+    -- Classic Puzzles
+    by Gyles Brandreth
+
+TODO
+
+    Another one of those reflection, rotation, color
+    counting puzzles.  Still don't understand these
+    things.
+    
+
+## Computer Bonus
+
+    A, B, and C are
+    different nine-digit integers that each
+    use the digits 1 through 9 once and only
+    once. What is the value of C that satisfies
+    the equation, A x B = C^2, and where
+    A and B are also perfect squares?
+
+    -- Madachy's Mathematical
+    Recreations by Joseph S. Madachy
+
+Solution:
+
+    Should be able to exhaustively search for this
+    solution.  The number of permutations is 9! which
+    is reasonable.
+    
+    I tried to do this with gtools and gmp but the large number
+    problems were very hard to work around.  The lack of sqrt for
+    large integers makes it difficult to find the squares.
+    
+    Dropped back to using basic python
+    
+```{r}
+library(reticulate)
+```
+
+```{python}
+import itertools
+import math
+
+# n = all the relevant 9 digit numbers
+n=[]
+for i in itertools.permutations(range(1,10),9):
+    m=0
+    for j in i:
+        m=10*m+j
+    n.append(m)
+
+# m = all the 9 digit values that are squares
+m=[]
+for i in n:
+    if round(math.sqrt(i))**2 == i:
+        m.append(i)
+
+# Find solutions to A*B == C**2
+n2=[i*i for i in n]
+for i in range(len(m)):
+    for j in range(i+1,len(m)):
+        if m[i]*m[j] in n2:
+            k=n2.index(m[i]*m[j])
+            print("A = ",m[i])
+            print("B = ",m[j])
+            print("C = ",n[k])
+```
+
+Solution found as:
+
+    A =  549386721  (23439^2)
+    B =  743816529  (27273^2)
+    C =  639251847
+
+    549386721*743816529 = 408642923892911409
+    

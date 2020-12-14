@@ -1,0 +1,321 @@
+---
+title: "Bent Spring 2012"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2012
+
+
+## Problem 1
+
+    Solve the following cryptarithm: 
+    
+    O/NE + T/WO + S/IX = NI/NE, where / indicates division.
+
+    As expected, TWO is divisible by 2, SIX is
+    divisible by 6, and NINE is divisible by 9,
+    but oddly TEN is divisible by 7. Each
+    different letter represents a different
+    digit, the same letter represents the same
+    digit, and there are no leading zeros.
+
+    -- H. G. McIlvried, III, PA Gamma '53
+
+Solution: solved in the crypti arithmetic notebook
+
+  Cyptic fractions:
+
+      O/NE + T/WO + S/IX = NI/NE
+
+      TWO is divisible by 2
+      SIX is divisible by 6
+      NINE is divisible by 9
+      TEN is divisible by 7
+
+  Putting over a common demoninator:
+
+      O * WO*IX + T * NE*IX + S * NE*WO = NI * WO*IX
+
+    a=make_crypt_df('onetwosixnine')
+    x_o=make_num(a,'o')
+    x_ne=make_num(a,'ne')
+    x_t=make_num(a,'t')
+    x_wo=make_num(a,'wo')
+    x_s=make_num(a,'s')
+    x_ix=make_num(a,'ix')
+    x_ni=make_num(a,'ni')
+    k=(x_o*x_wo*x_ix + x_t*x_ne*x_ix + x_s*x_ne*x_wo == x_ni*x_wo*x_ix)
+    k=k & (a$o != 0)
+        & (a$n != 0)
+        & (a$t != 0)
+        & (a$w != 0)
+        & (a$s != 0)
+        & (a$i != 0)
+    k=k & (make_num(a,'two') %% 2 == 0)
+    k=k & (make_num(a,'six') %% 6 == 0)
+    k=k & (make_num(a,'nine') %% 9 == 0)
+    k=k & (make_num(a,'ten') %% 7 == 0)
+    sum(k)
+    [1] 1
+    > a[k,]
+            o n e t w s i x
+    1138194 6 2 4 7 5 9 1 8
+
+    So:
+
+      O/NE + T/WO + S/IX = NI/NE
+   
+      6/24 + 7/56 + 9/18 = 21/24
+
+      2/8  + 1/8  + 1/2  = 7/8 
+
+
+## Problem 2
+
+    How many permutations of the integers 1
+    through N consist of a strictly ascending
+    sequence followed by a strictly descending
+    sequence. For example, for N = 9, one such
+    permutation is (1-4-5-7-9-8-6-3-2). There
+    must be at least two integers in a sequence,
+    and N is considered to be a member of both
+    sequences. Reversals are not considered to be
+    different permutations, i.e.
+    (2-3-6-8-9-7-5-4-1) is the same as the above
+    example.
+
+    -- Puzzle Corner in Technology Review
+
+TODO
+
+    meh
+
+## Problem 3
+
+    Find a non-trivial (x, y, z != 0) integral
+    solution of the following cubic equation:
+
+    987,654,321x + 123,456,789y + z = (x + y + z)^3
+
+    We want the solution with the smallest
+    positive value for (x + y + z); however, this
+    does not imply that x, y, and z are all
+    positive.
+
+    -- The Contest Center
+
+TODO
+
+    I peeked at the Bent -- still don't really understand
+    the solution.  They note that the key is to realize the
+    big coefficients are nearly a ratio of 8.  I saw that but
+    I didn't go any further.
+    
+    See the Bent for solution details.
+
+
+## Problem 4
+
+    In Green Town, half the farmland must be
+    maintained in a natural state by law. To
+    achieve this, in each field an inside strip
+    around the four sides must be left
+    uncultivated to provide habitat for wildlife.
+    All fields are rectangles of the same size,
+    100m wide and an integral number of meters
+    long. These border strips, which equal half
+    the field's area, are a uniform and integral
+    number of meters wide. It turns out that the
+    digits in the length, when read from left to
+    right, are in monotonically increasing order.
+    What is the length of a field and the width
+    of the border strip?
+
+    -- Enigma by Keith Austin in New Scientist
+
+Solution:
+
+    Let L = length of the field (including the border)
+        W = width of the border
+        
+    Area of field = (100-2*W)*(L-2*W)
+    Area of border = L*W*2+(100-2*W)*W*2
+    
+    We want these two areas to be equal:
+    
+    L = 2*W*(W-50)/(W-25)
+    
+    For W,L = integers we want 2*W*(W-50)/(W-25) to be an integer
+    
+    A quick search for integer W yields the following possibilities:
+    
+    W   L
+    =======
+    15  105
+    20  240
+    23  621
+    24  1248 --> digits of length in ascending order
+    
+    The areas of the field and border are:
+    
+    A(field)  = (1248-2*24)*(100-2*24) = 62400 m^2
+    A(border) = 1248*100-A(field) = 62400 m^2
+
+
+## Problem 5
+
+    To increase his probability of
+    throwing a 7, a gambler loaded a pair
+    of dice as show in the table.
+
+    Pip Value   Die 1   Die 2
+    --------------------------
+    1/2         1/4     1/12
+    3/4         1/6     1/6
+    5/6         1/12    1/4
+
+    One day, he accidentally grabbed one
+    standard die and one loaded die. What
+    was his probability of throwing a 7 with
+    one loaded die and one standard die?
+
+    -- Mathematics Teacher
+
+Solution:
+
+    We should be able to do this without the computer.
+    
+    For the fair die the probability of each value = 1/6
+    
+    Assume we have one fair die and die 1.  The combinations
+    that will produce 7 are:
+    
+    Fair   Die 1   Pr
+    -----------------------
+    6      1       1/6*1/4
+    5      2       1/6*1/4
+    4      3       1/6*1/6
+    3      4       1/6*1/6
+    2      5       1/6*1/12
+    1      6       1/6*1/12
+    -----------------------
+           Total   1/6*(1) = 1/6
+           
+    Using Die 2 we get the same result.
+    
+    In general, we get the same result as with two fair dice.
+
+    This is actually very surprising.  The loading of the second
+    die has absolutely no effect on the ability to roll a 7.  It
+    does, however, affect other point totals:
+    
+```{r}
+
+s=outer(1:6,1:6,"+")
+pfair=outer(rep(1/6,6),rep(1/6,6),"*")                  # Pr with fair die
+p1=outer(rep(1/6,6),c(1/4,1/4,1/6,1/6,1/12,1/12),"*")   # Pr with die 1
+p2=outer(rep(1/6,6),c(1/12,1/12,1/6,1/6,1/4,1/4),"*")   # Pr with die 2
+p3=outer(c(1/4,1/4,1/6,1/6,1/12,1/12),c(1/12,1/12,1/6,1/6,1/4,1/4))   # Pr both loaded
+
+total=unique(sort(s))
+prfair=c()
+pr1=c()
+pr2=c()
+pr3=c()
+for (i in total) {
+    prfair=append(prfair,sum(pfair[s==i]))
+    pr1=append(pr1,sum(p1[s==i]))
+    pr2=append(pr2,sum(p2[s==i]))
+    pr3=append(pr3,sum(p3[s==i]))
+}
+a=data.frame(total=total,Pr_fair=prfair,Pr_1=pr1,Pr_2=pr2,Pr_3=pr3)
+a
+```
+
+## Bonus
+
+    Arrange the integers 1 through
+    32 in a circle such that the sum of each
+    pair of adjacent integers is always
+    the square of an integer. Present
+    your answer as a string of 33 integers
+    starting and ending with 1.
+
+    -- Puzzles 101: A Puzzle
+    Master's Challenge by
+    Nobuyuki Yoshigahara
+
+TODO
+
+    Just trial and error.
+    
+
+## Computer Bonus
+
+    Take any positive
+    integer and apply the following
+    algorithm: (a) if the number is odd,
+    multiply by 3 and add 1; and (b) if the
+    number is even, divide by 2. If you
+    continue this process, you will always
+    end up with 1, no matter what number
+    you start with. For example, 17
+    requires 12 steps (17-52-26-13-40-20-10-
+    5-16-8-4-2-1). In the range of 1 to 10,000,
+    which integer requires the most steps
+    and how many steps are required?
+
+    -- Mathematical Amazements
+    and Surprises by Alfred S.
+    Posamentier and Ingmar Lehmann
+
+Solution:
+
+    Looks like it is time for exhaustive search.
+    
+```{r}
+count_steps = function(n) {
+    m=0
+    while(T) {
+        m=m+1
+        if (n%%2 == 1) {
+            n=3*n+1
+        } else {
+            n=n/2
+        }
+        if (n==1) { break }
+    }
+    return(m)
+}
+
+nmax=0
+nmoves=0
+
+for (i in 1:10000) {
+    m=count_steps(i)
+    if (m>nmoves) {
+        nmoves=m
+        nmax=i
+    }
+}
+print(paste0("Maximum number of moves = ",nmoves))
+print(paste0("Value for max moves = ",nmax))
+```
+
+Run time is very fast for 10K:
+
+    For numbers up to 10K:
+        Maximum number of moves = 261
+        Value for max moves = 6171
+
+    For numbers up to 1e6:
+        Maximum number of moves = 524
+        Value for max moves = 837799
+
+    I would agree that this is somewhat surprising.

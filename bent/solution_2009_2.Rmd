@@ -1,0 +1,311 @@
+---
+title: "Bent Summer 2009"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2009
+
+
+## Problem 1
+
+    The five offices of the Mudbridge
+    Women's Guild are held by Mesdames
+    Virtue, Wellbeloved, Xerxes,
+    Youngblood, and Zenith. These powerful
+    ladies are also very partial to a
+    game of contract bridge and, on each
+    weekday morning, a different one of
+    the five acts as hostess to three of the
+    others. The resulting fours are the
+    same each week, and each lady has just
+    one morning off each week -- the one
+    on which she is not part of the four. All
+    those whom Mrs. Virtue invites to her
+    morning game invite Mrs. Wellbeloved
+    to theirs. Mrs. Wellbeloved invites
+    two of the ladies whom Mrs. Xerxes
+    invites and, as the fourth member, a
+    lady not among those invited by Mrs.
+    Youngblood. Because she is president,
+    Mrs. Zenith's invitations confer a
+    certain distinction on the recipients.
+    Who, besides herself, does not receive
+    one? This problem is a bit tricky. Be
+    sure to think outside the box.
+
+    -- Tantalizer by Martin Hollis
+    in New Scientist
+
+TODO
+
+    Ugh - I loathe logic problems.  Guessing
+    games are best left to guessers.
+    
+
+## Problem 2
+
+    Three sharpshooters fire (not simultaneously)
+    at a rapidly spinning sphere. If each of them
+    hits the sphere, what is the probability
+    that all three shots land in the same
+    hemisphere for the following two cases: (1)
+    the great circle dividing the sphere into
+    two hemispheres can have any orientation and
+    (2) the great circle dividing the sphere
+    into two hemispheres must pass through the
+    sphere's poles?  Assume each point on the
+    sphere has an equal chance of being hit.
+
+    -- Daryl Cooper
+
+Solution:
+
+    In the first case it is a certainty.  After
+    the first two shots are taken construct a
+    great circle through these two points.  Regardless
+    of where the third shot hits it is in the same
+    half-sphere.
+    
+    In the second case, the first two shots will be
+    in the same hemisphere (by definition).  The
+    third shot will be in the same hemisphere iff
+    the angle between the two extreme points is less
+    than or equal to 180 degrees.  For example, if
+    the three points were equidistant at the equator
+    it would not be possible to separate into
+    two hemispheres with one holding all three shots.
+    
+    In this case, we need the third shot to be within
+    180 degrees of either shot 1 or shot 2 and the
+    three shots will be in the same hemisphere.  Each
+    of these has a P=0.5 so the overall probability
+    that one or the other is true is:
+    
+        P = 1 - 0.5^2 = 3/4
+        
+
+## Problem 3
+
+    Solve the following cryptic addition:
+    SEVEN + THREE + TWO =
+    TWELVE. We want the solution in
+    which TWO is the product of two
+    primes. No leading zeros; different
+    letters are different digits; same letter
+    is same digit. A computer is not necessary
+    to solve this.
+
+    -- Mathematical Puzzling by A. Gardiner
+
+Solution: solved in the cryptic arithmetic notebook
+
+      SEVEN + THREE + TWO = TWELVE
+      
+      TWO is the product of two primes
+
+```{r}
+source('rgc_lib.R')
+
+a=make_crypt_df('seventhreetwotwelve')
+x_seven=make_num(a,'seven')
+x_three=make_num(a,'three')
+x_two=make_num(a,'two')
+x_twelve=make_num(a,'twelve')
+k=(x_seven+x_three+x_two == x_twelve)
+k=k & (a$s != 0) & (a$t != 0)
+print(paste0("Number of solutions = ",sum(k)))
+print(paste0('SEVEN  = ',x_seven[k,]))
+print(paste0('THREE  = ',x_three[k,]))
+print(paste0('TWO    = ',x_two[k,]))
+print(paste0('TWELVE = ',x_twelve[k,]))
+```
+
+Need to select correct solution, check the factorization of the
+candidate solutions for `TWO`:
+
+```{r}
+library(gmp)
+
+print("Factors for 106:")
+print(factorize(106))
+print("Factors for 104:")
+print(factorize(104))
+
+```
+
+Only the first solution has two prime factors.
+The final solution is then:
+
+    SEVEN  = 82524
+    THREE  = 19722
+    TWO    = 106
+    TWELVE = 102352
+
+
+## Problem 4
+
+    Al and Ben play a game that uses a
+    supply of marbles marked 1, 2, 3, etc.,
+    and five saucers. Al puts marble 1
+    into a saucer. Ben puts marble 2 into
+    a saucer. Al puts marble 3 into a saucer,
+    and so on. The only restriction is
+    that the differences between any pair
+    of numbers in a saucer must be different
+    from the differences between
+    any other pair in that saucer. For instance,
+    a saucer must not contain 1, 5,
+    14, and 18. If a player cannot place his
+    number in any saucer, he loses. The
+    game can go on for a long time, but
+    what is the shortest possible game,
+    and what are the numbers in the
+    saucers when the game stops? Hint:
+    When the game stops, all saucers
+    have fewer than 4 marbles.
+
+    -- Enigma by Stephen Ainley
+    in New Scientist
+
+Solution:  I think I solved this problem once before
+by trial and error.
+
+The only interesting part here might be to try random
+solutions to see if I can solve it that way.
+
+From the problem description there are (at most) 15 marbles
+in the optimal solution with a loss at the 16th marble.
+I will generate a random number of marbles between 8 and 16
+and then play a "game" involving a random location for the
+next marble and then see if that is feasible.  If so,
+advance to next marble or try again until all of the
+saucers have been tried.
+
+```{r}
+# Set ntrials to 1e6 to have a reasonable shot
+# at finding a minimal set of 12/13 marbles.
+# Be warned that the run time is substantial (~1 hr).
+ntrials=1000
+mmin=999
+nmin=0
+
+for (trial in 1:ntrials) {
+    # print(paste0("Running trial = ",trial))
+    s=vector("list",5)
+    done=FALSE
+    for (m in 1:16) {
+        # print(paste0("Placing marble = ",m))
+        tried=c()
+        while (TRUE) {
+            # Get a random saucer number
+            n=sample(5,1)
+            # Can I put marble m in saucer n?
+            x=append(s[[n]],m)
+            x=sort(outer(x,x,"-"))
+            x=x[x>0]
+            if (length(x)==length(unique(x))) {
+                s[[n]]=append(s[[n]],m)
+                break
+            }
+            tried=append(tried,n)
+            if (length(unique(tried))==5) {
+                # print("No move possible")
+                done=TRUE
+                break
+            }
+        }
+        if (done) { break }
+    }
+    if (done & (m<16)) {
+        print("Short solution found")
+        print(m)
+        for (i in 1:5) {print(s[[i]])}
+        if (m<mmin) {mmin=m; smin=s; nmin=1}
+        if (m==mmin) {nmin=nmin+1}
+    }
+}
+if (mmin != 999) {
+    print(paste0("Shortest solution found = ",mmin))
+    print(paste0("Number of repeats for min solution = ",nmin))
+    print(smin)
+} else {
+    print("No short solutions found")
+}
+
+```
+
+After 3000K random trials the shortest game found was 12/13 moves.
+Specifically, it is not possible to place marble 13.  Here is an
+example:
+
+    Saucer 1:  3   8
+    Saucer 2:  4   6  11
+    Saucer 3:  7  10
+    Saucer 4:  5   9
+    Saucer 5:  1   2  12
+
+The other solutions are just rearranged saucers with same marble
+combinations.
+
+
+## Problem 5
+
+    Find the value of:
+
+    sqrt(2*sqrt(2*sqrt(2*sqrt(2*sqrt(2*. . .)))))
+
+-- Crucible
+
+Solution:
+
+    S = sqrt(2*sqrt(2*sqrt(2*...)))
+    
+    S^2 = 2*sqrt(2*sqrt(2*...)) = 2*S
+    
+    S = 2
+
+
+## Bonus
+
+    N (an odd number) people own a bank. What is
+    the minimum number of different locks that
+    must be put on a safe so that when duplicate
+    keys to these locks are distributed to the
+    different owners, every majority contains
+    a complete set of keys but no minority
+    does? For example, 3 people need 3 locks with
+    keys distributed as: 1-2, 2-3, 3-1; no single
+    person can open the safe, but all pairs
+    can. Express your answer as a function of N.
+
+    -- Puzzle Corner by Allan Gottlieb in
+    Technology Review
+
+TODO
+
+    I have seen this problem before - don't care
+    to repeat it here.
+
+
+## Double Bonus
+
+    In 2006, a teacher said to his class, an
+    American hero was born X years ago and died
+    at age Y, where Y minus its reverse equals
+    the square of the cube root of (X - Y).
+    If half of this hero's birth year is a
+    prime number, whose birthday was the teacher
+    referring to, and what anniversary was 2006?
+
+    -- Aziz S. Inan
+
+TODO
+
+    This is a virtual repeat of the Mozart question
+    from the Bent of Winter 2008.

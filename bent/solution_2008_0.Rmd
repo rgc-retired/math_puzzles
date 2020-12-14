@@ -1,0 +1,527 @@
+---
+title: "Bent Winter 2008"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2008
+
+
+## Problem 1
+
+    Ann, Beth, and Clara have been
+    challenged to find a solution to the
+    following cryptic:
+
+    FOUR is a perfect square;
+    FIVE is a Fibonacci number; &
+    SIX is a semi-prime (product of
+    two primes).
+
+    Each girl found a different solution,
+    and the values of FOUR, FIVE, and
+    SIX in Clara's solution were not used
+    in Ann's or Beth's answer. What was
+    Clara's solution? The usual rules
+    apply. No leading zeroes, and each
+    letter represents a different digit.
+
+    -- Richard England in New Scientist
+
+Solution: solved in the cryptic arithmetic notebook
+
+      FOUR is a perfect square
+      FIVE is a Fibonacci number
+      SIX is a semi-prime (product of two prime numbers)
+      
+      Ann, Beth, and Clara found a different solution
+      
+      FOUR, FIVE, and SIX in Clara's solution not in Ann's or Beth's.
+      
+      What is Clara's solution?
+
+
+    1. There are only two 4 digit Fibonacci numbers with 4 distinct digits:
+
+        1597 and 2584
+
+    2. There are 36 4 digit perfect squares with 4 distinct digits.  The
+       only ones that start with the same digit as the Fibonacci numbers
+       are of the form 1*** or 2***.  Furthermore, the perfect squares
+       can not have any duplicate digits with the Fibonacci numbers other
+       than the leading digit.  This limits the solution sets to:
+
+        FOUR   FIVE
+        -------------------------------
+        1597   1024
+        2584   2601 2916
+
+    3. Three digit semi-primes: there are lots of them (265).  The middle
+       digit must match the second digit of FIVE and the other digits
+       can not occur in FOUR or FIVE.  This reduces the solution set
+       to the following:
+
+
+        FOUR   FIVE     SIX
+        -------------------
+        1597   1024     803  <-- Clara's solution
+        2584   2601     763
+        2584   2916     793
+
+        Clara's solution must be the unique row (the first one).
+        
+        Can't say which one is Ann or Beth.
+
+
+## Problem 2
+
+    Consider a regular pentagram
+    (five-pointed star) with a circumscribing
+    circle of unit radius. Fold
+    the five points of the star so that
+    their tips meet in a point to form a
+    pyramid with a regular pentagon as
+    its base. What is the volume of this
+    pyramid?
+
+    -- Slicing Pizzas, Racing Turtles,
+    and Further Adventures in Applied
+    Mathematics by Robert B. Banks
+
+Solution:
+
+    Let's look at a picture first.
+    We will draw the circle and the star and then
+    figure things out:
+    
+```{r}
+r=1
+theta=seq(0,2*pi,length=200)
+xo=r*cos(theta)
+yo=r*sin(theta)
+r2=0.382
+xi=r2*cos(theta)
+yi=r2*sin(theta)
+plot(xo,yo,type='n',asp=1)
+polygon(xo,yo)
+polygon(xi,yi,border='green')
+dtheta=2*pi/5
+theta=seq(5)*dtheta
+x=r*cos(theta)
+y=r*sin(theta)
+#
+lines(x[c(1,3)],y[c(1,3)],col='red')
+lines(x[c(1,4)],y[c(1,4)],col='red')
+#
+lines(x[c(2,4)],y[c(2,4)],col='red')
+lines(x[c(2,5)],y[c(2,5)],col='red')
+#
+lines(x[c(3,5)],y[c(3,5)],col='red')
+
+polygon(x,y,lty='dashed',border='blue')
+
+```
+
+    We need to work out the size of the internal pentagon and the
+    length of the sides of the "points" of the star.  Once we have
+    that we should be able to find the volume.
+    
+    A pentagon divides the circle into 5 parts so each angle is 360/5 = 72 degrees.
+    The internal angle (between sides) of the pentagon are just 180-72=108 degrees.
+    
+    The sides of the outside pentagon connect points on the unit circle so we
+    can calculate the length of a side as:
+    
+        L = 2*sin(36 degrees) = 1.175571
+        
+    The isosceles triangle with this as a base has two 36 degree base angles with
+    a height of h/(L/2) = tan(36) so
+    
+        h = (L/2)*tan(36) = sin(36)*tan(36)
+        
+    So, the distance from the center of the circle to the point(s) of the internal
+    pentagon are:
+    
+        r2 = 1*cos(36)-sin(36)*tan(36)
+        
+    Now that we know the radius of the interior circle we can calculate the length
+    of each side of the smaller pentagon.  This is just:
+    
+        L2 = 2*r2*sin(36)
+        
+    The points of the stars have base angles of 180-108=72 degrees.  The length of
+    a side of the point is then:
+    
+        (L2/2)/d = cos(72) --> d = (L2/2)/cos(72)
+        
+    The height of each star point is:
+    
+        hpoint = d*sin(72)
+        
+    The distance from the center of the circle to the middle of a side of the small
+    pentagon is:
+    
+        d2 = r2*cos(36) = (1-sin(36)*tan(36))*cos(36)
+        
+    Based on d,hpoint we can calculate the height of the 5-sided pyramid when the
+    points are flipped up:
+    
+        hp = sqrt(hpoint^2 - d2^2)
+        
+    So - at this point we know the base dimensions and the height of the pyramid.
+    This is sufficient to calculate the volume.
+    
+```{r}
+theta=36*pi/180
+L=2*sin(theta)
+h=(L/2)*tan(theta)
+r2=1*cos(theta)-sin(theta)*tan(theta)
+L2=2*r2*sin(theta)
+d=(L2/2)/cos(2*theta)
+hpoint=d*sin(2*theta)
+d2=r2*cos(theta)
+hp=sqrt(hpoint^2-d2^2)
+# Area of the central pentagon
+area=1/2*L2*d2*5
+# Volume of the pyramid
+V=5*L2*d2*hp/6
+
+
+print(paste0("Side of outside pentagon = ",L,collapse=""))
+print(paste0("Height of outer triangle = ",h,collapse=""))
+print(paste0("Radius of inside circle  = ",r2,collapse=""))
+print(paste0("Side of inside  pentagon = ",L2,collapse=""))
+print(paste0("Height of star point     = ",hpoint,collapse=""))
+print(paste0("Height = ",hp,collapse=""))
+print(paste0("Area of base pentagon    = ",area,collapse=""))
+print(paste0("Volume of pyramid        = ",V,collapse=""))
+```
+
+Might be able to calculate this another way.  Consider a circle
+of radius=r that circumscribes a pentagon.  The ratio of the
+pentagon area to the circle area is:
+
+    area_p = 1/2*L*d*5
+       d=cos(theta)
+       L/2=sin(theta)
+       theta = pi/5
+       
+    area_p = sin(theta)*cos(theta)*5
+           = 2.377641
+           
+    area_c = pi*r^2 = pi
+    
+    ratio = area_p/area_c = 0.7568267
+
+At each slice the area ratio holds so if we calculate the volume
+of a cone of height hp the volume of the pentagonal pyramid should
+be this ratio times that volume.  For the central circle/pentagon
+given above:
+
+    V_Cone = 1/3*pi*r2**2*hp
+           = 1/3*pi*(0.38196601125010^2)*0.618033988749895
+           = 0.09442574
+
+so:
+
+    V_pyramid = V_cone * 0.7568267
+              = 0.07146392
+
+Which is the same as above.
+
+
+## Problem 3
+
+    Find the positive root of the following
+    equation:
+
+        (x + 9)**(1/3) - (x - 9)**(1/3) = 3.
+
+    Express your answer exactly in
+    terms of surds.
+
+    -- Mathematics Teacher
+
+Solution:
+
+    x = 4*sqrt(5) is the positive root.
+
+    Visualize this for some range of x to get an idea of what
+    is going on:
+    
+```{r}
+x=seq(8,10,length=100)
+y=rep(0,length(x))
+for (i in seq_along(x)) {
+    if (x[i]<9) {
+        y[i]=(x[i]+9)^(1/3)+(9-x[i])^(1/3) - 3
+    } else {
+        y[i]=(x[i]+9)^(1/3)-(x[i]-9)^(1/3) - 3
+    }
+}
+plot(x,y,type='b')
+abline(h=0,col='red',lwd=3)
+```
+
+So - we expect a solution somewhere near x=9.  This is confusing due to the sign
+issue for cube root of (x-9) for x<9.  We can eliminate this if we rearrange the
+equation and cube it:
+
+    (x+9)^(1/3) - (x-9)^(1/3) = 3
+    
+    (x+9)^(1/3) - 3 = (x-9)^(1/3)
+    
+    ((x+9)^(1/3) - 3)^3 = x-9
+    
+    (x+9) - 9 * (x+9)^(2/3) + 27 * (x+9)^(1/3) - 27 = x-9
+    
+    (18-27) - 9*(x+9)^(2/3) + 27*(x+9)^(1/3) = 0
+
+    -9 - 9*(x+9)^(2/3) + 27*(x+9)^(1/3) = 0
+    
+    1 + (x+9)^(2/3) - 3*(x+9)^(1/3) = 0
+    
+    Let u = (x+9)^(1/3) then x = u^3 - 9
+    
+    u**2 - 3*u + 1 = 0
+    
+    u = (3 +/- sqrt(9-4))/2
+    
+    Choosing the positive root:
+    
+    u = (3+sqrt(5))/2
+    
+    So
+    
+    x = u^3 - 9 = ((3+sqrt(5))/2)^3 - 9
+      = 4*sqrt(5)
+      ~ 8.944272
+
+
+## Problem 4
+
+    In a garden is a circular pond
+    with a horizontal bottom and vertical
+    sides. The owner of the garden
+    decides to erect a statue in the
+    middle of the pond. In preparation,
+    three identical cubical (solid and
+    impermeable) concrete blocks are
+    placed side by side in the pond to
+    form a base for the statue. When the
+    first block is placed in the pond, the
+    water level rises three inches. When
+    the second block is placed, the water
+    level rises another four inches. And,
+    when the third block is added, the
+    water level again rises four inches.
+    What is the length of the edges of
+    the blocks?
+
+    -- Almost Impossible Brain Bafflers
+    by Tim Sole and Rod Marshall
+
+Solution:
+
+    When the cubes are placed in the water they will
+    raise the water level based on their displacement.
+    If the cubes were fully submerged then adding each
+    cube would raise the water level by the same amount.
+    Since this does not occur, we know the first cube
+    is not fully submerged.  Whether or not the second
+    cube is full submerged is difficult to know.  We will
+    assume so and look for contradictions.
+    
+    A = cross sectional area of pond
+    h0 = initial water height
+    
+    V = A*h0 -> volume of water in pond
+    
+    Add first block (partially submerged):
+    
+        A*(h0+3)-S*S*(h0+3) = A*h0   [1]
+        
+    Add second block (two blocks fully submerged):
+    
+        A*(h0+7)-2*S*S*S = A*h0   [2]
+        
+    Add third block (three blocks fully submerged):
+    
+        A*(h0+11)-3*S*S*S = A*h0   [3]
+        
+    From equation [2]: 7*A-2*S*S*S = 0  --> A = (2/7)*S*S*S
+    From equation [3]: 11*A-3*S*S*S = 0 --> A = (3/11)*S*S*S
+    
+    CONTRADICTION!!!
+    
+    Second scenario:
+    
+    Add first block (partially submerged):
+    
+        A*(h0+3)-S*S*(h0+3) = A*h0   [1]
+        
+    Add second block (partially submerged):
+    
+        A*(h0+7)-2*S*S*(h0+7) = A*h0   [2]
+        
+    Add third block (three blocks fully submerged):
+    
+        A*(h0+11)-3*S*S*S = A*h0   [3]
+
+    From equation [1]: 3*A-S*S*(h0+3) = 0
+    From equation [2]: 7*A-2*S*S*(h0+7) = 0
+    
+    Combining: 1/3*(h0+3) = 2/7*(h0+7)
+       7*(h0+3) = 6*(h0+7)
+       h0 = 21 in
+
+    Substituting into equations [1-3]:
+    
+        [1] 3*A - 24*S*S = 0  -> A = 8*S*S
+        [2] 7*A - 56*S*S = 0  -> useless
+        [3] 11*A - 3*S*S*S = 0 -> 88*S*S - 3*S*S*S = 0
+        
+        S = 88/3 in
+          = 29.3333 in
+        
+        A = 8*S*S = 6883.556 in^2
+          = 47.802 ft^2
+
+
+## Problem 5
+
+    Using a standard set of 28 dominos,
+    Carl laid out in a row, in typical
+    domino style with ends matching,
+    e.g., 6-3, 3-5, 5-5, 5-1. He started with
+    0-0 and then added dominos, building
+    on either end of the string, so
+    that the total number of pips in the
+    row equaled 1, then 4, then 9, working
+    through each perfect square and
+    continuing as far as possible. His row
+    could not have been shorter at any
+    stage. When he reached the highest
+    square possible, he was left with five
+    unused dominos, four of which were
+    doubles. What were those five
+    dominos? List the complete order of the domino row of
+    your solution.
+
+    -- Adrian Somerfield in New Scientist
+
+TODO
+
+    Don't care
+    
+
+## Bonus
+
+    In the game of Thirty Five, each player is dealt
+    a hand of nine cards from a standard deck of 52 cards. To
+    win a pot, one must be able to select cards in a single suit
+    to obtain a score of 35, where face cards count 10, aces
+    count 1, and all other cards have their designated value.
+    What is the probability of getting a hand that can win the
+    pot?
+
+    -- Howard G. McIlvried III, PA Gamma'53
+
+Solution: try Monte-Carlo
+
+```{r}
+library(gtools)
+
+is_winner = function(h) {
+    for (r in 4:length(h)) {
+        a=combinations(length(h),r,h,set=F)
+        if (any(apply(a,1,sum)==35)) {
+            return(TRUE)
+        }
+    }
+    return(FALSE)
+}
+
+pipval=c(1,2,3,4,5,6,7,8,9,10,10,10,10)
+cards=0:51
+
+ntrials=1000000
+
+set.seed(2020)
+win=0
+for (trial in 1:ntrials) {
+    s=sample(cards,9)
+    winner=0
+    for (i in 0:3) {
+        h=pipval[s[trunc(s/13)==i]%%13+1]
+        if (sum(h)>=35) { 
+            if (is_winner(h)) {
+                winner=1
+            }
+        }
+    }
+    win=win+winner
+}
+print(win)
+print(win/ntrials)
+```
+
+Probability ~ 3.9113% (1e6 trials)
+
+    Pr         Trials    Seed
+    0.038966   1e6       42
+    0.039335   1e6       123
+    0.039265   1e6       2020
+    
+According to the closed form counting in the Bent:
+
+    Pr = 0.0391
+    
+    (143784024/3679075400)
+
+After looking at the solution I don't think counting is worth it.
+Random sampling is good enough for me.
+
+
+## Double Bonus
+
+    In 2006, the age of a famous composer
+    would be, if he were still alive, equal to 10 times 10 less
+    than his age when he died. His age at death equals 2006
+    minus the reverse of the year he died. Who is this composer?
+
+    -- Dr. Aziz S. Inan, CA Epsilon'78
+
+Solution:
+
+    b = year of birth
+    d = year of death = wxyz
+    a = age at death
+    
+    (2006-b) = 10*(d-b-10)
+    
+    (d-b) = 2006-zyxw
+    
+    Solve first equation for b: 2006-10*d+100 = -9*b -> b = (10*d-2106)/9
+    substituting in the second equation:
+    
+    (d-(10*d-2106)/9) = 2006-zyxw
+    
+    (9*d-10*d+2106)/9 = 2006-zyxw
+    
+    2106-d = 9*(2006-zyxw)
+    
+    2106-wxyz = 9*(2006-zyxw)
+    
+    By exhaustive elimination:
+    
+    d = wxyz = 1791 (year of death)
+    b = 1756
+    age at death = 35
+    
+    Famous Composer = Mozart

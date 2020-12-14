@@ -1,0 +1,654 @@
+---
+title: "Bent Spring 2002"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2002
+
+
+## Problem 1
+
+    Pam lives on Rhombus Road,
+    which has houses numbered from 3
+    to 99, inclusive. Ron is anxious to
+    learn her house number so he can call
+    on her, but Pam won't tell him. His
+    buddies, Art, Bill, Carl, and Don,
+    have a piece of information each
+    about the house number, but none
+    knows the actual number: Art
+    knows whether the house number is
+    a perfect square; Bill knows whether
+    it is a multiple of 3; Carl knows
+    whether it has one or two digits; and
+    Don knows whether it is a multiple of
+    5. Ron knows the type of information
+    each has. After questioning and getting
+    answers from Art, Bill, and Carl,
+    Ron thinks that Don's information
+    might confirm what Pam's number is.
+    After getting an answer from Don,
+    Ron says, "Now, if I knew whether
+    her number is odd or even, I'd be
+    sure." After wheedling the parity of
+    her number from Pam, Ron is sure
+    he knows her number. He buys flowers
+    and shows up at the address only
+    to find an abandoned house. Later,
+    he learns that Art and Bill had both
+    lied. What is Pam's house number?
+    
+    -- adapted from Brain Puzzlers
+    Delight by E.R. Emmet
+
+Solution: Must be house number 9.
+
+    Pam hour number is in the range [3,99]
+
+    Art knows if it is a perfect square
+    Bill knows if it is multiple of three
+    Carl knows if it has 1 or 2 digits
+    Don knows if it is a multiple of 5.
+
+    Ron thinks he needs Don's answer after
+    getting answers from Art, Bill, and Carl.
+
+    After Don's answer he needs to know if
+    the number is odd or even - Pam tells him.
+
+    He gets the answer wrong.
+
+    Art and Bill both lied.
+
+    What is the house number?
+
+    Possible perfect squares: 4,9,16,25,36,49,64,81
+
+    Answer possibilities
+
+    Art     Bill    Carl    Possibilities   Conclude
+    ------------------------------------------------
+    No      No      1       5, 7, 8
+    No      No      2       Many (56)
+    No      Yes     1       3, 6            Don not needed
+    No      Yes     2       Many (28)
+    Yes     No      1       4               Don not needed
+    Yes     No      2       16,25,49,64
+    Yes     Yes     1       9               Don not needed
+    Yes     Yes     2       36,81           Don not needed
+
+    Some of the cases do not require Don's input so we
+    can ignore these.  Of the remaining cases, 2 have so
+    many possibilities that Don wouldn't be good enough to
+    determine a final result.  This leaves two cases:
+
+    Art     Bill    Carl    Possibilities   Conclude
+    ------------------------------------------------
+    No      No      1       5, 7, 8
+    Yes     No      2       16,25,49,64
+
+    In the first case, if Don says it is not a multiple of
+    5 then he would need Pam's parity input to decide between
+    house numbers 7 and 8.  This is a possibility.
+
+    In the second case, no answer from Don can isolate the
+    answer to only odd/even.  If Don says it is a multiple of
+    5 then we don't need Pam.  If it is not a multiple of 5 then
+    it could be 16, 49, or 64.  Pam's input may not be definitive.
+
+    Conclude: we have the first case with a number that is not
+    a multiple of 5  (not sure which one -- but it is either house 7 or 8).
+
+    If Art and Bill both lied then the truth is:
+
+    Art     Bill    Carl    Possibilities   Conclude
+    ------------------------------------------------
+    Yes     Yes     1       9
+
+    Must be house number 9.
+
+
+## Problem 2
+
+    Once when I was visiting Upper
+    Slobovia where the currency is denominated
+    in oseps (each osep is
+    worth 100 ovatnecs) and the coins in
+    circulation have values of 5, 10, 20,
+    and 50 ovatnecs.  I was counting my
+    change and discovered that I had exactly
+    10 oseps worth of coins. Also,
+    to my surprise, I found that I had a
+    prime number of each kind of coin.
+    Then, I realized that I had the minimum
+    total number of coins I could
+    have under these conditions. How
+    many coins did I have? Remember,
+    1 is not a prime number.
+    
+    -- The Platinic Corner
+
+Solution:
+
+    50 ovatnec coins = 7
+    20 ovatnec coins = 31
+    10 ovatnec coins = 2
+    5 ovatnec coins  = 2
+    Total = 1000 ovatnecs
+
+Details: let us try this by hand
+
+    Coins = 5, 10, 20, and 50 ovatnecs
+    Prime number of each kind of coin --> Minimum of 2 of each
+    2*50+2*20+2*10+2*5 = 170 ovatnecs
+    
+    50 ovatnecs --> (1000-2*(5+10+20))/50 --> maximum of 17
+    20 ovatnecs --> (1000-2*(5+10+50))/20 --> maximum of 41
+    10 ovatnecs --> (1000-2*(5+20+50))/10 --> maximum of 83
+    5 ovatnecs  --> (1000-2*(10+20+50))/5 --> maximum of 167
+
+    Want to minimize total number of coins so probably want to maximize
+    use of the highest value coins.
+
+    Note: for the 5 ovatnecs coins the total value always ends in 5 except
+    for the case of 2 coins.  All the other totals end in zero so we must
+    have exactly 2 of these coins.
+    
+    Remaining coins must total 990 ovatnecs.  The following subtotals are
+    possible:
+
+    > 50*primes[primes<990/50]
+    [1] 100 150 250 350 550 650 850 950
+    > 20*primes[primes<990/20]
+    [1]  40  60 100 140 220 260 340 380 460 580 620 740 820 860 940
+    > 10*primes[primes<990/10]
+    [1]  20  30  50  70  110 130 170 190 230 290 310 370 410 430 470
+         530 590 610 670 710 730 790 830 890 970
+
+    Can't use max number of 50 ovatnec coins since this only leaves
+    40 ovatnecs and that is needed for the 20 ovatnec coins.  There is
+    nothing left for the 10 ovatnec coins.
+    
+    Try successively lower 50 ovatnec totals and all possibilities
+
+    50 ovatnecs   20 ovatnecs   10 ovatnecs   5 ovatnecs
+    -----------------------------------------------------
+    850           40            100 needed    10
+    850           60            80 needed     10
+    850           100           40 needed     10
+    850           140           0 needed      10
+    650           40            300 needed    10
+    650           60            280 needed    10
+    650           100           240 needed    10
+    650           140           200 needed    10
+    650           220           120 needed    10
+    650           340           0 needed      10
+    550           40            400 needed    10
+    550           60            380 needed    10
+    550           100           340 needed    10
+    550           140           300 needed    10
+    550           220           220 needed    10
+    550           260           180 needed    10
+    550           340           100 needed    10
+    550           380           60 needed     10
+    350           40            600 needed    10
+    350           60            580 needed    10
+    350           100           540 needed    10
+    350           140           500 needed    10
+    350           220           420 needed    10
+    350           260           380 needed    10
+    350           340           300 needed    10
+    350           380           260 needed    10
+    350           460           180 needed    10
+    350           580           60 needed     10
+    350           620           20 needed     10  --> feasible
+    
+    Need:
+    
+    50 ovatnec coins = 7
+    20 ovatnec coins = 31
+    10 ovatnec coins = 2
+    5 ovatnec coins  = 2
+    
+That was too hard.  Must be an easier way.
+
+I looked at their solution.  Here is what they did:
+
+    Let N=number of 5 ovatnec coins, D=10, Q=20, H = 50
+
+    Since the total is 1000 we must have an even number of
+    the 5 ovatnec coins.  Since 2 is the only even prime then
+    we must have 2 of these.  Then:
+
+        50*H + 20*Q + 10*D = 990
+        5*H  + 2*Q  + D    = 99
+
+    or
+
+        2*Q + D = 99 - 5*H
+
+    We want the minimum number of coins so we want the most
+    possible large denomination coins.
+
+    Since H<20 we can try successively smaller primes.  If we
+    assume H is odd then 2*Q+D must be even - so - D must be 2.
+
+    If this is the case then:
+
+        2*Q + 2 = 99 - 5*19 --> Q = 1 --> not prime
+        2*Q + 2 = 99 - 5*17 --> Q = 6 --> not prime
+        2*Q + 2 = 99 - 5*13 --> Q = 16 --> not prime
+        2*Q + 2 = 99 - 5*11 --> Q = 21 --> not prime
+        2*Q + 2 = 99 - 5* 7 --> Q = 31 --> PRIME!!! (max H, min total)
+        2*Q + 2 = 99 - 5* 3 --> Q = 41 --> PRIME!!!
+
+    Thus, for minimum coin count:
+
+        N = 2, Q = 31, D = 2, H = 7 --> total = 42 coins
+
+        N = 2, Q = 41, D = 2, H = 3 --> total = 48 coins X not minimum
+
+    There may be a solution for H = 2 then 2*Q+D and D must be odd.
+    This is more difficult to calculate:
+
+        2*Q + D = 99 - 5*2 = 89
+
+    Prime solutions:
+
+        D   Q   Total (not included 2D and 2H)
+        --------------------------------------
+        83   3  86
+        79   5  84
+        67  11  78
+        43  23  66
+        31  29  60
+        7   41  48
+        3   43  46
+
+    Since all of these totals exceed 42 the original solution
+    is the minimum.
+
+
+Verify with exhaustive search
+
+```{r}
+primes=read.table('primes.txt')[,1]
+zzz=c()
+for (c50 in primes[primes<1000/50]) {
+    for (c20 in primes[primes<1000/20]) {
+        for (c10 in primes[primes<1000/10]) {
+            for (c05 in primes[primes<1000/5]) {
+                t=50*c50+20*c20+10*c10+5*c05
+                if (t==1000) {
+                    print(paste(c50,c20,c10,c05,c50+c20+c10+c05))
+                }
+            }
+        }
+    }
+}
+```
+
+The minimum number of coins is obtained with:
+
+    50 ovatnecs = 7  -->  350
+    20 ovatnecs = 31 -->  620
+    10 ovatnecs = 2  -->   20
+    5 ovatnecs  = 2  -->   10
+    -------------------------
+    Total         42 --> 1000
+
+## Problem 3
+
+    Solve the following cryptic addition:
+    
+    YELLOW + YELLOW + RED = ORANGE
+    
+    The usual rules apply: each different
+    letter represents a different digit;
+    the same letter always represents
+    the same digit; and there are no
+    leading zeros.
+    
+    -- Technology Review
+
+Solution: in cryptic_arithmetic notebook
+
+    YELLOW = 143329
+    RED    = 846
+    ORANGE = 287504
+
+
+## Problem 4
+
+    Consider the letters from A
+    through M. If all possible 13-letter
+    permutations (no repeated letters)
+    of these letters are arranged in alphabetical
+    order, what is the
+    1,234,567,890th permutation in the
+    list?
+    
+    -- adapted from
+    Mathematics Teacher
+
+Solution: my original solution was the zero based counting
+
+    Zero based = [C, H, M, D, B, E, L, I, J, K, A, F, G]
+
+    Note the Bent solution is not the same:
+
+          [C, H, M, D, B, E, L, I, J, G, K, F, A]
+
+    I think they may be correct and my solution is actually off
+    by one.
+
+    If I use my code and let n=1234567890-1 I get their solution.
+
+    I think this is the difference between starting the count at
+    zero and starting the count at 1.  If I ask my code for
+    permutation 1 it actually swaps the last two letters.
+    If I ask for permutation 0 I get the original sequence.
+
+    The solution is the same up to the last four characters.
+
+    The solution method they outline is the same one I developed.
+
+    The next Bent acknowledges this as the hardest problem but they
+    do not acknowledge that they have an error.
+
+    For each choice of the first letter there are 12! permutations to
+    follow.
+
+    Axxxx  removes 12! possibilities
+    Bxxxx  removes 12! possibilities
+
+    This leaves 1234567890 - 2*12! = 276564690 permutations
+    This is not enough to cover all the Cxxx permutations so
+    the first character must be C.
+
+    We can eliminate C from the list and start over with 27656490
+    permutations of the set ['A','B','D',...]
+
+    We remove all the Axxx for 11! possibilities, etc. until we
+    determine the next character and remove it from the set.
+
+    Repeat this for all the remaining positions removing 10!, 9!, etc.
+    possiblities per letter as the set length is reduced.
+
+
+    Example code:
+
+    n=1234567890  --> should be one less as noted above
+
+    zzz=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M']
+
+    for i in range(12,-1,-1):
+        m=(n//math.factorial(i)); print(m,zzz[m]); del zzz[m]
+        n=n%math.factorial(i)
+    
+    2  C
+    6  H
+    10 M
+    2  D
+    1  B
+    1  E
+    6  L
+    3  I
+    3  J
+    3  K
+    0  A
+    0  F
+    0  G
+
+## Problem 5
+
+    At a recent party at my house, I
+    burned two cylindrical candles. I lit
+    the red candle, which was 2 cm
+    longer than the white candle, at
+    4 p.m., and I lit the white candle 15
+    minutes later. At 8 p.m. I noticed
+    that they were the same length. The
+    red candle burned out at midnight,
+    and the white candle burned out an
+    hour later. If each candle burned at
+    its own steady rate, what were their
+    original lengths?
+    
+    -- nearly impossible Brain Bafflers
+    by Tim Sole and Rod Marshall
+
+Solution:
+
+    The red and white candles are the same length at 8 pm.
+    The red candle burns to extinction in 4 hours.
+    The white candle burns to extinction in 5 hours.
+
+    The burn rate of the red candle = 5/4 * white burn rate.
+
+    The white candle height at time 0 = H
+    The white candle total burn time = 9-1/4 hours = 8+3/4 hours
+        = 35/4 hours
+    White candle burn rate = H / (35/4) = 4*H/35
+
+    The red candle height at time 0 = H+2
+    The red candle total burn time = 8 hours
+    Red candle burn rate = (H+2)/8
+
+    So: (H+2)/8 = 5/4 * 4*H/35 = H/7
+    or: H+2 = 8/7 * H
+    or: 2 = 1/7 * H
+    or: H = 14
+
+    White candle length = 14
+    Red candle length = 16
+
+    Sanity check:
+
+    Red candle burn rate = 16/8 = 2 cm / hour
+    White candle burn rate = 4/5 * 2 = 8/5 cm / hour
+    White candle burn time = 14 / (8/5) = 35/4 hours [QED]
+
+
+## Bonus
+
+    A satellite is in an equatorial
+    circular orbit 400 km above the
+    surface of the earth. To place the
+    satellite in geosynchronous orbit, its
+    engine must be fired twice, once to
+    place it into an elliptical transfer orbit
+    with apogee at the geosynchronous
+    altitude, and again at this
+    apogee to place it in circular geosynchronous
+    orbit. By how much, in
+    m/s, must the magnitude of the
+    satellite's velocity be increased at
+    each burn?
+    
+    -- C.K. Galer , MI A'77
+
+Solution:  I gave up and looked at the answer.  Very complex.
+
+    First burn delta V = 2399 m/s
+    Second burn delta V = 1457 m/s
+
+Many questions:
+
+1. I am not sure I understand why you can substitue ellipse axis
+   in place of radius -- but I will accept it.
+
+2. Also -- why is geosynchronous period 86164 instead of 86400?
+   I guess this is 24 hours minus the fraction of a day the
+   earth moves during this time.  If we assume a year is 365.24
+   days then `86400*(1-1/365.24) ~ 86163.44`.  The value is given
+   as precisely 86164 so maybe this is a better estimate of the
+   length of a year.
+
+3. Why is the potential energy negative?
+
+The total energy of the system changes when a burn occurs but it
+remains constant between burns.  This means that as the radius
+increases the speed must decrease.  If the potential energy was
+a positive value then as radius increases the value decreases.
+If the total energy was constant this would require an increase
+in velocity -- which is clearly wrong.  I guess this means the
+sign convention adopted below is correct.
+
+Many additional pieces of information are required:
+
+    Mass of Earth = 5.983e24 kg
+    Radius of Earth = 6378 km
+    G = 6.67e-11 m^3/kg s^2
+    For geosynchronous orbit: T = 86164 seconds (???)
+
+    Basic strategy:
+
+        E = K + U, K=Kinetic energy, U=Potential energy
+
+        K = 1/2 * m * v**2
+        U = - G*M*m/r**2 * r = -G*M*m/r
+
+        Centripetal force = Gravity
+        
+        m*v**2/r = G*M*m/r**2
+
+        Solving the last one for v**2 = G*M/r, so
+
+        K = 1/2 * m * G*M/r = G*M*m/(2*r)
+        U = -G*M*m/r
+
+        E = K+U = G*M*m/(2*r) - G*M*m/r = -G*M*m/(2*r)
+
+    For an elliptical orbit:
+
+        Same equations apply for E except replace r with a where
+        a is the major semi-axis. (Why???)
+
+        For any orbit: K = E - U
+
+            1/2*m*v**2 = -G*M*m/(2*a) + G*M*m/r
+                       = G*M*m*(1/r-1/(2*a))
+                  v**2 = G*M*  (2/r-1/a)
+                  v    = sqrt(G*M*(2/r-1/a))
+
+        For a cirular orbit: a=r so
+
+                  v    = sqrt(G*M/r)
+
+    Then they go nuts with subscripts.  i = initial orbit, g =
+    geosynchronous orbit, t is the transfer orbit, a = apogee,
+    and p is the perigee.
+
+    In the initial orbit:
+
+        vi = sqrt(G*M/ri)
+
+            G, M given above
+            ri = Radius of earth+height of orbit
+
+        vi = sqrt(6.67e-11 * 5.983e24 / (6378e3 + 400e3)
+           = 7673 m/s
+
+    In the geosynchronous orbit:
+
+        v = 2*pi*r/T --> vg = 2*pi*rg/Tg = sqrt(G*M/rg)
+        (2*pi/Tg)**2 * rg**2 = G*M/rg
+        rg **3 = G*M/(2*pi/Tg)**2 = G*M*Tg**2/(4*pi**2)
+
+        But: Tg = 86164 so
+
+        rg = ((G*M*86164**2)/(4*pi**2)) ** 1/3
+           = 42181 km
+
+        vg = sqrt(G*M/rg)
+           = 3076 m/s
+
+    In between (the transfer orbit): we slow down as we increase
+    the radius.  We are trading kinetic for potential energy.
+
+    The elliptic axis is 1/2 average of the two radii.
+
+        a = 1/2 * ((6378+400)+42181) = 24480 km
+
+    During the transition we have two different radii to
+    consider: the min radius (perigee) and max radius (apogee).
+    These must be considered separately:
+
+    Initial orbit: ri= 6778 km, vi=7673 m/s
+    Final   orbit: rg=42181 km, vg=3076 m/s
+
+        v = sqrt(G*M*(2/r - 1 /a)
+
+    At low point:  v = sqrt(G*M*(2/6778e3 - 1/24480e3))
+                     = 10072 m/s
+
+    At high point: v = sqrt(G*M*(2/42181e3 - 1/24480e3))
+                     = 1619 m/s
+
+    So - to get started in the transfer process we need to speed
+    up from 7673 m/s to 10072 m/s = 2399 m/s.
+
+    When we get out to geosynchronous orbit we will have slowed
+    way down (to 1619 m/s) and we need to speed up the geosynchronous
+    speed: go from 1619 m/s up to 3076 m/s = 1457 m/s
+
+    So:
+
+    First burn delta V = 2399 m/s
+    Second burn delta V = 1457 m/s
+
+    Sanity check for the transfer burn doing the calculations at
+    full floating point precision:
+
+        E = 1/2*m*v**2 - G*M*m/r
+    so:
+        E/m = 1/2*v**2 - G*M/r
+
+    Transfer perigee: E/m = -8151100.807458311
+    Transfer apogee:  E/m = -8151100.807458315
+
+    Which agrees up to the final digit!
+
+
+## Double Bonus
+
+    Ann and Brandon
+    play the following game. First, Ann
+    puts $1 in the pot. Then, they take
+    turns tossing a coin, with Brandon
+    tossing first. If Brandon gets heads,
+    he takes $1 from the pot; if he gets
+    tails, he adds $1 to the pot. Then,
+    Ann tosses the coin. If Ann gets
+    heads, she takes $1 from the pot; but
+    if she gets tails, she neither takes
+    anything from the pot nor adds anything
+    to the pot. They continue taking
+    turns tossing the coin until the
+    pot is empty, at which time the game
+    ends. Is this a fair game? If so, why?
+    If not, why not?
+    
+    -- Nikolaus Bernoulli (1687-1759)
+
+Solution:  I cheated and saw the solution.  Very clever.
+
+    The game is fair.
+
+    This is a zero sum game.  That means that if it
+    is fair for one player then it is fair for the
+    other.  The result for Ann is difficult to
+    determine but the result for Brandon is clearly
+    a fair game.
+
+    Observe: if it is fair for Brandon then it is fair for Ann.
+    The rules for Ann could be arbitrarily complex and it would
+    not change the results for a two person game.
+

@@ -1,0 +1,304 @@
+---
+title: "Bent Winter 2013"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2013
+
+
+## Problem 1
+
+    I am participating in a Super Bowl XLVII
+    betting pool. You know, the kind consisting
+    of a 10x10 grid with the cells numbered 00 to
+    99, where the first digit refers to the last
+    digit of the AFL team's score, and the second
+    digit refers to the last digit of the NFL
+    team's score. Each participant pays $1 per
+    square, and $25 is paid to the person holding
+    the winning number at the end of each
+    quarter. I paid $2 for two squares, picked
+    two slips at random from the basket, and got
+    00 and 88. A friend who arrived after all
+    the squares were taken, wants to buy my
+    numbers. What is a fair price for each of my
+    numbers? The following table provides data on
+    the final digits for the quarterly scores of
+    the 46 previous Super Bowls.
+
+    Final Digit   0  1 2  3  4  5  6  7 8  9
+    Number of   101 21 9 56 38 10 30 77 9 17
+    Appearances
+
+-- Don A. Dechman, TX A'57
+
+Solution:
+
+    We should be able to enuerate the probabilities
+    
+```{r}
+p=c(101,21,9,56,38,10,30,77,9,17)
+
+p0 = p[1]/sum(p); p00=p0^2
+p8 = p[9]/sum(p); p88=p8^2
+
+e00=0
+e88=0
+for (i in 0:4) {
+    e00=e00+(25*i)*(choose(4,i)*p00^i*(1-p00)^(4-i))
+    e88=e88+(25*i)*(choose(4,i)*p88^i*(1-p88)^(4-i))
+}
+print(paste0("Expected winnings for 00 = ",round(e00,2)))
+print(paste0("Expected winnings for 88 = ",round(e88,2)))
+
+# Alternate method
+print("Alternate solution method:")
+print(paste0("E(00) = ",4*25*p00))
+print(paste0("E(88) = ",4*25*p88))
+```
+
+Using Combinatorics:
+
+    [1] "Expected winnings for 00 = 7.53"
+    [1] "Expected winnings for 88 = 0.06"
+
+Just quadrupling the probability (alternate solution method):
+
+    [1] "E(00) = 7.53263823251418"
+    [1] "E(88) = 0.059812145557656"
+
+
+## Problem 2
+
+    Two spherical soap bubbles, each 10 cm in
+    diameter, coalesce to form a "double bubble"
+    consisting of two truncated spheres joined at
+    their flat surfaces with a plane circular
+    interface between them. What is the area of
+    the interface? Assume that the volume of the
+    double bubble is equal to the sum of the
+    volumes of the two original bubbles.
+
+    -- Howard G. McIlvried III, PA Gamma'53
+
+Solution:
+
+    It appears that this problem is underconstrained.
+    You could imagine many truncated sphere pairs that
+    meet the volume constraint.
+    
+    I peeked at the solution.  The key is to minimize
+    the surface area of the "double bubble".
+
+    With this in place it should be possible to calculate
+    a unique solution.
+
+
+## Problem 3
+
+    The newly crowned king of Cashtopia has
+    decided to replace the coins in use with a
+    new coinage bearing his image. Being
+    interested in efficiency, he wants to have
+    only three different coins. Furthermore, he
+    wants the denominations chosen so that the
+    average number of coins required to make
+    change for any amount from 1 cent through 99
+    cents is a minimum. Assuming that the need to
+    make change for any value between 1 and 99 is
+    equally likely, what three denominations
+    should he choose? If more than one set gives
+    the minimum, the king prefers the one with
+    the smallest sum for the three coins.
+
+    -- Doctor Ecco's Cyberpuzzles by Dennis E.
+    Shasha, CT A'77
+
+Solution:
+
+    Exhaustive search should be fast enough.
+    
+```{r}
+make_change = function(n,a,b,c) {
+    na=trunc(n/a)
+    n=n %% a
+    nb=trunc(n/b)
+    n=n %% b
+    nc=trunc(n/c)
+    n=n %% c
+    if (n != 0) {
+        return(c(-1,-1,-1))
+    }
+    return(c(na,nb,nc))
+}
+
+nmax=9999
+for (c in 1:97) {
+    for (b in (c+1):98) {
+        for (a in (b+1):99) {
+            ncoins=0
+            for (target in 1:99) {
+                x=make_change(target,a,b,c)
+                if (x[1]<0) {
+                    ncoins=99999
+                    break
+                } else {
+                    ncoins=ncoins+sum(x)
+                }
+            }
+            nmean=ncoins/99
+            if (nmean<=nmax) {
+                nmax=nmean
+                print(paste(nmax,a,b,c))
+            }
+        }
+    }
+}
+```
+
+The best performance is obtained with coins of 22, 5, and 1.
+The mean number of coins required for change is 5.3131...
+
+The equivalent performance occurs with 23,5,1 but this sum is higher.
+
+
+## Problem 4
+
+    How many distinct trapezoidal decompositions
+    (sum of consecutive positive integers) does n
+    have? For example, 15 = 7+8 = 4+5+6 =
+    1+2+3+4+5 has three.
+
+    -- Technology Review
+
+Solution: Hmmmmm .... need to work on this.
+
+    Let us try out some numbers and see if we get
+    a pattern:
+    
+    n  Decompositions
+    ----------------------
+    1  1
+    2  none
+    3  1+2
+    4  none
+    5  2+3
+    6  none
+    7  3+4
+    8  none
+    9  4+5,2+3+4
+    10 1+2+3+4
+    11 5+6
+    12 3+4+5,
+    
+    I would never have gotten it.  This involves the number
+    of factors and realizing that even factors don't matter.
+    
+    Given N = 2^k * M then the number of trapezoidal decompositions
+    (TD) is 1 less than the number of factors of M.
+    
+    Recall that if we get the prime factors of M and they have
+    multiplicities m1, m2, ... the number of factors is:
+    
+        (1+m1)*(1+m2)*...
+        
+    So: TD = (1+m1)*(1+m2)*... - 1
+    
+    In the case of 15 = 3*5 we have each prime factor with mi=1 so
+    
+    TD(15) = (1+1)*(1+1)-1 = 3 decompositions (as given in the problem).
+    
+    In the case of N = 90 = 2*(3^2*5)
+    
+    TD(45) = (1+2)*(1+1) - 1 = 5 decompositions as given in Bent solution.
+
+
+## Problem 5
+
+    The game of Spot-It consists of a deck of
+    cards, with eight pictures on each card.
+    Between any two cards, there is one, and only
+    one, matching picture. If each picture occurs
+    the same number of times in the full deck,
+    what is the maximum number of cards in the
+    deck?
+
+    -- Steve Schaefer via mathrec.org
+
+TODO
+
+    meh
+    
+
+## Bonus
+
+    N&Ns come in two colors: red and green; and
+    there is always the same total number in each
+    package (less than 50) with the same ratio of
+    red to green. Al and Beth have each eaten two
+    packages of N&Ns over the last couple of
+    days. Al just reaches into the package and
+    randomly chooses an N&N. With his first
+    package, when he had eaten the last red N&N,
+    he saw that he had one green left. With his
+    second package, when he had eaten the last
+    red, he had two greens left. He later
+    calculated that the situation with the first
+    package is four times as likely as the
+    situation with the second package. Beth uses
+    a different approach; until she runs out of
+    one color, she flips a coin and eats a red if
+    heads and a green if tails. With her first
+    package, when she had eaten the last red N&N,
+    she noted the number of greens left. With her
+    second package, when she had eaten the last
+    red, she had one more green left than with
+    her first package. Beth also made some
+    calculations and determined that the number
+    of greens left with the first package is four
+    times as likely as the number left with the
+    second package. How many red and how many
+    green N&Ns are in a package?
+
+    -- Susan Denham in New Scientist
+
+TODO
+
+
+## Double Bonus
+
+    What is the remainder when 2^(4,700,063,497)
+    is divided by 4,700,063,497?
+
+    -- Adapted from Prime Numbers, the Most
+    Mysterious Figures in Math by David Wells
+
+Solution:
+
+    Brute force remainder is ???
+    Does not work with gmp -- may need Python
+    The exponent exceeds the gmp implementation limit
+    for the pow() function.  They probably used 32
+    bit integers internally!
+    
+    Switched to python brute force = 3
+
+    OK - probably could have done this with gmp using
+    the shortcut in the Bent.  I think they are saying:
+    
+    (a*b) mod m = ((a mod m) * (b mod m)) mod m
+    
+    They decompose the exponent into binary and then
+    calculate each term mod m, the product mod m and
+    have their result.
+
+    I should probably try that.
+    
+    This reminds me of the modulo calculations done
+    in my investigation of prime numbers.

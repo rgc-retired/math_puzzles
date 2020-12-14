@@ -1,0 +1,434 @@
+---
+title: "Bent Spring 2016"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2016
+
+
+## Problem 1
+
+    Solve the following cryptic multiplication.
+    Each different letter stands for a different
+    digit, and each different digit is always
+    represented by the same letter; there are no
+    leading zeros.  TRY*THIS = TICKLER
+
+    -- H. G. McIlvried III, PA Gamma'53
+
+Solution: solved in cryptic arithmetic notebook
+
+      TRY * THIS = TICKLER
+
+    a=make_crypt_df('trythistickler')
+    k=(make_num(a,'try')*make_num(a,'this') == make_num(a,'tickler'))
+    k=k&(a$t != 0)
+    sum(k)
+    [1] 1
+    a[k,]
+            t r y h i s c k l e
+    3620205 9 8 6 2 0 3 7 4 1 5
+
+    TRY = 986
+    THIS = 9203
+    TICKLER = 9074158
+
+## Problem 2
+
+    What is the largest integer n such that
+    7^2048 - 1 is exactly divisible by 4^n?
+
+    -- 2015 Quant Quiz, National Museum of
+       Mathematics
+
+Solution:
+
+    Should be able to brute force this with gmp.
+    
+```{r}
+library(gmp)
+
+n1=as.bigz(7)^2048-1
+
+for (n in 1:2874) {
+    n2=as.bigz(4)^n
+    if (n1%%n2 == 0) { maxn=n }
+}
+print(sprintf("Maximum value of n = %d",maxn))
+```
+
+The maximum value of n = 7
+
+
+## Problem 3
+
+    On their birthday, twins Jackie and Jill
+    received from their uncle a set of 12 wooden
+    cubes and a two-pan balance. Each cube was a
+    different color and integral number of cm (1
+    through 12 cm) on a side, but they all were
+    the same density. The colors of the cubes
+    were azure, brown, crimson, drab, ebony,
+    fuchsia, gold, heliotrope, ivory, jade,
+    khaki, and lilac, not in order of size. Their
+    uncle challenged the twins to find
+    combinations that balanced some of the cubes
+    against others. Four of the balances the
+    twins discovered were: (1) the drab and gold
+    cubes balanced the brown and heliotrope
+    cubes; (2) the khaki cube balanced the azure,
+    ebony, and lilac cubes; (3) the ebony, gold,
+    jade, and khaki cubes balanced the azure,
+    brown, drab, fuchsia, heliotrope, and ivory
+    cubes; and (4) the brown cube balanced the
+    drab, ivory, and khaki cubes. When they were
+    called in to supper, they ran in quickly,
+    forgetting to take their cubes with them. It
+    rained that night and washed the colors off
+    all the cubes. The twins were very unhappy
+    and asked to have the cubes repainted in the
+    same way as they were originally. Match the
+    size of each cube to its original color.
+
+    -- Madachy's Mathematical Recreations by
+       Joseph S. Madachy
+
+TODO
+
+    meh
+
+
+## Problem 4
+
+    On their next birthday, the twin's uncle gave
+    them a big pile of unpainted 1-cm cubes and
+    suggested they glue some of the cubes
+    together to make larger cubes. Jill quickly
+    produced a larger cube (without any voids).
+    Not to be outdone, Jackie formed an even
+    larger cube (also without any voids). Then,
+    each twin painted some of the faces of her
+    large cube. As happened the previous year,
+    when they were called in to supper, they left
+    their cubes outside, and the next morning
+    found that an overnight rain had dissolved
+    the glue (but had not washed off any paint).
+    Each twin examined the pile of small cubes
+    that had made up her large cube, and each
+    found that exactly 100 of her small cubes had
+    no paint on any of their faces. How large was
+    each twin's cube, and how many of its faces
+    had each twin painted?
+
+    -- Adapted from Mathematical Puzzling by A.
+       Gardiner
+
+TODO
+
+    meh
+
+
+## Problem 5
+
+    You have a copy machine that lets you scale
+    your original from 100% (no enlargement) to a
+    maximum of 155% in increments of 1%. How can
+    you use this machine to produce a copy of a
+    square picture such that the length of the
+    side of the final copy is exactly double the
+    length of the side of the original? (A
+    setting of xxx% means that the ratio of the
+    length of the side of the copy to the length
+    of the side of the original is x.xx.)
+
+    -- Mathematics Teacher
+
+Solution:  can try exhaustive search with 2, 3, 4, ...
+enlargements.
+
+    Apparently you can not shrink the size - just
+    expand - so we need to look for products.
+
+```{r}
+
+n=c()
+for (a in 100:154) {
+    for (b in (a+1):155) {
+        d=a*b
+        if ((d %% 10000) == 0) {
+            n=append(n,c(a,b))
+        }
+    }
+}
+print(n)
+```
+
+    Well -- two attempts won't work.
+    Let's try more.  May need to go recursive.
+    Not really sure how to approach this problem.
+    Let us try three
+    
+```{r}
+n=c()
+for (a1 in 100:155) {
+    for (a2 in 101:155) {
+        for (a3 in 101:155) {
+            d=a1*a2*a3
+            if (d==2000000) {
+                n=append(n,c(a1,a2,a3))
+            }
+        }
+    }
+}
+n=matrix(n,ncol=3,byrow=T)
+print(n)
+
+```
+
+Apparently it can be done in three tries: 125%, 125% and 128%.
+
+
+## Bonus
+
+    The number
+    
+    365 = 13^2 + 14^2 = 10^2 +11^2 +12^2
+    
+    is the smallest integer which is both
+    the sum of the squares of two consecutive
+    positive integers and the sum of the squares
+    of three consecutive positive integers. The
+    second smallest such integer is 
+    
+    35,645 = 133^2 + 134^2
+           = 108^2 + 109^2 + 110^2. 
+           
+    What is the tenth smallest such integer
+    and what is the exact ratio of the
+    (n+1)st such integer to the nth such
+    integer as n gets very large? We want the
+    ratio in terms of simple mathematical
+    functions, such as surds. A computer is
+    not necessary, except to do the math.
+
+    -- Time Travel and Other Mathematical
+    Bewilderments by Martin Gardner
+
+Solution:
+
+    Exhaustive search.
+    
+    We can generate candidates as: n^2+(n+1)^2+(n+2)^2 = i
+    Check to see if this is the sum of consecutive squares.
+    
+    This is taking a really, really long time.  Still only have the
+    first seven after ~ 60 minutes of running:
+    
+    365              = 5 73
+    35645            = 5 7129
+    3492725          = 5 5 139709
+    342251285        = 5 1321 51817
+    33537133085      = 5 29 29 1061 7517
+    3286296790925    = 5 5 337 2909 134089
+    322023548377445  = 5 149 432246373661
+
+
+    About the only pattern I see is that they are all multiples of 5.  They also
+    have only a few prime factors but not sure if that is relevant.
+    
+    Eventually I gave up and looked up the solution.  The key is writing the
+    expressions properly, reorganizing them, and then recognizing that this
+    is a Pell equation:
+    
+    N = n^2 + (n+1)^2 = (m-1)^2 + m^2 + (m+1)^2
+    
+        (2*n^2 + 2*n + 1 = 3*m^2 + 2) * 2
+      
+        (4*n^2 + 4*n + 1) + 1 = 6*m^2 + 4
+      
+        (2*n+1)^2 + 1 = 6*m^2 + 4
+      
+        (2*n+1)^2 - 6*m^2 = 3
+      
+    Let p = 2*n+1, then:
+    
+        p^2 - 6*m^2 = 3  which is a Pell equation.
+        
+[Pell Equation on Wikipedia](https://en.wikipedia.org/wiki/Pell%27s_equation)
+
+    Unfortunately, all of these results apply to p^2-6*m^2=1.
+    The three on the RHS makes this a problem.
+    
+    Considering p^2-6*m^2=1:
+    
+    There are tables of primitive solutions for this equation.
+    Once the primitive solution is known there are recurrence
+    relations to generate infinite additional solutions:
+    
+    The smallest solution is: p=5, m=2
+    
+    Additional terms may be solved from the relationship:
+    
+    p(k+1) = p(1)*p(k)+n*m(1)*m(k)
+    m(k+1) = p(1)*m(k)+m(1)*p(k)
+
+    These generate the terms:
+    
+    p(k)      m(k)      n(k)
+    ---------------------------
+    5         2         2
+    49        20        24
+    485       198       242
+    4801      1960      2400
+    47525     19402     23762
+    470449    192060    235224
+    
+    Now we nee to figure out how to apply this to the real problem:
+    
+[A more general Pell Equation](https://math.stackexchange.com/questions/1719280/does-the-pell-like-equation-x2-dy2-k-have-a-simple-recursion-like-x2-dy2)
+
+    If we have:
+    
+        X^2 - d^Y^2 = k, k != 1 then we need to find a solution.
+        
+    After that we can solve the related Pell equation:
+    
+        X^2 - d*Y^2 =1 for (u,v) then
+        
+    We can recurse the first solution as:
+    
+        x(n+1) = u*x(n) + d*v*y(n)
+        y(n+1) = v*x(n) + u*y(n)
+
+    In our case we have a solution of the first equation:
+    
+    p=3, m=1 (any solution - found by trial and error)
+    
+    For the second equation we have u=5, v=2 (from Wikipedia)
+    
+    So:
+
+        p(2) = 5*3 + 6*2*1 = 27
+        m(2) = 2*3 + 5*1   = 11
+        N = (m-1)^2 + (m^2) + (m+1)^2 = 365
+        
+    and:
+    
+        p(3) = 5*27 + 6*2*11 = 267
+        m(3) = 2*27 + 5*11 = 109
+        N = 35645
+        
+    and
+    
+        p(4) = 5*267 + 6*2*109 = 2643
+        m(4) = 2*267 + 5*109 = 1079
+        N = 3492725
+        
+    etc.
+    
+    Tabulating yields:
+    
+    N
+    -------------------------
+    1  365
+    2  35645
+    3  3492725
+    4  342251285
+    5  33537133085
+    6  3286296790925
+    7  322023548377445
+    8  31555021444198565
+    9  3092070077983081805
+    10 302991312620897818205
+
+    The algebraic ratio is harder to explain so I will just adopt the Bent
+    notation:
+    
+        p0^2 - 6*m0^2 = 1   (Pell's equation)
+        
+    and
+    
+        r^2 - 6*s^2 = 3   (the generalized equation)
+        
+    To generate additional solutions:
+    
+        (p[0]+m[0]*sqrt(6))^n * (r+s*sqrt*6)) = (p[n]+m[n]*sqrt(6))
+        
+        Where p[0]=5, m[0]=2, initial state r=3, s=1
+
+    For the next (r,s) in the solution sequence we have:
+    
+        Ratio = (p[0]+m[0]*sqrt(6))^(n+1) * (r+s*sqrt(6)) / (p[0]+m[0]*sqrt(6))^(n)
+        
+              = (p[0]+m[0]*sqrt(6)) * (r+s*sqrt(6))
+              
+              = (5 + 2*sqrt(6)) * (r+s*sqrt(6))
+              
+    This is the ratio for m[n]/m[n+1].  The number we are finding is N ~ m^2 so
+    
+        Ratio^2 = 49 + 20*sqrt(6) ~ 97.98979485566355
+
+    This problem was hard!
+
+Preserved for prosperity but it would never have finished before the expiration of
+the life of the universe!
+
+Do not actually try to run this.
+
+```{r, eval=FALSE}
+library(gmp)
+
+isqrt=function(n) {
+    xold=as.bigz(n)
+    while(T) {
+        xnew = as.bigz((xold+as.bigz(n/xold))/2)
+        if (xnew == xold) { break }
+        if (xnew == (xold+1)) {
+            break
+        }
+        xold=xnew
+    }
+    return(xnew)
+}
+
+
+nlist=c()
+n=as.bigz(1)
+while(T) {
+    n1=n^2+(n+1)^2+(n+2)^2
+    n2=as.bigz((isqrt(2*n1-1)-1)/2)
+    if (n2^2 + (n2+1)^2 == n1) {
+        nlist=append(nlist,n1)
+        print(nlist)
+        if (length(nlist)>=10) { break }
+        n=n*9.88
+    } else {
+        n=n+1
+    }
+}
+```
+
+
+## Computer Bonus
+
+    What are the smallest and next smallest bases
+    for which the integer ba exactly divides
+    abcde? For bases 11 and higher, letters are
+    used to represent digits greater than 9, that
+    is, a is used to represent 10, b to represent
+    11, c for 12, etc. Present your answer as
+    base 10 integers.
+
+    -- Don A. Dechman, TX A'58
+
+TODO
+
+    Never would have found this.
+    
+    The bases are 1182 and 14194.

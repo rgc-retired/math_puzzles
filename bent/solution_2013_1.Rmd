@@ -1,0 +1,420 @@
+---
+title: "Bent Spring 2013"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2013
+
+Generally not a good problem set.
+
+## Problem 1
+
+    Joe has wired 100 bulbs, labeled 1 to 100,
+    into an electrical circuit along with a
+    button switch. He starts with all the bulbs
+    unlit. When he pushes the button, every light
+    lights. When he pushes it a second time,
+    every second light (i.e., lights 2, 4, 6,
+    etc.) goes off. On the third push, every
+    third light changes status, that is, if it is
+    off, it turns on, and if it is on, it turns
+    off. On the fourth push the same thing occurs
+    for every fourth light, and so on for the
+    fifth through hundredth pushes. At this
+    point, how many lights are lit?
+
+    -- The Electric Toilet Virgin Death Lottery
+    and Other Outrageous Logic Problems, by
+    Thomas Byrne and Tom Cassidy
+
+Solution:
+
+    Try brute force - It says there are 10 lights on.
+    The lights that remain on are the perfect squares:
+    
+    > which(bulbs)
+     [1]   1   4   9  16  25  36  49  64  81 100
+    
+```{r}
+bulbs=rep(T,100)
+for (n in 2:100) {
+    for (i in seq(n,100,n)) {
+        bulbs[i]=!bulbs[i]
+    }
+}
+print(sum(bulbs))
+```
+
+
+## Problem 2
+
+    As part of an experiment to study the
+    alertness of students, the letters A to F
+    were permuted and briefly shown (in the form
+    of a six letter "word") to seven students.
+    After an hour, the students were asked to
+    write down the order of the letters. What the
+    students wrote was: Greg, BCDAEF; Hal,
+    DAEFBC; Ivan, ABEFDC; Jill, BCFDEA; Kate,
+    AEBDFC; Lila, CFEABD; and Mel, DCAEFB. The
+    students were then asked a series of
+    questions that each answered based on what he
+    or she had written as his or her recollection
+    of the order of the letters. For each
+    possible pair of letters, they were asked if,
+    reading from left to right, one letter came
+    before another. A typical question was, "Does
+    A come before D?" (The letters in the
+    questions were always in alphabetical order.)
+    Each student got a different even number of
+    questions correct. (No one had them all
+    wrong.) What was the correct order of the
+    letters?
+
+    -- Susan Denham in New Scientist
+
+TODO
+
+    meh
+
+
+## Problem 3
+
+    A typical roll of NECCO(R) wafers contains 40
+    wafers with a random distribution of eight
+    different flavors. Suppose NECCO(R) decides to
+    make sample rolls containing only 12 wafers.
+    What is the probability that a twelve-wafer
+    roll will have at least one wafer of each
+    flavor? Assume that the rolls are made up
+    from batches of wafers that contain equal
+    numbers of each flavor and that the wafers in
+    each roll are selected at random.
+
+    -- Howard G. McIlvried III, PA Gamma'53
+
+Solution:
+
+    Try Monte-Carlo
+    
+```{r}
+ntrials=100000
+
+set.seed(42)
+n=0
+for (trial in 1:ntrials) {
+    s=sample(8,12,replace=T)
+    if (length(unique(s))==8) {
+        n=n+1
+    }
+}
+print(paste0("n = ",n))
+print(paste0("Pr = ",n/ntrials))
+```
+
+Results of random sampling:
+
+    Seed   Trials Pr
+    ======================
+    42     100K   0.09333
+    42     1000K  0.092724
+    123    1000K  0.093373
+    2020   1000K  0.093218
+
+    Bent analytical solution = 0.09330642
+    
+    I do not understand the analytical solution.
+    See below for details.
+    
+My attempt - analytically:
+
+    Since there are 8 flavors and 12 wafers there are 8^12 possible
+    packages.  This is ~65e9 which is a bit much for brute force
+    counting.
+
+    If there were only 8 wafers this would be simple:
+    
+    (8/8)*(7/8)*...*(2/8)*(1/8) = factorial(8)/8^8
+                                = 40320 / 16777216
+                                ~ 0.002403259
+
+    With a couple of extra tries the odds should improve
+    substantially.  Effectively we have 4 extra wafers
+    that can be distibuted throughout the 12.  This
+    should improve things as C(12,4)= 495
+    
+    Multiplying gives a number > 1 so this isn't right.
+    
+    Let us try a different way:
+    
+    We will try a toy problem and then try to generalize.
+    Assume 2 flavors and 4 wafers
+    
+    a b c d y = 14/16 = 7/8
+    0 0 0 0 0
+    0 0 0 1 1
+    0 0 1 0 1
+    0 0 1 1 1
+    0 1 0 0 1
+    0 1 0 1 1
+    0 1 1 0 1
+    0 1 1 1 1
+    1 0 0 0 1
+    1 0 0 1 1
+    1 0 1 0 1
+    1 0 1 1 1
+    1 1 0 0 1
+    1 1 0 1 1
+    1 1 1 0 1
+    1 1 1 1 0
+
+    The odds of getting the first "flavor" is 1.
+    The odds of getting the second "flavor" is 1-(1-1/2)^3 = 7/8
+    
+    Multiplying = 1*7/8 = 7/8 --> confirms result above.
+
+    We can repeat this for 3 flavors and 5 wafers.  This requires 3^5 = 243
+    rows so we will check it and just report the results.
+    
+    Num flavors  Num cases
+    ----------------------
+    1            3
+    2            90
+    3            150
+
+    We can repeat this for 4 flavors and 7 wafers.  This is 4^7 = 16384 rows.
+    
+    Num flavors  Num cases
+    ----------------------
+    1            4
+    2            756
+    3            7224
+    4            8400
+
+    For 5 flavors and 7 wafers
+    
+    Num flavors  Num cases
+    ----------------------
+    1            5
+    2            1260
+    3            18060
+    4            42000
+    5            16800
+    
+    For 5 flavors and 8 wafers
+    
+    Num flavors  Num cases
+    ----------------------
+    1            5
+    2            2540
+    3            57960
+    4            204120
+    5            126000
+
+    Still not seeing the pattern -- needs more work.
+
+I eventually gave up -- checked out the Bent
+    
+    Prepare to have your mind blown:
+    
+    The Bent gives the solution as the number of flavors
+    missing as:
+    
+        C(8,8-n)*(8-n)^12
+    
+    Apparently this only works for n=1,2, ..., 7 but they
+    don't specifically state that so they enumerate the
+    number of possibilities as:
+    
+        8^12 = 68719476736 (68.71948e9)
+    
+    For each of the values 1:7 we can tabulate the numbers.
+    They give the following table:
+    
+    n   Possibilities
+    ------------------
+    1   110730297608 ~ 110.7e9
+    2    60949905408
+    3    13671875000
+    4     1174405120
+    5       29760696
+    6         114688
+    7              8    
+    
+    This makes no sense to me.  How can the number of possibilities
+    exceed the total number of permutations???  In any event, they
+    sum up the values with an alternating series (no explanation)
+    as:
+    
+    N(at least one missing) = sum((-1)^(n+1)*choose(8,8-n)*(8-n)^12,n,1,7)
+    
+    This sums to: 62307508096
+    
+    The Pr (at least one missing) = 0.9066936
+
+    So: Pr (none missing) = 0.09330642
+
+    I looked in the following volume of the Bent but they didn't add
+    any more explanation other than to say this was one of the harder
+    problems.
+    
+
+## Problem 4
+
+    Consider a double row of regular hexagons,
+    ten in the top row and nine in the bottom
+    row, arranged like the cells in a honeycomb.
+    Starting at the upper left hexagon and
+    zigzagging down and up, label the hexagons A
+    through S. How many different paths are
+    there, starting at A and ending at S, where a
+    path consists of a series of ten to 19
+    letters indicating the order in which the
+    hexagons are visited? You can only move from
+    one hexagon to another hexagon that shares a
+    common edge. No hexagon can be visited more
+    than once for a given path.
+
+    -- Why Do Buses Come in
+    Threes? by Rob Eastaway and
+    Jeremy Wyndham
+
+
+TODO
+
+    My head hurts.
+    
+
+## Problem 5
+
+    Find three different nonzero digits such that
+    each of the six permutations of the digits,
+    read as six three-digit integers, is a
+    semiprime. A semiprime is an integer that is
+    the product of two, not necessarily
+    different, primes. For example, 121 = 11*11
+    and 143 = 11*13 are semiprimes, while 153 =
+    3*3*17 and 105 = 3*5*7 are not.
+
+    -- Richard England in New Scientist
+
+Solution:
+
+    Brute force
+    
+```{r}
+library(gtools)
+library(gmp)
+
+a=combinations(9,3)
+
+for (i in seq(nrow(a))) {
+    b=permutations(3,3,a[i,])
+    k=apply(b,1,function(x) {length(factorize(100*x[1]+10*x[2]+x[3]))==2})
+    if (all(k)) {
+        print(a[i,])
+    }
+}
+
+```
+
+The solution set is:
+
+    [1] 1 7 8
+
+    N    Factors
+    -------------
+    178   2  89
+    187  11  17
+    718   2 359
+    781  11  71
+    817  19  43
+    871  13  67
+
+
+## Bonus
+
+    Al, Beth, Carl, and Dawn are sitting around a
+    table at a bar, as Al tries to guess Beth's
+    age. They all know she is at least 21, or she
+    wouldn't have been allowed into the bar. Al
+    asks Beth five questions, pausing for
+    contemplation after each question:
+
+    1. Is your age a multiple of 17?
+    2. Is your age a multiple of 3?
+    3. Is your age a prime number?
+    4. Are you older than I am? (Beth knows Al's age.)
+    5. Have you celebrated your 51st birthday?
+
+    At this point, Al announces that he has
+    deduced Beth's age, but Beth tells him he is
+    wrong. Carl, whose age is a prime number, has
+    been listening to this conversation and is
+    able to correctly deduce Al's age. From his
+    knowledge of Beth, he surmises that she has
+    not answered all the questions truthfully and
+    guesses that she has alternated correct and
+    incorrect answers. He knows that Beth is
+    older than he is, and although he has guessed
+    correctly how many of Beth's answers are
+    incorrect, he has assumed the wrong ones. So,
+    when he announces what he has deduced as
+    Beth's age, Beth tells him he is also wrong.
+    Finally, Dawn, who has also been listening in
+    and is sharper than Carl, guesses correctly
+    which of Beth's answers are incorrect. Now,
+    knowing that Beth is younger than she is,
+    Dawn is able to correctly announce Beth's
+    age. What are the ages of Al, Beth, Carl, and
+    Dawn, and what are Al's and Carl's incorrect
+    guesses? It may help to know that Dawn's age
+    is divisible by 13 and they all know that
+    their ages are all different.
+
+    -- Brain Puzzler?s Delight
+    by E.R. Emmet
+
+
+TODO
+
+    Yuck
+
+
+## Computer Bonus
+
+    You are floating in a sea of 7s on a raft
+    with the number 101. You discover that you
+    can take a 7 and insert it into your raft to
+    enlarge it (getting 7101; 1701; 1071; or
+    1017). Unfortunately, every time you do this,
+    the raft divides itself by its smallest prime
+    factor (leaving in the above case 2367; 567;
+    357; or 339).If the raft goes below 100, it
+    will sink. What is the maximum number of
+    insertions you can make before you sink?
+    Remember, 1 is not a prime.
+
+    -- Technology Review
+
+
+TODO
+
+    Seems like a prime candidate for recursive programming.
+
+    Glad I didn't work on this.  Turns out the answer is
+    that there are lots of ways you can get an infinite
+    loop so the raft can stay floating forever.
+
+    101 --> 1701 (divide by 3) --> 567
+    567 --> 7567 (divide by 7) --> 1081
+    1081 --> 10817 (divide by 29) --> 373
+    373 --> 3737 (divide by 37) --> 101
+    
+    and the loop goes forever.

@@ -1,0 +1,671 @@
+---
+title: "Bent Spring 2018"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2018
+
+
+## Problem 1
+
+    I have found five nine-digit integers such
+    that, among them, the digit 1 appears once,
+    the digit 2 appears twice, 3 appears three
+    times, and so forth to 9 which appears nine
+    times. The first and second integers, both of
+    which are exact fifth powers, between them,
+    contain all nine different digits.The third
+    integer is an exact fourth power. The fourth
+    integer, which consists of only two different
+    digits, is a palindrome divisible by 33 and
+    111. The digits of the fifth integer form an
+    increasing sequence in which each digit is
+    equal to, or greater than, the preceding
+    digit. What are the five nine-digit integers?
+
+    -- Adapted from an Enigma by Adrian
+    Somerfield in New Scientist
+
+Solution:
+
+    This was WAY harder than it should have been due
+    to the ambiguous (?) wording of the question.  I
+    assummed that the palindrome was divisible by
+    the product 33*111 but it was not!  Once that
+    was understood it was just cranking.
+
+    None of the numbers can contain a 0 since all 45
+    digits are accounts for with 1-9.
+    
+    No number can contain more than 1-1, 2-2s, 3-3s, etc.
+
+    Need to find 9 digit 5th powers
+    Need to find 9 digit 4th powers
+    Need to find palindrome, 2 diff digits, divisible by 33, 111
+    
+```{r, eval=FALSE}
+
+nmin=100000000
+nmax=999999999
+
+xmin=trunc(exp(log(nmin)/5))
+xmax=trunc(exp(log(nmax)/5))
+
+# Fifth powers
+p5=c()
+for (i in xmin:xmax) {
+    m=i^5
+    if (m >= 100000000) { p5=append(p5,m) }
+}
+p5=p5[!grepl('0',p5)]
+p5=p5[!grepl('1.*1',p5)]
+p5=p5[!grepl('2.*2.*2',p5)]
+p5=p5[!grepl('3.*3.*3.*3',p5)]
+
+
+# Fourth powers
+xmin=trunc(exp(log(nmin)/4))
+xmax=trunc(exp(log(nmax)/4))
+
+p4=c()
+for (i in xmin:xmax) {
+    m=i^4
+    if (m >= 100000000) { p4=append(p4,m) }
+}
+p4=p4[!grepl('0',p4)]
+p4=p4[!grepl('1.*1',p4)]
+p4=p4[!grepl('2.*2.*2',p4)]
+p4=p4[!grepl('3.*3.*3.*3',p4)]
+
+# Palindromes
+# Need palindrome of two different digits that
+# is a multiple of 33 and 111
+#
+# BUT - APPARENTLY - NOT SIMULTANEOUSLY!!!
+#
+
+# Check the multiples of 33
+xmin=trunc(nmin/(33))
+xmax=trunc(nmax/(33))
+ppal=c()
+for (i in xmin:xmax) {
+    m=i*33
+    if ((m>99999999) & (m <= 999999999)) {
+        if (m%%111 == 0) {
+            a=strsplit(sprintf("%d",m),"")[[1]]
+            if (all(a==rev(a))) {
+                if (length(unique(a))==2) {
+                    ppal=append(ppal,m)
+                }
+            }
+        }
+    }
+}
+# Check the multiples of 111
+xmin=trunc(nmin/(111))
+xmax=trunc(nmax/(111))
+for (i in xmin:xmax) {
+    m=i*111
+    if ((m>99999999) & (m <= 999999999)) {
+        if (m%%33 == 0) {
+            a=strsplit(sprintf("%d",m),"")[[1]]
+            if (all(a==rev(a))) {
+                if (length(unique(a))==2) {
+                    ppal=append(ppal,m)
+                }
+            }
+        }
+    }
+
+}
+ppal=unique(sort(ppal))
+ppal=ppal[!grepl('0',ppal)]
+ppal=ppal[!grepl('1',ppal)]
+ppal=ppal[!grepl('2',ppal)]
+
+```
+
+    A partial solution is found at this point:
+    
+    5th powers: 656356768 714924299 992436543
+    4th powers: 21 values
+    palindrome: 13 values
+    
+    We can limit the 5th powers to only the first two since only
+    the second one contains a 1 and only the first contains an 8.
+    
+    So: first two numbers are
+    
+        656356768
+        714924299
+
+    This uses up all the 1s and 2s.  After removing these from the
+    list of fourth powers we are only left with:
+    
+        688747536
+    
+    At this point the digit counts are:
+    
+        1=1, 2=2, 3=2, 4=3, 5=3
+        6=6, 7=4, 8=3, 9=3
+        
+    All of the 6s have been used so they can be removed from the palindrome
+    list which leaves only 8 values:
+    
+    444888444 557575755 755575557 777333777
+    888555888 889898988 988898889 999777999
+    
+    There is only 1 available 4 so the first value is eliminated.
+    There are only 2 available 5s so this eliminates 3 more.
+    There are only 3 available 7s so this eliminates one more.
+    There are only 5 available 8s so this eliminates two more.
+    
+    The only remaining candidate is:
+    
+        999777999
+    
+    At this point the solution set is:
+    
+        656356768 714924299 688747536 999777999
+        
+    The digit counts are:
+    
+        Digit     1 2 3 4 5 6 7 8 9 
+        Count     1 2 2 3 3 6 7 3 9 
+        Available     1 1 2     5
+        
+    These remaining digits can only be arranged as: 345588888
+    
+    The full solution set is:
+    
+        656356768 = 58^5
+        714924299 = 59^5
+        688747536 = 162^4
+        999777999 = palindrome = 30296303*33 = 9007009*111
+        345588888 = remaining digits in increasing order
+
+
+## Problem 2
+
+    At a recent bridge game, Don thought his luck
+    couldn't get any worse, until he was dealt a
+    hand that not only didn't have any aces or
+    face cards, but included exactly two 2's,
+    three 3's, and four 4's. What is the exact
+    probability of being dealt such a hand? A
+    bridge hand consists of 13 cards dealt from a
+    well shuffled standard deck of 52 cards.
+
+    -- Don A. Dechman, TX A'58
+
+Solution:
+
+    Standard combinatorics:
+    
+    2-2s = C(4,2)
+    3-3s = C(4,3)
+    4-4s = C(4,4)
+    Rest = 4 cards from 5-10 = 24 total
+         = C(24,4)
+         
+    Total number of bridge hands = C(52,13)
+    
+    P = C(4,2)*C(4,3)*C(4,4)*C(24,4)/C(52,13)
+      = 255024/635013559600
+      = 99/246511475
+      ~ 4.01604e-07
+
+
+## Problem 3
+
+    At Sam's Soup, Salad & Sandwich Deli, patrons
+    can order from a menu consisting of ten
+    different items.They can order as many
+    different items as they wish, but they can
+    order at most two of any given item. To
+    minimize data entry, Sam has devised an
+    approach that requires sending only one
+    number per order to the kitchen. He did this
+    by assigning a code number consisting of a
+    positive integer to each item on the menu.
+    The waiter then enters only the sum of the
+    codes for the items ordered.  (If two of the
+    same item are ordered, the item's code is
+    added twice.) If the codes have been chosen
+    so that every possible order results in a
+    unique number, what is a simple set of codes
+    for the ten items on the menu?
+
+    -- Adapted from Doctor Ecco's
+       Cyberpuzzles by Dennis E. Shasha
+
+Solution:
+
+    I would just use powers of 2.
+
+    The solution is to use powers of 3.  Apparently
+    you can order 0, 1, or 2 of each item so you need
+    three states to encode things.
+    
+    meh
+
+
+## Problem 4
+
+    In the famous Tower of Hanoi puzzle, you
+    start with three pegs (P1, P2, and P3). On P1
+    are n discs of different sizes, increasing in
+    diameter from the smallest at the top to the
+    largest at the bottom. The objective is, in
+    as few moves as possible, to transfer the
+    stack from P1 to P3 by moving the discs, one
+    at a time, from peg to peg to peg while
+    observing the rule that no disc can ever be
+    placed on top of a smaller disc. For three
+    pegs and n discs, the process takes 2^n-1
+    moves. For example with three pegs and n = 4,
+    15 moves are required; and three pegs with n
+    = 18 requires 262,143 moves and (at a rate of
+    one move per second) requires 72 hr, 49 min,
+    and 3 sec. For Super-Hanoi, you can have more
+    than three pegs. For p pegs, the objective is
+    to transfer an n disc stack from P1 to Pp in
+    the fewest possible moves. For example, with
+    4 pegs, 4 discs can be transferred in 9 moves
+    instead of 15. What is the minimum number of
+    pegs needed to be able to transfer 18 discs
+    from P1 to Pp in a minute or less at the rate
+    of one move per second? Also, what is the
+    arrangement of discs on the pegs immediately
+    before the largest disc is moved from P1 to
+    Pp? Transferring a single disc from one peg
+    to another constitutes a move.
+
+    -- An Enigma by Stephen Ainley
+       in New Scientist
+
+TODO
+
+    meh
+    
+    They argue that you need 6 pegs
+    
+    If you have n empty pegs you can "store" n disks.
+    They can be assembled onto 1 peg
+    This leaves n-1 empty pegs so you can "store" n-1
+    etc.
+    
+    With 5 total pegs you can only have:
+    
+    5, 4, 3, 2, 1 = 15 disks = not enough disks
+    
+    With 6 total pegs you can have:
+    
+    6, 5, 4, 3, 2, 1 = 21 disks which is enough
+    
+    You actually need a seventh peg as the destination:
+    
+    So, for the 18 disk game you would move off 6 disks and
+    then stack 5 for a total of 11 moves.
+    Repeat for 5 disks + 4 stack for 9 moves.
+    Repeat for 4 disks + 3 stack for 7 moves.
+    This leaves 3 disks on the original peg.
+    Need to move off 2 and then transfer final disk to target. = 3 moves
+    Assemble second largest and third largest = 2 moves
+    Now we have 3 empty pegs
+    Unpack peg with 4 disks = 7 moves
+    Unpack peg with 5 disks = 9 moves
+    Unpack peg with 6 disks = 11 moves
+    
+    Total = 59 moves < 1 minute
+
+
+## Problem 5
+
+    In a right triangle, inscribe a semicircular
+    arc, such that the arc is tangent to both
+    legs of the right triangle, and the center of
+    the semicircle and its two endpoints lie on
+    the hypotenuse of the triangle. These three
+    points divide the hypotenuse into four
+    segments. Starting at one end of the
+    hypotenuse and moving toward the other end,
+    the lengths of these segments are x cm, 120
+    cm, 120 cm, and y cm. Given that x and y are
+    integers, what are the maximum and minimum
+    lengths the hypotenuse can have?
+
+    -- Adapted from
+       The Wall Street Journal by
+        Robert W. Schweitzer, NY Z'52
+
+Solution:
+
+    I need to draw a picture.
+    
+```{r, eval=FALSE}
+
+r=120    # radius of the circle
+m=-2/3   # slope of hypotenuse - y=m*x+b
+         # r = m*r + b --> b=r*(1-m)
+         # x-intercept: 0 = m*x+b --> x = -b/m
+b=r*(1-m)
+xmax=-b/m
+xh=seq(0,xmax,length=100)
+yh=m*xh+b
+
+theta=seq(0,2*pi,length=100)
+
+xc=r+r*cos(theta); yc=r+r*sin(theta)
+
+plot(xc,yc,type='n',asp=1)
+polygon(xc,yc,border='red')
+points(r,r,ps=3,col='blue')
+lines(xh,yh,col='green')
+lines(rep(0,length(yh)),yh,col='green')
+lines(xh,rep(0,length(yh)),col='green')
+lines(c(0,r),c(r,r),col='green')
+lines(c(r,r),c(0,r),col='green')
+text(10,max(yh)+20,"X")
+text(max(xh)-20,20+20,"Y")
+```
+
+    Note that these definitions of h,w do not quite match the ones used in
+    the solution in the Bent.  They assign z, w as the lengths of the legs
+    outside the 120^2 area.  In the equations below we use the full leg length.
+    
+    Let:
+    
+        h = height of triangle
+        w = width of triangle
+
+    From above we can write:
+    
+        (h-120)^2 + 120^2 = (120+x)^2
+        
+            x = sqrt((h-120)^2 + 120^2) - 120
+        
+        (w-120)^2 + 120^2 = (120+y)^2
+        
+            y = sqrt((w-120)^2 + 120^2) - 120
+        
+        (h-120)/120 = 120/(w-120) = h/w
+        
+            h = 120 + 120^2 /(w-120)
+            
+        Need to find:
+        
+            (h-120) s.t. (h-120)^2 + 120^2 = n^2 if x is integer
+            (w-120) s.t. (w-120)^2 + 120^2 = m^2 if y is integer
+            
+        The Bent asserts, and I blindly followed along, that h, w
+        are integers.  How do I know that?????  If a^2+b^2 = integer
+        does that necessarily imply that a,b are integers?
+        
+            Know: w-120 is a factor of 120^2 = 2^6 * 3^2 * 5^2
+            
+        How many factors for 120^2?
+        
+            Number of factors = (1+6)*(1+2)*(1+2) = 63
+            
+```{r, eval=FALSE}
+
+# Enumerate all the possible factors of 120^2
+z=c()
+for (n2 in 0:6) {
+    for (n3 in 0:2) {
+        for (n5 in 0:2) {
+            z=append(z,prod(c(1,rep(2,n2),rep(3,n3),rep(5,n5))))
+        }
+    }
+}
+
+# w = z+120 but only w-120 is used above so just use z
+# y = sqrt(z^2+120^2)-120
+y=sqrt(z^2+120^2)-120
+k=(y==trunc(y))
+w=z+120
+h=120+120^2/(w-120)
+x = sqrt((h-120)^2 + 120^2) - 120
+#
+print("W = ")
+print(w[k])
+print("H = ")
+print(h[k])
+print("X = ")
+print(x[k])
+print("Y = ")
+print(y[k])
+
+hypotenuse=240+x[k]+y[k]
+print("Hypotenuse = ")
+print(hypotenuse)
+print("Range = ")
+print(range(hypotenuse))
+```
+
+    The only integer solutions are:       
+    
+    W = 345 170 210 280 408 184
+    Y = 135  10  30  80 192  16    
+
+    W = 345 170 210 280 408 184
+    H = 184 408 280 210 170 345
+    X =  16 192  80  30  10 135
+    Y = 135  10  30  80 192  16
+    
+    Hypotenuse:
+    391 442 350 350 442 391
+    
+    Range: 350 442
+
+
+## Bonus
+
+    Suppose that, in a distant galaxy, there is a
+    solar system in which, instead of being
+    spheres, the planets are right circular cones
+    (with heights equal to the diameters of their
+    bases). Suppose one of these planets has the
+    same total volume and mass as our Earth, but
+    a uniform density; what would be the
+    gravitational acceleration on a person
+    standing in the center of the circular base,
+    and what would be the gravitational
+    acceleration on a person standing at the
+    apex? Assume the Earth is a perfect sphere
+    with a radius of 6,370 km and an average
+    density of 5,518 kg/m3. Use a value of
+    6.673E-11 N m2/ kg2 for G. Express your
+    answers correct to three significant figures.
+
+    -- Higher Mathematics for
+       Engineers and Physicists
+       by I.S. ans E.S. Skolonikoff
+
+Solution:
+
+    Volume of earth = 4/3*pi*R^3
+       = 4/3*pi*6370000^3
+       = 1.082697e+21 m^3
+       
+    Mass of earth = 5.974322e+24 kg
+    
+    For the conical earth: H = 2*R
+    
+    V = 1/3*pi*R^2*2*R = 1.082697e+21
+    
+    R =  8025697 m
+    H = 16051394 m
+    
+    I did the integrations but I get a much different answer from the Bent.  I used
+    a differential ring of radius=r at a height y above the axis with the peak of
+    the cone at the origin and the axis of the cone vertial (y-axis in my calc).
+    Since the differential element is a ring it only requires two integrals to
+    perform the volumetric calculation:
+
+    gbase: integrate(integrate(G*rho*2*%pi*r*(H-y)/sqrt(r^2+(H-y)^2)^3,r,0,(y/H)*R),y,0,H)
+    gapex: integrate(integrate(G*rho*2*%pi*r*y/sqrt(r^2+y^2)^3,r,0,(y/H)*R),y,0,H)
+
+    In calculating the attaction at the base (y=H):
+    
+    The distance from the ring to the point on the base is sqrt(r^2+(H-y)^2)
+    The term (H-y)/d calculates the component of the gravity force along y axis
+    The attraction varies as 1/d^2
+    The overall denominator is then d^3.
+    
+    So: G*rho*2*pi*r * (H-y)/d^3 should be integrated for r and y
+    
+        r varies from 0 to (y/H)*R
+        y varies from 0 to H
+
+    At the center of the base I get: g = 9.494673880675947
+    At the apex   of the cone I get: g = 3.920554736208179
+
+    Even if I flip the cone upside down and try it again I get the same result.
+
+    *****************************************************************
+    ***** THIS IS NOT EVEN CLOSE TO THE SAME ANSWER AS THE BENT *****
+    *****                                                       *****
+    ***** I have done additional investigation and I think the  *****
+    ***** Bent is wrong.                                        *****
+    *****************************************************************
+
+    The Bent has: g = 24.75 at the middle of the base, 2.75 at the apex
+    
+    They do a calculation involving the center of mass???
+    
+    They calculate the center of mass as 3/4*H with apex at origin.  I can
+    get this value -- not a problem.
+    
+    ycm = integrate(integrate(rho*2*%pi*r*y,r,0,(y/H)*R),y,0,H)/(1/3*rho*%pi*R^2*H)
+        = 3*H/4
+
+    They use this in calculating the g values:
+    
+        For conical earth they calculate:
+        
+            R = 8026200 m  --> about the same as mine
+            m = 5.9743e24 kg
+    
+        gbase = G*M/(1/4*H)^2 = 6.673e-11*5.974e24/(16051394/4)^2 = 24.756
+        gapex = G*M/(3/4*H)^2 = 2.75
+        
+    Why is there a difference? and which one is correct???
+    
+    With a very minor adjustment to my integral I can get the correct g for a
+    sphere so it should work.
+
+    Conversely, I think their method should also work so I am confused.
+
+    I found a reference that says the center of mass method is not correct.
+
+    Specifically:
+
+        Newton proved that a solid sphere of uniform density and
+        mass M exerts the same force on an external point mass as
+        would a point mass M placed at the center of the sphere.
+        (See Problem 6a in problem section 5C).
+
+        This does not, however, generalize to other uniform solids
+        of mass M - it is not true that the gravitational force they
+        exert is the same as that of a point mass M at their center
+        of mass. 
+
+    MIT courseware link:
+    
+        https://ocw.mit.edu/courses/
+        mathematics/18-02sc-multivariable-calculus-fall-2010/
+        4.-triple-integrals-and-surface-integrals-in-3-space/
+        part-a-triple-integrals/
+        session-78-applications-gravitational-attraction/
+        MIT18_02SC_MNotes_g.pdf
+
+    The source indicates you need to perform the integrations.
+
+
+## Double Bonus
+
+    Solve the following
+    cryptic addition in base 13.
+
+    HOWIE
+    FRED
+    CHUCK
+    JEFF
+    JUDGE
+
+    Although the base is an unlucky
+    number, the following circumstances
+    negate this. The panel of JUDGEs
+    is, of course, prime, as are FRED,
+    CHUCK, and JEFF, while HOWIE
+    is the product of 7 (lucky number),
+    not necessarily different, primes. The
+    usual rules apply. Use a, b, and c to
+    represent the digits 10, 11, and 12.
+
+    -- H.G. McIlvried, III, PA Gamma'53
+
+Solution: solved in the cryptic arithmetic notebook although the
+details are in a separate file.
+
+    Cryptic addition in base 13:
+
+      HOWIE + FRED + CHUCK + JEFF = JUDGE
+
+      JUDGE is prime
+      FRED, CHUCK, and JEFF are prime
+      HOWIE is the product of 7 prime factors
+
+    I switched to python itertools (see jeff.py)
+    
+    Searching on FRED, JEFF, JUDGE (7 symbols) still results in 7679 solutions
+    Let's add chuck (three more symbols)
+    
+    This makes the problem worse since there are 13*12*11 times as many
+    permutations to consider.
+    
+    Make need to just bite the bullet and try all the combinations even though
+    it is a lot of them.
+    
+    sympy has isprime() and factorint() to help make the computations but it will
+    still take a long time to investigate 13! permutations.  This is 6.3e9 cases.
+    The run-time is about 4 hours!
+
+    We could add some limits to the search:
+    
+    J, F, C, and H must be non-zero
+    Can't say anything about other digits since base-13 primes can have any final digit!
+
+    Checking on the primality constraints yields 9951 feasible solutions.
+    These have been stored in `jeff_solution.txt` using numpy savetxt.
+    
+    Adding the equation of JEFF+FRED+CHUCK+HOWIE = JUDGE reduces
+    the solution to a unique case.
+    
+    Maybe I should have checked the equation first and then checked primality -- not sure
+    which is the most efficient.  I added the equation condition to the python code and
+    the solution is actually slower so ... a more efficient algorithm may be required.
+    
+    I tried just generating and counting the permuations (without any calculations) and
+    that would take ~30 minutes so maybe 3-4 hours isn't too bad.
+
+    In [217]: a[k]
+    Out[217]:
+           j   e  f  r  d  u  g  c  h  k  o  w   i
+    9798  12  11  6  1  5  4  9  7  3  2  8  0  10
+
+    x_jeff[k]  =  28307    ( cb66 - base 13)
+    x_fred[k]  =  13499    ( 61b5 - base 13)
+    x_chuck[k] = 207287    (73472 - base 13)
+    x_howie[k] = 103400    (380ab - base 13)
+    x_judge[k] = 352493    (c458b - base 13)
+
+

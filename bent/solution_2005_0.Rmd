@@ -1,0 +1,440 @@
+---
+title: "Bent Winter 2005"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2005
+
+
+## Problem 1
+
+    The latest release of the Prime Players
+    consists of three CDs, each with a
+    different playing time. Each CD has
+    four tracks with a total playing time of
+    not more than one hour. The four tracks
+    on any of these CDs each last for a different
+    prime number of minutes. Furthermore,
+    any combination of three different
+    tracks on any of these CDs play
+    for a prime number of minutes. What
+    are the lengths of the tracks on these
+    three CDs?
+
+    -- Andrew Gibbons in New Scientist
+
+Solution: Fairy simple exhaustive search.  The primes are 2, 3, ...  Since the sum of
+the four primes must not exceed 60 then the largest is 60-(2+3+5) = 50.  We can enumerate
+all the primes up to 50 and look for combinations that meet the requirements above.
+
+```{r}
+library(gmp)
+library(gtools)
+```
+
+
+```{r}
+p=(1:50)[isprime(1:50)>0]
+
+# Get all combinations of 4 primes that sum to 60 (or less)
+a=combinations(length(p),4,p)
+s=apply(a,1,sum)
+a=a[s<=60,]
+
+# Find the cases where any combination of three sums to a prime number
+s=apply(a,1,function(x) { 
+    m=combinations(4,3,x);
+    all(isprime(apply(m,1,sum)))
+    }
+    )
+a=a[s,]
+
+# Candidate solutions
+print(a)
+
+```
+
+The only three sets of primes that meet these criteria are:
+
+    [1,]    5    7   17   19
+    [2,]    7   11   13   23
+    [3,]    7   13   17   23
+
+
+## Problem 2
+
+    The coordinates, in clockwise order,
+    of the vertices of a heptagon H1 are (0,0),
+    (2,2), (1,4), (3,6), (3,5), (7,3), and (5,1).
+    Form a second heptagon H2 by joining
+    the midpoints of adjacent sides of H1.
+    Next, form heptagon H3 by joining the
+    midpoints of the sides of H2. It should
+    be clear that, because these heptagons
+    decrease in area, if this process is continued
+    indefinitely, the heptagon will
+    ultimately shrink to a point. What are
+    the coordinates of this point?
+
+    -- You Are a Mathematician by David Wells
+
+Solution: Let us look at a figure and then make some
+calculations.
+
+```{r}
+h1x=c(0,2,1,3,3,7,5)
+h1y=c(0,2,4,6,5,3,1)
+plot(h1x,h1y,type='n',asp=1)
+polygon(h1x,h1y,lwd=3)
+
+x=h1x
+y=h1y
+# p=c('red','blue','green','cyan','black','yellow','orange')
+p=palette()
+for (i in 1:30) {
+    x=c(x,x[1]); hx=(x[1:7]+x[2:8])/2
+    y=c(y,y[1]); hy=(y[1:7]+y[2:8])/2
+    polygon(hx,hy,border=p[i%%length(p)+1])
+    x=hx; y=hy
+}
+grid()
+
+```
+
+In the limit this shold converge to a point.  We can do this
+numerically or symbolically.  Since we are lazy the first attempt
+will be numerically.
+
+```{r}
+# Given the starting value from H1
+h1x=c(0,2,1,3,3,7,5,0)
+h1y=c(0,2,4,6,5,3,1,0)
+
+while (T) {
+    h2x=(h1x[1:7]+h1x[2:8])/2
+    h2y=(h1y[1:7]+h1y[2:8])/2
+    xxx = (diff(range(h2x))+diff(range(h2y)))
+    if (xxx < 1e-10) { break }
+    h1x=c(h2x,h2x[1])
+    h1y=c(h2y,h2y[1])
+}
+print(paste(h2x[1],h2y[1]))
+
+```
+
+Numerically the limit appears to by x=3, y=3.
+
+These are the means of the original X,Y coordinates.
+
+The solution calls this the centroid of the figure and demonstrates
+that the centroid remains unchanged after a round of coordinate
+conversions so it will eventually be the remaining point.
+
+
+## Problem 3
+
+    Two five-person tennis teams, the
+    Aces and the Bulls, play each other in
+    the finals of a tournament. The ranking
+    of the 10 players from most skillful to
+    least skillful is A1, B1, A2, B2, A3, B3,
+    A4, B4, A5, and B5. Any player always
+    beats a player of lesser skill. The finals
+    consists of five one-on-one matches,
+    with the winner being the team that
+    wins three or more matches. If the pair-
+    ings are determined by pulling names
+    out of a hat, what is the probability that
+    the Bulls will win?
+
+    --Howard G. McIlvried III, PA Gamma'53
+
+Solution:  we could try this analytically or Monte-Carlo.
+Since I have no energy today--let's try Monte-Carlo.
+
+Let us encode the values as odd and even integers.
+
+    B5, B4, B3, B2, B1 = 1, 3, 5, 7, 9
+    A5, A4, A3, A2, A1 = 2, 4, 6, 8, 10
+    
+For each trial we will pick a set of 5 from A and 5 from B.
+Tabulate the results.
+
+```{r}
+ateam=c(2,4,6,8,10)
+bteam=c(1,3,5,7,9)
+
+num_trials=100000
+num_b_wins=0
+
+for (i in 1:num_trials) {
+    a=sample(ateam,5)
+    b=sample(bteam,5)
+    if (sum(b>a)>2) { num_b_wins=num_b_wins+1 }
+}
+
+print(paste("Prob B wins = ",num_b_wins/num_trials,collapse=""))
+```
+
+B has a probability of ~ 0.225 of winning even with 1e7 trials.
+
+We can try this again analytically.  It could get a bit messy
+since the probability are not independent.  Let's just enumerate
+all the permutations of the bteam and find out how many times it
+beats the ateam:
+
+```{r}
+b=permutations(5,5,bteam)
+s=apply(b,1,function(x) { sum(x>ateam) })
+
+print(paste0('Permutations of B team = ',nrow(b),collapse=''))
+print(paste0('Number of times B wins = ',sum(s>2),collapse=''))
+print(paste0('Probability of B win = ',sum(s>2)/nrow(b),collapse=''))
+```
+
+So - enumerating all possibilities yields
+
+    Permutations of B team = 120
+    Number of times B wins = 27
+    Probability of B win = 0.225
+
+
+## Problem 4
+
+    Joe was playing with his seven-digit
+    calculator. It is a calculator
+    where each digit is represented by
+    some combination of seven line segments,
+    i.e., an "8" uses all seven line
+    segments. He displayed a positive integer,
+    and his daughter Joan looked
+    at it upside down. She declared, "I see
+    a number that is a perfect square, and
+    I don't see any leading zeroes." Joe
+    then multiplied his number by 2. Joan
+    looked at it upside down and declared,
+    "I see another number, and again it
+    is a perfect square." All digits except
+    3, 4, and 7 are seen as digits when
+    viewed upside down. What number
+    did Joe originally display?
+
+    -- Susan Denham in New Scientist
+
+Solution: this is a cryptic arithmetic problem in disguise.
+Upside down we get:
+
+    0 --> 0
+    1 --> 1
+    2 --> 5
+    3 --> Illegal
+    4 --> Illegal
+    5 --> 2
+    6 --> 9
+    7 --> Illegal
+    8 --> 8
+    9 --> 6
+
+So the digits 1, 8, and 0 are unchanged.  When you turn the
+calculator upside down, of course, the order of the digits is
+reversed.
+
+So, from the given problem:
+
+    - Original number does not end in zero
+    - The original number only contains 0, 1, 2, 5, 6, 8, 9
+    - Original number is perfect square when upside down
+    - The number * 2 also contains 0,1,2,5,6,8,9 - no trailing zero
+    - The number*2 upside down is perfect square
+    - Both numbers have <= 7 digits
+    
+Find by exhaustive search?
+
+Unfortunately my exhaustive search fails to return any feasible solution!!!
+
+Is it possible they are using "3" inverted to "E" for exponent?
+Alternately, maybe "4" inverted to "h" for hexadecimal?
+
+OOOOOps -- they say 2->2 and 5->5 --- LOL
+
+I will fix it and try again.
+
+Solution now exists.
+
+```{r}
+
+flip_digit = function(x) {
+    # if (x=="2") return("5")
+    # if (x=="5") return("2")
+    if (x=="6") return("9")
+    if (x=="9") return("6")
+    return(x)
+}
+
+invert_display = function(n) {
+    s=strsplit(sprintf("%d",n),"")[[1]]
+    # Change 2->5, 5->2, 6->9, 9->6
+    # Reverse order of digits
+    for (i in seq_along(s)) { s[i]=flip_digit(s[i]) }
+    s=rev(s)
+    return(as.numeric(paste0(s,collapse="")))
+}
+
+is_flippable = function(n) {
+    s=strsplit(sprintf("%d",n),"")[[1]]
+    # Check to see if the number contains 3, 4, or 7
+    # If so then the display will not be flippable
+    return(!any(s %in% c("3","4","7")))
+}
+
+is_a_square = function(n) {
+    return(round(sqrt(n))^2 == n)
+}
+
+zzz=c()
+# First number from father
+for (i in 1:9999999) {
+    if ((i %% 10) == 0) { next }
+    if (is_flippable(i)) {
+        # First number for daughter
+        m=invert_display(i)
+        if (is_a_square(m)) {
+            # Second number from father
+            n=( (2*i) %% 1000000 )
+            if (is_flippable(n)) {
+                # Second number for daughter
+                m2=invert_display(n)
+                zzz=c(zzz,i)
+                if (is_a_square(m2)) {
+                    # This is a solution
+                    print(c(i,n,m,m2))
+                }
+            }
+        }
+    }
+}
+```
+
+After correcting for the fact that 2 and 5 remain flip invariant ...
+
+The only solution is an original value of:
+
+    n = 9126      Upside down = 9216 = 96^2
+    2*n = 18252   Upside down = 25281 = 159^2
+
+
+## Problem 5
+
+    Three-dimensional tic-tac-toe is
+    played on a 4 x 4 x 4 array of cells.
+    Two players take turns by placing
+    their symbol in any unoccupied cell.
+    The winning player is the first one
+    whose symbols occupy four cells in a
+    row, either horizontally, vertically, or
+    any of the 28 diagonals. What is the
+    minimum number of cells that must
+    be occupied to ensure that the other
+    player cannot win? Submit a sketch
+    (in pdf or jpeg format only, if your
+    sketch is electronic) of each of the
+    four horizontal layers that notes the
+    positions of the occupied cells.
+
+    -- Peter E. Rentz, IN A'55
+
+TODO
+
+Do I care?
+
+Solution shows how to block the opponent.
+
+
+## Bonus
+
+    The staff at a bank includes a
+    Director, two Assistant Directors, and
+    five Department Heads. The Director
+    wants several different padlocks on the
+    strongroom door with keys distributed
+    so that he can open the door alone, either
+    AD can open the door with the
+    other AD or with any two DH's (but
+    not with only one DH), or else any four
+    DH's can open the door (but not only
+    three DH's). All padlocks must be open
+    to open the door. No key opens more
+    than one lock. No lock requires more
+    than one key to open. Keys may be duplicated
+    to more than one person. What
+    is the minimum number of padlocks
+    needed, and how should the keys be distributed?
+
+    -- 100 Games of Logic by Pierre Berloquin
+
+TODO
+
+I think I have seen this before.  The *key* to this problem is to
+realize that some people have more than one key and others don't.
+
+According to the solution you need 20 locks where the Dir has all 20.
+The others get split up as needed.  Solution is simply trial and error
+until you figure it out.
+
+
+## Computer Bonus
+
+    A factorian is a
+    positive integer, which is equal to the
+    sum of the factorials of its digits. The
+    first three factorians are 1 = 1!, 2 =
+    2!, and 145 = 1! + 4! +5!. What is the
+    next factorian? Note that 0! = 1 by
+    definition.
+
+    -- Keys to Infinity by Clifford Pickover
+
+Solution: let us try exhaustive search
+
+```{r}
+is_factorian = function(n) {
+    s=strsplit(sprintf("%d",n),"")[[1]]
+    m=0
+    m=sum(sapply(s,function(x) {factorial(as.integer(x))}))
+    return(m == n)
+}
+
+t1=Sys.time()
+n=146
+while(T) {
+    if (is_factorian(n)) {
+        print(paste0("Solution = ",n,collapse=""))
+    }
+    n=n+1
+    if (n>2540160) { break }
+    # if ((n%%1000) == 0) { print(n) }
+}
+t2=Sys.time()
+print(t2-t1)
+```
+
+The solution is 40585.
+
+According to the solution this is the only factorian larger than 145.
+You can not have 8 digit factorian.  Even if all the digits are 9 this
+only yields 8*(9!) < 1e7 so the sum of the factorials can never be
+large enough.
+
+The largest feasible value is 7*9! = 2540160.
+
+So - a search of 146 to 2540160 is sufficient to ensure all factorians
+are found.
+
+Searching the full range takes about 1.5 minutes
+

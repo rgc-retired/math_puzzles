@@ -1,0 +1,364 @@
+---
+title: "Bent Fall 2017"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2017
+
+
+## Problem 1
+
+    Aunt Alice is a bit hard of hearing, so that
+    when her nephew Ned asked various neighbors
+    some questions about their house numbers, she
+    failed to hear the answers, though she heard
+    the questions fine. Ned has lived on
+    Christmas Crescent for some time, and his
+    aunt knows Ned's number, but Alice has only
+    just bought a vacant house there, but Ned
+    doesn't know that. The Crescent has houses
+    numbered rather curiously from 5 to 105,
+    inclusive.  Ned asked the same three
+    questions to three people, first to X, then
+    to Y, then to Z, who live in separate houses
+    on the Crescent. The questions were: (i) Is
+    the number of your house a multiple of 4?
+    (ii) Is it a perfect square?  (iii) Is it a
+    multiple of 9?  No two sets of three answers
+    were exactly the same. After hearing X's
+    answers, Ned says to him: "If I knew whether
+    your house number is greater than 83, I would
+    know what it is." (Alice heard her nephew say
+    this and was able to write down X's number
+    correctly.) After hearing Y's answers, Ned
+    says to him: "If I knew whether your number
+    is greater than 50, I could tell you what it
+    is." (Alice heard her nephew say this, and as
+    she happened to know that Y's number is
+    greater than her own, she was able to write
+    it down correctly.  After hearing Z's
+    answers, Ned says to him: "If I knew whether
+    your house number is greater than 30, I could
+    tell you what it is." (Alice heard this and
+    notes with interest that her own number is
+    certainly less than Z's. But she too has no
+    way of deciding whether Z's number is greater
+    than 30. However, being anxious to continue
+    building her reputation for logical deduction
+    and intuition, guessed that it was greater
+    than 30 and wrote down the number, which,
+    fortunately was quite correct.) What are the
+    house numbers of Ned, Alice, X, Y, and Z?
+
+    -- Brain Puzzler's Delight by E.R. Emmet
+
+TODO
+
+    meh
+
+
+## Problem 2
+
+    The Rev. Obadiah Slope does not actually care
+    about soccer but, since becoming a Rural
+    Dean, he likes to seem as if he does. So he
+    takes a dutiful interest in the local league
+    (each team plays each other team once in a
+    season). "How is it going this year, my son?"
+    he recently asked the retired tax inspector
+    who acts as secretary.  "Well, it's not
+    finished yet you know," was the answer, "even
+    though only four sides are competing this
+    time. Parminster United have so far played
+    two games and lost them both, with three
+    goals for and six against in total. Quondam
+    Athletic have also played two, winning one
+    and drawing the other, with a total of four
+    goals for and three against. Real Episcopi
+    have drawn one and won two, totaling two
+    goals for and none against. And Salem
+    Dynamo...." "Splendid! Splendid!" Rev. Slope
+    broke in, conscious that the lunch hour was
+    nigh and suddenly remembering that, "I must
+    see a man about a misericord." What was the
+    score in each of Salem's matches?
+
+    -- A Tantalizer by Martin Hollis in New
+    Scientist
+
+TODO
+
+    meh
+
+
+## Problem 3
+
+    On a 12-hour analog clock, at what time near
+    8:18 are the hands symmetric about 6, that
+    is, 6 splits the angle between the minute and
+    hour hands? At what time near 8:18 is the
+    clockwise angle from the hour hand to the
+    minute hand the Golden Mean fraction of the
+    whole circle, that is, the angle between the
+    minute and the hour hands is 360 degrees
+    (sqrt(5) - 1)/2?
+    Express your two answers (to the nearest
+    millisecond) in the form hh:mm:ss.ttt.
+
+    -- Allan Gottlieb's Puzzle Corner in
+       Technology Review
+
+Solution:
+
+    Let t = current time (in seconds)
+    
+    h = angle for the hour hand
+    m = angle for the minute hand
+    
+    h=t/(86400/2)*360
+    m=t/3600*360 with a repeat every 3600 seconds
+
+    Want: h-180 = 180-m
+    
+    So: t/(86400/2)*360 - 180 = 180 - (t/3600-n)*360
+    
+    where n = 8 = number of hours
+    
+    t = 29907.69230769231 seconds
+    
+    Solving for t = 8:18:27.692
+
+    As far as the Golden Mean fraction - I don't know what
+    that really means.  I guess it means the minute hand
+    leads the hour hand by 360*(sqrt(5)-1)/2 degrees.
+    
+    so: (t/3600-n)*360 - t/(86400/2)*360 = 360*(sqrt(5)-1)/2
+    
+    Where n = 7 or 8 (might need to allow minute hand to be in
+    the next hour).
+    
+    t = 08:18:38.097119
+    
+    The solution in the Bent appears different but is the same.
+    They have M=(360*sqrt(5)-600)/11 after 8 which is the same
+    time as above.
+
+
+## Problem 4
+
+    In the game of tennis, two players hit a ball
+    back and forth across a net into a defined
+    court. A player loses a point by either
+    hitting the ball outside the court or failing
+    to return a ball before it has bounced twice.
+    The first player to win four points, provided
+    he is ahead by at least two points, wins the
+    game. Thus, the final score can be 4-0, 4-1,
+    4-2, 5-3, 6-4, etc. The same player serves
+    for a complete game, and on each point he has
+    two chances to make a successful serve.
+    Assume a player has a probability, p1, of a
+    successful first serve, a probability, p2, of
+    a successful second serve if the first serve
+    is bad, a probability q1 of winning a point
+    if his first serve is good, and a probability
+    q2 of winning a point if his second serve is
+    good. If he is serving, what is his
+    probability w of winning a point (in terms of
+    p's and q's)? What is his probability g of
+    winning the game (in terms of w)? If p1=0.8,
+    p2=0.7, q1=0.6, and q2=0.5, what are w and g?
+
+    -- H.G. McIlvried III, PA G'53
+
+Solution:
+
+    The probability of winning a point should be:
+    
+    w = p1*q1 + (1-p1)*p2*q2
+
+    To win a game:
+    
+        win 4 points in a row:                 w^4
+        win 4 out of 5 (lose 1 of first 4):    C(4,1)*w^4*(1-w)
+        win 4 out of 6 (lose 2 of first 5):    C(5,2)*w^4*(1-w)^2
+        win 3 out of 6 --> deuce:              C(6,3)*w^3*(1-w)^3*W(deuce)
+        
+        Once you get to deuce there are two alternatives or go back
+        to deuce:
+        
+            ww
+            wL -> Deuce
+            Lw -> Deuce
+            LL
+            
+        W(deuce) = w^2/(w^2 + (1-w)^2)
+        
+    Summing all the possibilities:
+    
+        P = w^4 + 
+            C(4,1)*w^4*(1-w) + 
+            C(5,2)*w^4*(1-w)^2 + 
+            C(6,3)*w^3*(1-w)^3*w^2/(w^2+(1-w)^2)
+        
+        P = w^4*(15 - 34*w + 28*w^2 - 8*w^3)/(2*w^2 - 2*w + 1)
+        
+    For the specific case:
+    
+        p1=0.8, p2=0.7, q1=0.6, q2=0.5
+        
+        w = 0.8*0.6 + (1-0.8)*0.7*0.5 = 0.55 (55/100)
+        
+        P ~ 0.6231485024752476
+        
+          = 50350399/80800000 (precisely)
+
+
+## Problem 5
+
+    Solve this cryptic addition with the usual
+    rules: different letters are different
+    digits, same letter is same digit, no leading
+    zeros, base 10. 
+
+    FIVE + FIVE + TEN + TEN + TEN + TEN + THIRTY = EIGHTY.
+
+    -- Journal of Recreational Mathematics
+
+Solution: from the cryptic arithmetic notebook
+
+    Cryptic addition:
+
+      FIVE + FIVE + TEN + TEN + TEN + TEN + THIRTY = EIGHTY
+
+    a=make_crypt_df('fivetenthirtyeighty')
+    x1=make_num(a,'five')*2+make_num(a,'ten')*4+make_num(a,'thirty')
+    x2=make_num(a,'eighty')
+    k=(x1==x2)&(a$f!=0)&(a$t!=0)&(a$e!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+            f i v e t n h r y g
+    2923964 8 0 5 2 1 4 9 3 7 6
+
+
+## Bonus
+
+    Four square blocks of sizes from 1^2 up to 4^2
+    can be fitted into a 7 x 5 rectangle (as
+    shown), but not into a smaller rectangle. As
+    you take a larger series of blocks, 1^2, 2^2,
+    3^2, ..., n^2, it is not always easy to choose
+    the rectangle which will accommodate them
+    with the least "waste". With n=4, the minimum
+    waste is 5. What size rectangles give the
+    minimum waste for n=11 and for n=12? Consider
+    the rectangle as a pxq grid, and draw in the
+    n squares. Next, fill in each of these
+    squares with digits; 1 for the 1^2 square, 2
+    for the 2^2 square, 3 for the 3^2 square, ...
+    Use a for 10^2 , b for 11^2 , etc. Use a dash for
+    wasted space. Present your answers as q rows
+    of p digits, as indicated in the example
+    below.
+
+        3334444
+        3334444
+        3334444
+        2214444
+        22-----
+
+    -- Stephen Ainley in New Scientist
+
+TODO
+
+    meh
+
+
+## Computer Bonus
+
+    Find the (base 10) count of and the sum of
+    all palindromic numbers between 1 and
+    100,000,000 (base), inclusive, for bases 2
+    through 10, inclusive. A palindromic number
+    is a number which reads the same forward and
+    backward.
+
+    -- Rolf B. Karlsson, MI Z'96
+
+Solution: Try brute force?
+
+Preserved for posterity but the run time is very long.
+
+```{r, eval=FALSE}
+library(gmp)
+
+int_to_digits=function(n,b=10) {
+    a=c()
+    while (n>0) {
+        m=n%%b
+        n=trunc(n/b)
+        a=append(a,m)
+    }
+    a=rev(a)
+    return(a)
+}
+
+for (b in 2:10) {
+    np=0
+    total=as.bigz(0)
+    nmax=b^8
+    for (i in 1:nmax) {
+        a=int_to_digits(i,b)
+        if (all(a==rev(a))) { np=np+1; total=total+i }
+    }
+    print(sprintf("%d   %d   %s",b,np,as.character(total)))
+}
+
+```
+
+    While this was running forever I went and solved it in Python:
+    
+    Python Solution:
+    
+    Base   Num     Sum
+    ---------------------------
+    2         30           2632
+    3        160         327039
+    4        510        9986436
+    5       1248      141759070
+    6       2590     1240259700
+    7       4800     7770547197
+    8       8190    38125189144
+    9      13120   155181063996
+    10     19998   545045045040
+
+
+    R Solution:
+    
+    Base   Num     Sum
+    ---------------------------
+    2         30           2632
+    3        160         327039
+    4        510        9986436
+    5       1248      141759070
+    6       2590     1240259700
+    7       4800     7770547197
+    8       8190    38125189144
+    9      13120   155181063996
+    10     19998   545045045040
+
+    I repeated the final base in R using bigz values to avoid
+    overflow and loss of precision.
+
+Need something to make pandoc happy.
+
+```{r}
+1
+```

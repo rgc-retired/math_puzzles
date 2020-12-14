@@ -1,0 +1,447 @@
+---
+title: "Bent Summer 2001"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2001
+
+## Problem 1
+
+    They were one of those Tau Beta
+    Pi bi-spousal couples. One day, she
+    went on an errand. That evening, he
+    asked her how long the errand had
+    taken. Knowing he also liked puzzles,
+    she responded, "When I left, the
+    hands on my watch were aligned,
+    with the hour hand between 8 and 9
+    and the minute hand between 2 and
+    3. When I returned, the hands were
+    again aligned, but this time the hour
+    hand was between 2 and 3, and the
+    minute hand was between 8 and 9.
+    You tell me how long I was gone." To
+    the nearest second, how long did the
+    errand take?
+    
+    -- Justo T. Del Puerto
+
+Solution:
+
+    Measure all angles in degrees, clockwise from 12.
+
+    Let m = number of minutes past the hour
+    
+    The angle of the minute hand is:
+    
+        Minute angle = (m/60)*360
+    
+    When hour hand is between 8 and 9 the angle of the hour hand is:
+    
+        Hour angle = 240+(m/60)*30
+    
+    When leaving:
+        240+(m/60)*30 = (m/60)*360 + 180
+        2 = (m/60)*11
+        m = 120/11 (between 2 and 3)
+        
+        Time = 8 hours + 120/11 minutes = 8.1818...
+        
+    When coming home (by analogy to above):
+    
+        Hour angle = 2/12*360 + (m/60)*30
+        
+        60+(m/60)*30 + 180 = (m/60)*360
+        2            +  6  = (m/60)*11
+        m = 60*8/11 = 480/11 (between 8 and 9)
+        
+        Time = 2 hours + 480/11 minutes = 2.7272...
+    
+    We assume she left in the morning (about 8) and returned in afternoon (about 3).
+    If we use 24 hour time we get an elapsed time of:
+    
+    (14+480/11/60) - (8+120/11/60) = 6.5454... hours
+        = 392.7272... minutes
+        = 23563.64    seconds
+
+Note: their solution is a lot shorter but it gives the same result.  They make the
+observation that the hands are in opposition at 6AM and 6PM and 10 (?) times in
+between.  This means that the hands are in opposition once every 12/11 hours.
+From ~8AM to ~3PM there are 6 such intervals so the time is 6*12/11 = 72/11 hours.
+This is the same result.
+        
+## Problem 2
+
+    A palindrome is a number that
+    reads the same forward and backward.
+    How many integers in the range from
+    1 through 10^10 are palindromic?
+    
+    -- Edward C. Creutz, PA Gamma'36, and
+    Michael J. Creutz, CA Beta'66
+
+Solution:
+
+A value of 10^n has n+1 digits so 10^10 has 11 digits.  Numbers smaller
+than this have 1-10 digits. So:
+
+The integers can have 1-10 digits.  Consider each pattern where
+a must be non-zero (9 possibilities), b, c, d, and x can be any digit
+(e.g. 10 possibilities):
+
+    Num digits: pattern       Number
+    --------------------------------
+    10 digits: abcdxxdcba     90000
+    9 digits:  abcdxdcba      90000
+    8 digits:  abcddcba       9000
+    7 digits:  abcxcba        9000
+    6 digits:  abccba         900
+    5 digits:  abxba          900
+    4 digits:  abba           90
+    3 digits:  axa            90
+    2 digits:  aa             9
+    1 digit:   a              9
+    -------------------------------
+    TOTAL                    199998
+
+## Problem 3
+
+    Solve the following cryptic
+    multiplication, where FLY is exactly
+    divisible by GO. GO x FLY = KITES
+    
+    -- Don A. Dechman, TX Alpha'57
+
+Solution: solved in the cryptic_arithmetic notebook
+
+    GO    = 27
+    FLY   = 594
+    KITES = 16038
+
+
+## Problem 4
+
+    On the first day of spring on the
+    level plains of Ecuador, a certain
+    tribe of tall Indians celebrates the
+    fact that they can see the sun for a
+    longer time than a neighboring tribe
+    of short Indians. In fact, how much
+    longer, in seconds, is the time between
+    sunrise and sunset for the tall tribe
+    (whose eyes are 200 cm above the
+    ground) as compared to the short
+    tribe (whose eyes are 140 cm above
+    the ground)?
+    
+    -- Byron R. Adams, TX Alpha'58
+
+TODO
+
+I think we need to make some assumption about the radius of the
+earth and the fact that the earth is (approximately) a sphere???
+
+I peeked at the answer: the assume a perfect sphere of radius = 6378 km.
+They also consider the earth's rotation rate of 360 degrees per day.
+They make a small angle approximation for cos(theta).
+
+The answer they are looking for is: 3.556 seconds
+
+## Problem 5
+
+    In order to help deal with the
+    changing postage rates, an efficiency
+    expert tried to design a 2 x 3 pane of
+    stamps in such a way that by using a
+    single stamp or a connected set of
+    them, all possible postage rates 1, 2, 3,
+    ..., N could be met exactly. The first
+    attempt yielded the arrangement
+    below, which can satisfy the values
+    from 1 to 32 except for 18; therefore,
+    N = 17 for this arrangement. The
+    maximum would be 63, of course
+    (1+2+4+8+16+32), but there is no way
+    to reach that total while meeting the
+    requirement for all sets of stamps to
+    be contiguous. Find the largest N and
+    show its 2 x 3 array.
+
+        +----+----+----+
+        | 10 |  9 |  7 |
+        +----+----+----+
+        |  2 |  3 |  1 |
+        +----+----+----+
+    
+    -- Adapted from New Scientist
+
+TODO
+
+I gave up and looked at the solution.  They indicate that
+the theoretical maximum is 40 (there are 6 singles, 7 pairs,
+... etc. up through 1 group of 6) but there are no feasible
+solutions above 36.  Both of the following achieve this
+feasible maximum:
+
+    1 - 2 - 15
+    4 - 6 - 8
+    
+    1 - 3 - 17
+    8 - 2 - 5
+
+
+## Bonus
+
+    Riley has ten spherical beads,
+    1 cm in diameter. Two are red, two are
+    orange, two are yellow, two are green,
+    and two are blue. The beads are to be
+    strung to make a circular bracelet.
+    How many different bracelets can be
+    formed?
+    
+    -- Howard G. McIlvried III, PA Gamma'53
+
+Note: after solving the problem to my satisfaction I looked at their solution
+and they have a smaller number of unique bracelets.  They consider a palindrome
+to be the same bracelet so I need to add that to the calculations.  They also
+talk about two types of palindromes ???
+
+Their solution is very complicated.  Not sure I would have ever found an analytical
+solution.  The solution in the next issue of the Bent is longer than one page
+(of a narrow column).
+
+My computer solution (including palindromes) = 11352 unique combinations
+Their solution = 5736 combinations
+
+After adding the palindrome check, my Python computer solution yields:
+
+    Number of solutions =  5736
+    Solution time (secs) =  1719.3
+
+The number of unique solutions agrees with their solution.
+
+Fixing the Lua version took longer than I anticipated -- but it finally runs
+with similar (corrected) results:
+
+    Number of solutions = 5736
+    Solution time (secs) = 297.3
+
+Note the Lua runtime is about 5 minutes versus the nearly 3 day run time of my
+attempt to solve this in R.
+
+
+Solution:
+
+I could simply enumerate all the 10-digit 5-tuples and then pick the possible
+combinations (e.g. 2 of each digit).  After that, I could throw away any rows
+that are shifted versions of previous rows.
+
+This seems rather ham-fisted but it should work.
+
+I tried it and it ran for freaking ever!  Just generating the data takes a minute.
+Attempting to eliminate the shifted rows took over an hour and wasn't close to being
+done.  After checking this out some more I realized it would run for more than 3 days!!!
+I was able to speed it up a bit - but still more than 2 day run time.
+
+Need to be smarter about this -- or use a different language.
+
+
+
+```{r}
+library(gtools)
+
+t1=Sys.time()
+
+# Generate all the digit permutations
+a=gtools::permutations(5,10,repeats.allowed=TRUE)
+
+# Select only the ones with 2 of each digit
+k=apply(a,1,function(x) {sum(x==1)==2 & sum(x==2)==2 & sum(x==3)==2 & sum(x==4)==2})
+b=a[k,]
+
+rm(a)
+
+t2=Sys.time()
+
+print(paste0('Setup = ',difftime(t2,t1,units='secs'),' seconds'),collapse='')
+
+print(dim(b))
+
+## Commented out - just a feasibility test
+if (FALSE) {
+  t3=Sys.time()
+  
+  for (i in 1:100) {
+    # print(i)
+    for (j in (i+1):nrow(b)) {
+      x=b[j,]
+      for (k in 1:9) {
+        x=c(x[-1],x[1])
+        if (all(x==b[i,])) { b[j,]=0; break }
+      }
+    }
+    k=apply(b,1,sum)
+    b=b[k!=0,]
+  }
+  t4=Sys.time()
+  print(paste0('Runtime = ',difftime(t4,t3,units='secs'),' seconds'),collapse='')
+}
+```
+
+A couple of observations:
+
+    If there are m different colors for each of the n beads then the number of possible
+    combinations is m^n.  We can generate all possible combinations as a number of
+    n digits in base m (m-ary n-tuple).
+    
+    Not sure how to calculate the number of combinations with 2 of each color.
+    
+    Note that a unique pattern will eliminate up to (n-1) rows since they will be
+    circular shift(s) of the unique pattern.
+    
+
+Let's try a smaller problem to see if we can gain any insight.
+Start with two colors:
+
+    Assume we have 4 beads of two different colors = aabb
+    Enumerate all the binary combinations and then select the ones that have two of each.
+    Finally, select the ones that are unique (even with circular shift)
+
+    
+    bead1 bead2 bead3 bead4   Result
+    -------------------------------
+    a     a     b     b       Starting pattern
+    a     b     a     b       Second pattern
+    a     b     b     a       Eliminate - circular shift of starting pattern
+    b     a     a     b       Eliminate - circular shift of starting pattern
+    b     a     b     a       Eliminate - circular shift of second pattern
+    b     b     a     a       Eliminate - double circular shift of starting pattern
+
+Doing the same thing up to more colors/beads (2 each color) yields:
+
+     4 beads, 2 colors -->      6 possible --> 2   unique combinations
+     6 beads, 3 colors -->     90 possible --> 16  unique combinations
+     8 beads, 4 colors -->   2520 possible --> 318 unique combinations
+    10 beads, 5 colors --> 113400 possible --> ??? unique combinations
+
+Trying brute force on 10 beads, 5 colors seems to take a really long time.
+May need to switch languages or get a smarter algorithm.  The difficulty
+is in checking each row against all shifts of all other rows.  The
+algorithm is O(n^2) and n is very big.
+
+** WARNING -- the first version of Lua code is wrong **
+
+I rewrote this in Lua -- a lot of work but it runs faster.  At least it
+finishes a couple of orders of magnitude faster but it still takes a
+long time to run (about 10 minutes).  With LuaJit:
+
+    10 beads, 5 colors --> 30144 unique combinations
+
+The source is locate in `bracelet.lua`.  The unique solutions are given
+in the text file `bracelet_solution.txt`.  The 5 colors are denoted by
+digits 1-5.  The columns in the output represent the pattern.  It is assumed
+that we needed to eliminate any rows that are circularly equivalent.
+
+Need more work on this.
+
+It should be possible to enumerate these manually and use cmbinatorics
+but I'm not sure how.
+
+Even so - the LuaJit execution time of 10 minutes versus R of ~3 days?????
+Need to figure this out for future reference.
+
+** Python was easy to write **
+
+Should also look into Python itertools ... nothing really makes this easier except
+in the generation of the n-tuple.  The itertools.product call makes it trivial to
+parameterize this instead of hard-coded nested loops.  In addition, np.roll makes
+it easy to check for cyclic rotation of vectors.  Unfortunately, a quick check shows
+that it is still very slow.
+
+Well -- I found out about collections.deque for quick rotation and ran the *same* tests
+as the Lua program and now I have a different answer.  For the Python program
+I get:
+
+    10 beads, 5 colors --> 11352 unique combinations
+
+Comparing the results I think the Python answer is correct.  There are rows in the
+Lua solution that are shifted versions of prior rows.  For example, check out rows
+0 and 3281 (zero-based) in the Lua solution.
+
+The Python code is in file `bracelet.py`.
+
+** Fixing the Lua Code **
+
+Examining the Lua code for errors I think it was only testing 8 shifts instead of 9
+when looking for duplicates.  I changed the limit to 9 and we will try to rerun this
+when the python code has finished (I added some instrumentation and timing code).
+
+    Python:
+    Number of solutions =  11352
+    Solution time (secs) =  1757.561486005783
+
+    LuaJIT after fixing shift counter:
+    Number of solutions = 22680
+    Solution time (secs) = 492.128
+    
+Something still seems wrong.  Need to compare results and figure out why.
+Problem still exists at the first line where the full number of shifts is required.
+I think I have the shift and comparison code reversed.  Either I need to increase
+the shift counter once more or swap the shift/check logic.  The current logic
+actually makes one useless comparison so I will do the shift and then compare.
+That should work correctly.
+
+    LuaJIT after fixing shift/check logic:
+    Number of solutions = 11352
+    Solution time (secs) = 338.531
+
+The solution for LuaJIT is now identical to the Python code.
+
+Note that after writing this I modified the Lua and Python code to check for
+palindromes to match the solution from the Bent.  In that case, the number
+of feasible bracelets is reduced to (about) half the value given above.
+
+## Double Bonus
+
+    A chemist had twelve
+    10-gram weights, one of which he
+    knew was inaccurate. By conducting
+    only three weighings on his equal-arm
+    balance, he determined which weight
+    was inaccurate and whether it was too
+    light or too heavy. How did he do it?
+    
+    -- Maurice W. Widener, TX Alpha'48
+
+TODO
+
+I gave up and looked at the solution.  They indicate that there are
+two possiblities for each of the 12 weights for 24 possibilities.
+
+With three weighings you can get - left heavy, right heavy, or balance.
+
+This is 3^3 possibilities = 27 results.
+
+It should be possible to map the 27 weight results against the 24
+possible weights to get a unique result.  They suggest the following
+as one solution with weights 1, 2, ..., 9, A, B, C:
+
+    1 2 3 4   vs.   5 6 7 8
+    1 5 6 9   vs.   2 7 A B
+    3 7 8 A   vs.   2 6 B C
+
+Need to confirm that this works.  They give one example for
+
+    Right-heavy
+    Balanced
+    Right-heavy
+    
+    This means weight 3 is light.
+

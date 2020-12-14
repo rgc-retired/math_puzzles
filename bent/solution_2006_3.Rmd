@@ -1,0 +1,302 @@
+---
+title: "Bent Fall 2006"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2006
+
+
+## Problem 1
+
+    The wife of a man who grew barley
+    Was also the sister of Charlie.
+    Her neighbor grew hay
+    And was married to Ray,
+    And one of these girls was named Carly.
+    The girl who was married to Wayne
+    Lived next to the farm that grew grain.
+    She liked to eat celery
+    That was grown by Valerie,
+    And she weighed 80 more pounds than Jane.
+    The woman whose husband grew dill
+    Was never married to Bill.
+    Before Jane married Benny
+    And Ray married Jenny,
+    She went out drinking with Jill.
+
+    Who is married to whom, and what does each couple grow?
+    Only one couple has rhyming names.
+
+    -- Technology Review
+
+TODO
+
+    meh
+
+
+## Problem 2
+
+    Uncle Wilbur was rich enough in life to command
+    the boundless devotion of his family. However,
+    some of them he despised, and some he merely
+    disliked.  Therefore, he repaid them by leaving
+    his entire estate to be divided equally among the
+    581 inmates of a home for retired greyhound racing
+    dogs. The sum involved ran to five figures and,
+    when divided, gave each dog a whole number of
+    dollars. By coincidence, the exact number of
+    relatives he despised happens to equal the first
+    two digits of the value of his estate, and the
+    third digit is the number he merely disliked. The
+    last two digits equal the number of his kinsfolk,
+    that is the sum of those he despised and those he
+    merely disliked.  How much money did each dog get?
+
+    -- Adapted from Martin Hollis
+
+TODO
+
+Probably would do exhaustive search.
+
+```{r}
+
+# Get the multiples of 581
+x=(10000:99999)[(10000:99999) %% 581 == 0]
+
+despised=trunc(x/1000)
+disliked=(trunc(x/100)%%10)
+kinsfolk=x%%100
+
+k = ((despised+disliked) == kinsfolk) & (despised>0) & (disliked>0)
+
+x[k]
+
+x[k]/581
+
+```
+
+    The original sum was 91798
+    Each dog received 158
+
+
+## Problem 3
+
+    A 3 m by 3 m rug that is 1 cm thick is rolled up
+    on a wooden cylinder 10 cm in diameter. Assume
+    that the first wrap leaves a small gap between the
+    rug and the cylinder (assume that the bottom
+    surface of the rug forms a straight line between
+    the wooden cylinder and the edge of the rug), but
+    that there are no other gaps in the roll. What is
+    the distance from the outer edge of the rolled rug
+    to the center of the wooden cylinder?
+
+    -- Oscar C. Bascara, NY D '90
+
+Solution:
+
+    Each time you wrap the rug around the cyclinder the radius
+    increases by 1 cm --> diameter increases by 2 cm.
+    
+    First wrap: D=10cm  --> circumference = pi*10
+        remaining rug length ~ 300-10*pi = 268.58
+    
+    Second wrap: D=12cm --> circumference = pi*12
+        remainder = 230.855
+    ...
+    
+    Sixth wrap: D=20cm --> remainder = 17.257 cm
+
+    Not enough for a complete seventh wrap.
+    
+    Final diamter = 22 (inner diameter for wrapping the rug)
+    
+    The outer diameter = 22+2 = 24 cm --> outer radius = 12 cm.
+
+
+## Problem 4
+
+    A spherical plum pudding of radius R contains N
+    infinitely small plums, randomly distributed. What
+    is the expected distance of the nearest one from
+    the surface?
+
+    -- W.A. Whitworth, 1901
+
+Solution:
+
+    This is the spherical equivalent to the cone problem
+    from 2006 Spring.  In this solution they give a much
+    clearer explanation of the calculations.
+    
+    The multiplication by N for the N plums is specifically
+    noted.
+    
+    Here he uses a differential shell as the probability region.
+    The ratio of the internal shere to the full sphere is the
+    probability that this plum is nearest the surface.  The
+    exponent here is (N-1) for the N-1 other plums.
+    
+    So we have:
+    
+    Pr (inside the diff slice) = 4*pi*r**2*dr/(4/3*pi*R**3)
+    
+    Pr (other plums inside) = ((4/3*pi*r**3)/(4/3*pi*R**3))**(N-1)
+    
+    Expected value:
+    
+    E = N * integrate(r*3*r**2/R**3*(r**3/R**3)**(N-1),(r,0,R))
+    
+      = 3*N*R/(3*N+1)
+      
+    This is the expected value of the distance from the center
+    of the sphere.  The distance to the outside:
+    
+    D = R - E = R/(3*n+1)
+
+    Note: need to help Sympy with the integral by declaring
+    n as positive integer and declare R as positive.  Note
+    that the equation above uses N but it is probably better
+    to use a symbol of lower case n in sympy to avoid collision
+    with the N() function.
+
+
+## Problem 5
+
+    A flexible string of length L hangs from the
+    bottom of a spherical fixture of radius R. The
+    string swings back and forth in a plane. What is
+    the maximum area that the string can sweep out?
+    (Assume L < pi*R.)
+
+    -- adapted from Howard P. Dinesman
+
+
+WARNING: the solution given in the Bent has something wrong.
+The given integral does not equal the final value.  I think
+the limits on the integral should be 0 to +L instead of -L to +L.
+
+
+Solution:  I don't really understand this problem.  Is this a 2D or a 3D
+problem?  Can the plane be horizontal?   If it must be vertical then I
+can see the problem.  As the string wraps around the spherical support is
+deviates from the perfect circle.  Below the level of the sphere the string
+will sweep out a perfect circle:
+
+    A1 = 1/2 * pi * L**2
+    
+For angles of the string where it partially wraps around the sphere the
+string is tangent to the sphere with a length less than L.  As it wraps more
+and more the length gets shorter.  If we call the angle for the portion of
+the sphere that is wrapped with the string as theta then:
+
+    arc length = L*theta
+    
+    length of string = L - R*theta
+    
+    Can I just integrate this as 1/2*(L-R*theta)*dtheta*(L-R*theta)?
+    Apparenty not.  This doesn't work.
+    
+    point of tangency: x0,y0
+        x0 = R*sin(theta)
+        y0 = R-R*cos(theta)
+        
+    Slope of tangent line = tan(theta)
+
+    End of string: x = x0 + (L-R*theta)*cos(theta)
+                   y = y0 + (L-R*theta)*sin(theta)
+                   
+    Substituting:
+    
+        x=R*sin(theta)+(L-R*theta)*cos(theta)
+        y=R-R*cos(theta)+(L-R*theta)*sin(theta)
+        
+    What does this look like in a plot?
+    
+```{r}
+R=1
+L=pi*R
+
+plot(c(-4,4),c(-4,4),type='n',asp=1)
+theta=seq(0,2*pi,length=100)
+x_sphere=R*cos(theta)
+y_sphere=R+R*sin(theta)
+polygon(x_sphere,y_sphere,lwd=3)
+
+lines(c(0,0),c(0,-L),col='red',lwd=3)
+
+# Semicircle for the lower half
+theta=seq(-pi/2,0,length=100); x_1=L*cos(theta); y_1=L*sin(theta)
+
+# Strange reducing circle for upper half
+theta=seq(0,pi,length=100)
+x_2=R*sin(theta)+(L-R*theta)*cos(theta)
+y_2=R-R*cos(theta)+(L-R*theta)*sin(theta)
+
+polygon(c(x_1,x_2),c(y_1,y_2),border='red',lty='dashed')
+polygon(-1*c(x_1,x_2),c(y_1,y_2),border='red',lty='dashed')
+grid()
+```
+
+Now I understand the difficulty.
+
+Need to work on this some more.
+
+## Bonus
+
+    A needle of length l is thrown randomly onto a
+    ruled grid. The horizontal spacing of the grid is
+    d1 and the vertical spacing of the grid is d2.
+    What is the probability that the needle will cross
+    either a horizontal or a vertical line (or both)?
+    Consider only the case where l<d1<d2.
+
+    -- adapted from P.S. Laplace, 1821
+
+TODO
+
+    Buffon needle problem
+
+
+## Double Bonus
+
+    It has been said that if enough monkeys were given
+    enough time with enough typewriters, they would
+    eventually reproduce all of the works of
+    Shakespeare. Suppose that there are 10,000,000
+    monkeys, each typing the 26 lower case letters
+    plus the space bar at random, at 10 characters per
+    second. What is the expected time interval between
+    occurrences of the sequence "wherefore art thou
+    romeo"?
+
+    -- Byron R. Adams, TX Alpha '58
+
+Solution:
+
+    Nothing really tricky here -- just big numbers.
+    
+    The phrase has 24 characters so we are looking for a particular
+    sequence in base 27.
+    
+        27^24 = 2.252e34
+        
+        Character rate = 1e8 characters per second
+        
+        Time = 2.253e26 seconds
+             = 2.607e21 days
+             = 7.144e18 years (assuming 365 days/year)
+             
+        Which is, of course, much longer than the age of the universe.
+
+    On the other hand, it might happen twice in 48e-8 seconds!
+
+        
+
+

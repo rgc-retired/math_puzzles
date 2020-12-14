@@ -1,0 +1,648 @@
+---
+title: "Bent Spring 2001"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2001
+
+## Problem 1
+
+    A local eatery has an electronic
+    "slot machine" that offers various
+    games. In one of them, called
+    PrimeTime, after a coin is inserted,
+    the digits 1 through 9 appear in
+    random order around a circle. Then,
+    an arrow, like the minute hand on a
+    clock, spins and stops, pointing to the
+    space between two of the digits. If
+    the two-digit number formed in a
+    clockwise direction by the two digits
+    on either side of the space the arrow
+    points to has a two-digit prime
+    factor, you win the jackpot. For
+    example, if the arrow stopped
+    between 9 and 2, you would win
+    because 92 has the prime factor 23.
+    On the other hand, if your number
+    were 81, you would lose. I recently
+    played the game; and, as the arrow
+    was spinning, I realized to my
+    dismay that no matter where the
+    arrow stopped, I would lose. Starting
+    with 1, what was the clockwise order
+    of the digits?
+    
+    -- Susan Denham in New Scientist
+
+Solution:
+
+Could generate all the permutations and then check them.  Seems excessive.
+
+Could enumerate all the two digit primes and their multiples to look for patterns.
+For example, I might find that a 9 can never be preceded by the number 8 (since 89 is prime).
+If I can find any digits that only permit a single successor/predecessor then I will have
+part of the sequence.  The sequence we are looking for should be revealed from this
+pattern analysis:
+
+```{r}
+is_prime = function(n) {
+  if (n<4) {
+    if (n==2 | n==3) { return(TRUE) }
+    return(FALSE)
+  }
+  if (n%%2 == 0) { return(FALSE) }
+  for (i in 3:sqrt(n)) {
+    if (n%%i == 0) { return(FALSE) }
+  }
+  return(TRUE)
+}
+
+p=(1:100)[sapply(1:100,is_prime)]
+p=p[p>9]
+
+print("Two digit primes:")
+print(p)
+
+# Generate all the integer multiples of these primes up to 9*11=99
+# Remove all the results above two digits
+#
+# These results are Poison (we want to avoid them)
+p=as.vector(outer(1:9,p,'*'))
+p=p[p<100]
+
+print("Two digit primes and multiples:")
+p
+
+print("Patterns based on final digit:")
+for (i in 1:9) {
+  print(c(i,sort(p[p%%10 == i])))
+}
+
+print("Patterns based on initial digit:")
+for (i in 1:9) {
+  print(c(i,sort(p[trunc(p/10) == i])))
+}
+
+```
+
+From the results above we conclude:
+
+    --> indicates a conclusion based strictly on the patterns above.
+    Other comments and eliminated digits occur based on these primal
+    patterns and the observation that a digit can only occur before or
+    after another digit (not in both places - e.g. 2 relative to 7):
+
+    1 must be preceded by 8                 must be -8-1-
+    2 must be preceded by 1, 3, 7
+    3 must be preceded by 6  -->            must be -6-3-
+    4 must be preceded by 1, 5
+    5 must be preceded by 1, 3, 7
+    6 must be preceded by 1, 3, 5, 9
+    7 must be preceded by 2  -->            must be -2-7-
+    8 must be preceded by 1, 9
+    9 must be preceded by 4  -->            must be -4-9-
+
+    1 must be followed by 2, 4, 5, 6, 8
+    2 must be followed by 7
+    3 must be followed by 2, 5, 6
+    4 must be followed by 9
+    5 must be followed by 4, 6
+    6 must be followed by 3
+    7 must be followed by 2, 5 -->          must be -2-7-5-
+    8 must be followed by 1
+    9 must be followed by 8                 must be -9-8-
+
+Merging some of the partial patterns:
+
+    -4-9-8-1-  as a result of -4-9- and -9-8- and -8-1-
+    -2-7-5-    as a result of 2 must precede 7 so it can't also follow
+    -6-3-      primal pattern
+
+But 4 must be preceded by 1, 5 so:
+
+    -2-7-5-4-9-8-1-  as a result of -2-7-5- and -4-9-8-1-
+    -6-3-
+
+And, 6 must be preceded by 1,3,5,9:
+
+    -2-7-5-4-9-8-1-6-3- ...
+    
+If we circularly shift to start with 1:
+
+    ... -1-6-3-2-7-5-4-9-8- ...
+
+Then the game can only generate numbers with single digit prime factors:
+
+    16 = 2*2*2*2
+    63 = 3*3*7
+    32 = 2*2*2*2*2
+    27 = 3*3*3
+    75 = 3*5*5
+    54 = 2*3*3*3
+    49 = 3*3*7
+    98 = 2*3*3*7
+    81 = 3*3*3*3
+
+Just for grins, let's try the permutation method:
+
+```{r}
+library(gtools)
+
+t1=Sys.time()
+# a is the permutation matrix with 1 in the left-most column
+# The remaining columns are all permutations of the digits 2-9
+a=cbind(1,gtools::permutations(8,8,2:9))
+# b is the two digit number made with digits from adjacent columns of a.
+# This also wraps around from the end of the a matrix back to column 1.
+b=10*a+cbind(a[,2:9],a[,1])
+
+# Check each of the permutations to see if they contain any of the
+# target values (in p).  If so - then that is not what we want.
+k=apply(b,1,function(x) {any(x %in% p)})
+t2=Sys.time()
+
+print(t2-t1)
+
+# Find all the rows that are "losers" -- e.g. have no two digit prime factors
+a[which(k==FALSE),]
+
+```
+
+Which yields the same answer and runs very quickly.  It is actually amazing that there is
+only one combination that yields this result.
+
+As a corollary: what is the expected payout from this game?  What percent of the time can
+you actually get a two digit prime factor?
+
+We can use the results from above to calculate this:
+
+```{r}
+m=apply(b,1,function(x) {sum(x %in% p)})
+sum(m)/length(b)
+```
+
+Amazingly, 5/8 of the time you will actually have a two digit prime factor!
+
+This also means that 3/8 of the time you will not have a two digit prime factor.
+If we assumed the 9 spaces on the wheel were statistically independent (not a
+good assumption), then we could estimate the likelihood of an entire wheel
+that has no two digit prime factor as:
+
+```{r}
+(3/8)^9*nrow(a)
+```
+
+So we expect that about 6 rows of the permutation matrix has no two digit
+prime factor.  Actually the result is 1 which is remarkably close to the random
+assumption calculation -- at least it is within an order of magnitude.
+
+
+## Problem 2
+
+    Don't let the wording of this
+    cryptic fool you into thinking it is
+    solvable in base 10. It isn't.
+    
+    TEN x TEN - TEN = NINETY
+    
+    Your job is to solve it in the
+    smallest base for which a solution
+    exists.
+    
+    -- Journal of Recreational Mathematics
+
+Solution:
+
+There are only 5 symbols used in the equation above.  This means that
+the base must be at least base 5.  We could exhaustively search for
+solutions to the cryptic problem but the number of permutations increases
+rapidly with the base number but it should be feasible up to base 20 or so:
+
+```{r}
+d=data.frame(base=5:20)
+d$perm=choose(d$base,5)*factorial(5)
+plot(d$base,d$perm,type='b',log="xy")
+grid()
+```
+
+Let's try this:
+
+```{r}
+# Get the code to play with cryptic arithmetic problems
+source('rgc_lib.R')
+```
+
+We will verify this doesn't work in base-10:
+
+```{r}
+a=make_crypt_df('tenninety',10)
+x10=make_num(a,'ten',10)
+x90=make_num(a,'ninety',10)
+k=(x10*x10-x10 == x90) & (a$t != 0)
+sum(k)
+```
+I tried several base values up through 32 without any solutions.
+Need to think this through - let's try symbolically:
+
+    TEN*TEN-TEN = TEN*(TEN-1) = NINETY
+    
+    TEN ~ sqrt(NINETY)  --> TEN is just slightly more than sqrt(NINETY)
+
+    number of digit in NINETY = 6, TEN = 3.  TEN must exceed sqrt(base) to add digit.
+
+    TEN = T*b^2 + E*b + N
+    NINETY = N*b^5 + I*b^4 + N*b^3 + E*b^2 + T*b + Y
+    
+So:
+
+    TEN*TEN-TEN = (T*b^2 + E*b + N)*(T*b^2 + E*b + N) - (T*b^2 + E*b + N)
+
+        T^2       b^4
+        2*E*T     b^3
+        2*N*T+E^2 b^2
+        2*N*E     b
+        N^2
+
+    NINETY = N*b^5 + I*b^4 + N*b^3 + E*b^2 + T*b + Y
+    
+TODO -- need to work on this some more
+
+
+## Problem 3
+
+    I recently visited a small aviary
+    and asked the keeper how many
+    birds he had. He replied, "I have a
+    total of 401 birds of five different
+    species. The number of auks is a
+    fourth power, although they will be
+    breeding soon. I have more than ten
+    boobies, and their number is both a
+    palindrome and triangular. The
+    number of cuckoos is divisible by 13.
+    The number of doves, which is more
+    than the number of auks, is prime
+    and a Fibonacci number. More than
+    five-eighths of the four species I
+    have mentioned so far are auks and
+    cuckoos. How many eagles do I
+    have?" (A triangular number has the
+    form n(n + 1)/2, where n is a positive
+    integer. Such numbers can be
+    arranged in triangles, like bowling
+    pins.)
+    
+    -- The Platinic Corner
+
+Solution:
+
+    Total number of birds = 401
+    Five species, each has count less than 401
+    
+    auks = fourth power > 1 (if breeding) --> [16, 81, 256]
+    boobies = triangular, palindrome > 10 --> [55, 66, 171]
+    cuckoos = divisible by 13
+    doves   = prime, Fibonacci > auks
+      prime, Fibonacci = [89, 233] --> auks can not be 256.
+    auks+cuckoos > 5/8*(auks+cuckoos+doves+boobies)
+    
+        boobies >= 55
+        doves   >= 89
+        
+        auks+cuckoos > 5/8*(auks+cuckoos+doves+boobies)
+        3*(auks+cuckoos) > 5*(doves+boobies) >= 5*(55+89)
+        auks+cuckoos >= 240
+    
+    This is starting to get confusing -- let the computer do the search.
+    
+    eagles  = unknown = 401-(auks+boobies+cuckoos+doves)
+    
+```{r}
+a=data.frame(auks=NA,boobies=NA,cuckoos=NA,doves=NA,eagles=NA)
+for (auks in c(16,81)) {
+  for (boobies in c(55,66,171)) {
+    for (cuckoos in (1:30)*13) {
+      for (doves in c(89,233)) {
+        if ((auks+cuckoos) > 5/8*(auks+cuckoos+doves+boobies)) {
+          if ((auks+cuckoos+doves+boobies)<401) {
+            a=rbind(a,c(auks,boobies,cuckoos,doves,401-(auks+boobies+cuckoos+doves)))
+          }
+        }
+      }
+    }
+  }
+}
+a=a[!is.na(a$auks),]
+row.names(a)=1:nrow(a)
+a
+```
+
+The number of eagles must be 7.
+
+The number of boobies must be 55, number of doves must be 89.
+The number of auks and cuckoos can vary as noted in the solution.
+
+
+## Problem 4
+
+    An urn contains nine balls labeled 1
+    through 9. Draw out the balls one at
+    a time and line them in the order
+    drawn to form a nine-digit number.
+    What is the probability that the
+    number so formed is divisible by 11?
+    
+    -- Technology Review
+
+Solution: try Monte-Carlo
+
+```{r}
+n_trials=1000000
+n=0
+for (i in 1:n_trials) {
+  s=0
+  for (j in sample(1:9,9)) {s=10*s+j}
+  if (s%%11 == 0) { n=n+1 }
+}
+n/n_trials
+```
+
+I could also look at the divisibility rules on Wikipedia
+and see if there is a tricky way to find divisibility by 11.
+
+I could also check out all the 9 digit permutations.  This should be feasible since
+there are only 9! permutations to consider:
+
+```{r}
+library(e1071)
+a=permutations(9)
+
+s=rep(0,nrow(a))
+for (i in 1:ncol(a)) { s=10*s+a[,i] }
+
+n=sum(s%%11 == 0)
+
+n/nrow(a)
+
+```
+
+This is the result of exhaustive search.
+It compares well with the result from Monte-Carlo:
+
+    Exhaustive = 0.08730159
+    Sampling   = 0.087654    (using 1e6 Monte-Carlo trials)
+
+
+## Problem 5
+
+    A pentomino is a plane figure
+    constructed from five unit squares
+    joined along their edges. A complete
+    set of pentominoes consists of one of
+    each of the 12 different such figures.
+    Rotations and reflections are allowed
+    but do not count as different figures.
+    Starting with a complete set whose
+    squares are the size of chessboard
+    squares, what is the smallest number
+    of pentominoes that can be placed on
+    a chessboard so that none of the
+    remaining pentominoes can be placed
+    on the board? Pentominoes must be
+    placed so that they are congruent
+    with the squares of the chessboard,
+    and they cannot overlap. To see what
+    a complete set of pentominoes looks
+    like, see the Brain Ticklers column in
+    the Fall 1999 issue of THE BENT. We
+    like to assign the letter names F, I,
+    L, N, P, T, U, V, W, X, Y, and Z,
+    which the pentominoes at least
+    somewhat resemble.
+    
+    -- Mathematics Teacher
+
+TODO
+
+## Bonus
+
+    An anti-aircraft gun with
+    muzzle velocity v can be fired at any
+    azimuth or elevation by vertical and
+    horizontal rotation about its fixed
+    location. What is the total volume of
+    sky that can be reached by a shell
+    from the gun, i.e., what is the
+    envelope of coverage? Assume the
+    land in the vicinity of the gun is level,
+    and ignore wind and air resistance.
+    Express your answer as a function of
+    v and the gravitational constant g.
+    
+    -- Richard W. de Nobel, OH Alpha'52
+
+Solution:
+
+    We should be able to calculate the volume using
+    slices in the horizontal direction and then calculating
+    the distance (radius) achievable at the optimal
+    firing angle.  These will be differential discs
+    that can be summed from 0 to ymax to yield the
+    total volume.
+    
+    Assume the target height is y0.  We need to find
+    the largest x that can be achieved at this height.
+    
+    Under uniform acceleration:
+    
+        v = a*t
+        x = 1/2*a*t^2
+    
+    Assume firing angle is theta, then:
+    
+    vx0=v*cos(theta)
+    vy0=v*sin(theta)
+    
+    Time to reach max altitude: t1=vy0/g
+    Max altitude: ymax=1/2*g*(vy0/g)^2 = vy0^2/(2*g)
+    Time to fall: t2=sqrt(2*(ymax-y0)/g)
+    Total flight time = t1+t2
+    Distance (x-axis) = vx0*(t1+t2)
+    
+    Substituting:
+    
+      xmax = v*cos(theta)*(v*sin(theta)+sqrt(2*(v^2*sin(theta)^2/(2*g)-y0)/2))
+      
+    Want to maximize wrt theta (need sympy -- this is ugly):
+    
+    Unfortunately, this gets ugly and stays ugly!
+    
+    Sympy ran for several minutes trying to integrate this so I killed it.
+    
+    The sympy expressions seemed correct for y0=0 using some numerical
+    values for v, g.
+    
+    Conceptually this works -- but maybe need a different way to find
+    the volume.
+    
+    For a given x (radius) there should be a maximum altitude.  Is it possible
+    to find this and then sum up differential cylinders?
+    
+    I gave up -- but this would have been the way to go.
+ 
+    This is the approach taken in the Bent and they
+    express y=f(x,theta) and then maximize y wrt theta with dy/dtheta=0.
+    Solving this gives the relationship between x and theta which can be
+    used to eliminate theta and get an equation for x and ye (envelope).
+    
+    Once this relationship is known we can just integrate the cylinders from 0
+    to the maximum possible firing distance.
+    
+    From the Bent:
+    
+    x = v*t*cos(theta)
+    y = v*t*sin(theta) - 1/2*g*t^2
+    
+    elimination of t leads to:
+    
+    t=x/(v*cos(theta))
+    y=v*x/(v*cos(theta))*sin(theta) - 1/2*g*x^2/(v*cos(theta))^2
+     = x*tan(theta) - x^2*g/(2*v^2*cos(theta)^2)
+     
+    Let: h = v^2/(2*g) = maximum height when firing straight up
+    
+    y = x*tan(theta) - x^2 * 1/(4*h*cos(theta)^2)
+    
+    The maximal y for a given x defines a point on the envelope.
+    To find the maximal y we need dy/dtheta = 0
+    
+    this is maximized when x=2*h/tan(theta) or
+    
+    theta = atan(2*h/x)
+    
+    so:
+    
+    ye = h-x^2/(4*h)  (yes - I used sympy to simplify this)
+    
+    so, now:
+    
+    we can constuct differential cylinders (as I suspected above) and
+    calculate the volume:
+    
+    integrate(2*pi*x*ye,(x,0,xmax))
+    
+    where xmax = maximum possible x value which occurs for theta=45 degrees.
+    
+    xmax:  vy0=v*sin(45*pi/180)=v/sqrt(2)
+           vx0=v*cos(45*pi/180)=v/sqrt(2)
+           t = 2*vy0/g
+           xmax = 2*v/sqrt(2)*v/sqrt(2)/g
+                = v^2/g
+                = 2*h (from above)
+                
+    so: V = integrate(2*pi*x*(h-x^2/(4*h)),(x,0,2*h))
+          = 2*pi*h**3
+          
+    or:
+    
+        v = 2*pi*((v^2)/(2*g))^3
+          = 2*pi*v^6/(8*g^3)
+          = pi*v^6/(4*g^3)
+
+We should be able to do this with reticulate and sympy:
+
+```{r}
+library(reticulate)
+```
+
+
+```{python}
+import sympy
+from sympy import *
+
+x,y,theta,t,g,v = symbols('x y theta t g v',positive=True)
+
+xpos=v*t*cos(theta)
+ypos=v*t*sin(theta)-g*t**2/2
+
+# Solving the first equation for t:
+tval=solve(xpos-x,t)[0]
+
+# and substituting into the second eliminates t.
+# Need to find the value of theta that maximizes this height for a given x
+thetaval=solve(diff(ypos.subs(t,tval),theta),theta)[0]
+pprint(Eq(S('theta_for_ye'),thetaval))
+
+# If we substitute back into equation for y then we have the desired function
+# This is the height of the envelope (aka differential cylinder of radius x)
+ye=simplify(ypos.subs(t,tval).subs(theta,thetaval))
+pprint(Eq(S('ye'),ye))
+
+# Now we need to integrate differential cylinders over x from 0 to xmax.
+# xmax occurs when the firing angle is 45 degrees
+# The time the projectile is in the air is 2*time for projectile to reach peak.
+# The speed in the x direction is constant
+tmax=2*(v*sin(pi/4)/g)
+xmax=v*cos(pi/4)*tmax
+pprint(Eq(S('xmax'),xmax))
+
+# Now we can integrate
+pprint(Eq(S('Volume'),integrate(2*pi*x*ye,(x,0,xmax))))
+
+print()
+print("Alternate expression:")
+print()
+
+# Alternately
+pprint(Eq(S('Volume'),pi/4*S('xmax')**3))
+```
+
+I am actually starting to wonder what this envelope looks like.  Using the results
+from above we should be able to just plot it:
+
+```{r}
+v=100
+g=32.2
+xmax=v^2/g
+
+x=seq(-xmax,xmax,length=200)
+y=-g*x^2/(2*v^2)+v^2/(2*g)
+
+plot(x/xmax,y/xmax,type='b')
+abline(h=0,col='red',lwd=3)
+abline(v=0,col='red',lwd=3)
+```
+
+Looking again at the equations shows the envelope is quadratically related to
+the maximum firing range:
+
+    ye = (xmax - g*x^2)/2
+    
+We could probably use this calculate the volume as well -- but we will leave that
+for another day.
+
+
+## Double Bonus
+
+    A 9-ft. by 12-ft. rug
+    has a centered 1-ft. by 8-ft. hole, with
+    the 8-ft. dimension parallel to the 12-ft.
+    side. Show how to cut the rug into
+    two pieces that can be fit together to
+    form a 10-ft. by 10-ft. rug with no
+    hole.
+
+    -- Author not specified
+
+TODO
+
+    I have seen this problem before.  Make a staircase
+    and shift it one step.
+    

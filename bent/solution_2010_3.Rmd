@@ -1,0 +1,312 @@
+---
+title: "Bent Fall 2010"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2010
+
+
+## Problem 1
+
+    Ann, Barb, and Cleo are three
+    remarkable women: two are remarkably
+    intelligent, two are remarkably
+    beautiful, two are remarkably artistic,
+    and two are remarkably rich. Each
+    has no more than three remarkable
+    characteristics. If Ann is remarkably
+    intelligent, she is remarkably rich. If
+    Barb or Cleo is remarkably beautiful,
+    she is remarkably artistic. If Ann or
+    Cleo is remarkably rich, she is remarkably
+    artistic. Which woman is not
+    remarkably rich?
+
+    -- Test Your Logic by George J. Summers
+
+TODO
+
+    meh - logic
+    
+    
+## Problem 2
+
+    A researcher is interested in studying
+    cheating at his alma mater, but he feels
+    that if he asks students directly if they
+    cheat, he will not get an honest answer.
+    Therefore, he decides to use the following
+    procedure. He places three cards
+    in an opaque bag. The first card reads,
+    "Have you cheated on a test in the past
+    year?"; the second card reads, "Answer
+    Yes," and the third card reads, "Answer
+    No." He hands the bag to a student, asks
+    him to select a card at random from the
+    bag, answer Yes or No, and replace the
+    card in the bag, all without letting the
+    researcher see the card. The researcher
+    interviewed 2,352 students and received
+    928 yeses and 1,424 nos. Assuming that
+    all of the students either answer truthfully
+    or answer yes or no when directed,
+    what is the estimated percentage of
+    students who cheat?
+
+    -- Why Do Buses Come in Threes?
+    by Rob Eastaway & Jeremy Wyndham
+
+Solution:
+
+    If we get an even sample then 1/3 will answer
+    yes as instructed, 1/3 will answer no as instructed,
+    and 1/3 will answer the real question.
+    
+    So:  the forced responses are 784=yes, 784=no.
+    The remainder are 784=honest
+    
+    honest responses are: 928-784 = 144 yes, 1424-784=640 no
+    
+    Estimated percentage of cheaters = 144/784 = 9/49 ~ 0.184 = 18.4%
+
+
+## Problem 3
+
+    A banker agrees to lend you a hundred
+    million dollars at an interest rate
+    of 100%. If the compounding period for
+    the interest is yearly, then you will owe
+    the banker two hundred million dollars
+    after one year (assuming that you make
+    no other payments). However, if the
+    interest rate is compounded monthly
+    at an interest rate of 1/12 of 100%, then
+    you will owe $261,303,529.02 after one
+    year; if the interest is compounded
+    weekly at a rate of 1/52 of 100%, you
+    will owe $269,259,695.44. How much
+    will you owe, to the nearest penny, after
+    one year, if the interest is compounded
+    continuously?
+
+    -- John L. Bradshaw, PA A'82
+
+Solution:
+
+    This is a relatively well-known result.  Continuous
+    compounding is exponential:
+    
+    total = loan * exp(i)
+          ~ 2.718281828459045 * loan
+
+    This is the limiting case of (1+i/n)^n as n-->infinity
+
+    I will leave the rounding to the nearest penny as an exercise
+    but it should yield 271828182.85
+
+
+## Problem 4
+
+    Three spheres of radii 2, 3, and 4
+    cm lie on a horizontal plane, tangent
+    to each other. A fourth sphere of radius
+    1 cm is placed in the pocket formed by
+    the other three. What is the distance of
+    the center of the smallest sphere from
+    the plane surface?
+
+    -- Technology Review
+
+TODO
+
+    This seems like a devilishly simple problem
+    that makes my head hurt.  I should definitely
+    work on this.
+    
+
+## Problem 5
+
+    A young girl is riding in a swing with
+    chains 8 ft in length and a seat 2 ft above
+    the ground. She wants to jump off and land
+    as far from the swing's rest position as
+    possible. At what angle of the swing (the
+    angle is 0 degrees  when the chains are
+    vertical) should she release from the seat,
+    and how far from the point directly under
+    the swing's rest position can she land?
+    Treat the girl as a point mass, and assume
+    that the highest she can pump the swing is
+    45 degrees with respect to vertical.
+
+    -- Towing Icebergs, Falling Dominoes, and
+    Other Adventures in Applied Mathematics by
+    Robert B.  Banks
+
+Solution:
+
+    This seems like a fun problem.  Need to trade
+    potential and kinetic energy along with ballistic
+    motion.
+
+
+## Bonus
+
+    A football punter, standing at the middle of
+    the 50-yard line, wishes to make a "coffin
+    corner" kick. That is, to kick the ball out
+    of bounds as close to the goal line as
+    possible, but not into the end zone. If
+    successful, the opposing team will get the
+    ball at the yard line where it goes out of
+    bounds; if unsuccessful, it will get the
+    ball at the 20-yard line. Assume the ball
+    travels in a straight line, has enough
+    velocity to cross the sideline or goal line,
+    and there is no run-back. If the kicker's
+    launch angle has a normal distribution with
+    a standard deviation of 7.5 degrees from
+    where he aims, at what sideline yard marker
+    should the punter aim so that the expected
+    value of the opposing team's starting
+    position is minimized? What is that expected
+    value (in yards from their goal line)? A
+    football field, not counting the end zones,
+    is 300 feet by 160 feet.
+
+    -- Steven E. Bradley, AZ A'77
+
+Solution:
+
+    Let's use Monte Carlo
+    
+    A measure the angle of the kick as the angle relative to the center
+    of the field.  For a very shallow angle the ball will go into the
+    end zone and come out to the 20.  If the angle is "steep enough" it
+    will go out of bounds.
+    
+```{r}
+num_kicks=1000000       # Number of kicks at each target yardline
+kasd=7.5*pi/180         # Kick angle standard deviation in radians
+width=80/3              # Width of half-field: kicker to the sideline
+
+acrit=atan(width/50)    # Critical kick angle.  If the kick angle is less than
+                        # this value it will go into the end-zone.
+
+set.seed(123)           # reproducibility
+
+yardlist=seq(0,15,0.2)  # Kick target yardlines
+x=c()                   # Mean response
+
+for (target in yardlist) {
+    theta = atan(width/(50-target))
+    ka=rnorm(num_kicks,theta,kasd)
+    y=ifelse(ka<acrit,20,50-width/tan(ka))
+    x=c(x,mean(y))
+}
+plot(yardlist,x,type='b',xlab="Target",ylab="Mean Start",main="Coffin Corner Kick")
+grid()
+```
+
+```{r}
+print(paste0("Optimal starting yardline = ",min(x)))
+print(paste0("Optimal target yardline   = ",yardlist[which.min(x)]))
+```
+
+The optimal target is:
+
+    Aim for ~6 yardline
+    Mean starting result is 14.4 yardline
+
+Of course we could also do this analytically but this was more fun.
+
+
+## Computer Bonus
+
+    The smallest palindromic square with an even
+    number of digits is 698,896 (the square of
+    836).  What are the next two smallest
+    palindromic squares with an even number of
+    digits?
+
+    -- The Colossal Book of Mathematics by
+    Martin Gardner
+
+Solution:
+
+    We should be able to solve this with exhaustive search.
+    We will simply start counting up from 837, calculate
+    the square and check to see if it is a palindrome.
+    To ensure this is valid for large numbers we can use
+    gmp for wide integers or use reticulate/python.
+    
+    Let's try gmp first:
+
+```{r}
+library(gmp)
+
+is_palindrome = function(n) {
+    s1=as.character(as.bigz(n))
+    s2=paste0(rev(strsplit(s1,"")[[1]]),collapse="")
+    if (s1==s2) {
+        return(TRUE)
+    }
+    return(FALSE)
+}
+
+# Comment this out unless you really want to run it.
+# It takes about 40 minutes to run!
+if (FALSE) {
+    t1=Sys.time()
+    curr_target=0
+    n=1
+    num_palindromes=0
+    while(1) {
+        m=as.bigz(n)^2
+        if (nchar(as.character(m))%%2 == 0) {
+            if (nchar(as.character(m)) != curr_target) {
+                curr_target=nchar(as.character(m))
+                print(paste0("Searching num digits = ",curr_target))
+            }
+            if (is_palindrome(m)) {
+                print(n)
+                print(paste0("Time = ",Sys.time()-t1))
+                num_palindromes=num_palindromes+1
+                if (num_palindromes==3) {
+                    break
+                }
+            }
+        }
+        n=n+1
+    }
+} else {
+    print("No output produced since run-time is ~ 40 minutes")
+}
+
+```
+
+The first two are easy:
+
+    [1] 836     ( 0.54 seconds)
+    [1] 798644  (28.36 seconds)
+
+but then it gets more difficult.  No solution as of n=59908778.
+Finally found it:
+
+    [1] 64030648  (2337.56 seconds)
+
+
+Repeated the analysis with python and it was much faster:
+
+    836         836**2      =           698896  ( 6 digits), t= 0.00 seconds
+    798644      798644**2   =     637832238736  (12 digits), t= 0.83 seconds
+    64030648    64030648**2 = 4099923883299904  (16 digits), t=70.42 seconds
+    
+This is about 33X faster than R with gmp.
+

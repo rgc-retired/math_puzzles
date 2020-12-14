@@ -1,0 +1,481 @@
+---
+title: "Bent Summer 2002"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2002
+
+
+## Problem 1
+
+    In June 2001, my wife and I
+    celebrated our golden wedding
+    anniversary. To our surprise, the
+    anniversary occurred on the same
+    day of the week as the wedding 50
+    years ago. I wondered if this is a
+    common occurrence. Consider the 52
+    years from 1900 through 1951. What
+    is the exact probability that, for a
+    randomly selected wedding date in
+    this period, the golden anniversary
+    fell on the same day of the week?
+    
+    -- R. Wilson Rowland, MD B'51
+
+Solution:
+
+    Question -- what about weddings on leap year (Feb 29?).  If we
+    celebrate the anniversary on March 1 then they will alway be
+    on the same day of the week.  Otherwise, I don't know when to
+    celebrate them.  There is no Feb 29 at 50 years in the future.
+
+    --> For now -- I will simply ignore weddings on Feb 29
+
+    A year has either 365 or 366 days. In either case:
+
+    365%7 = 1 --> slip one day a year
+    366%7 = 2 --> slip two days
+
+    Between 1900 and 2001 leap years occur every four years
+    starting in 1904.  For a 50th wedding anniversary you can
+    either span 12 or 13 leap years.  For example,
+
+       0,4,8,12,16,20,24,28,32,36,40,44,48 --> 13
+       3,7,11,15,19,23,27,31,35,39,43,47   --> 12
+
+    When there are 13 leap years we slip 50-13=37 days during
+    normal year and 26 days during leap years.  This is a total
+    of 26+37 = 63 days --> precise multiple of 7 so the anniversary
+    will be the same day as the wedding.
+
+    When there are 12 leap years we slip 50-12=38 days during
+    normal year and 24 days during leap years.  This is a total
+    of 24+38 = 62 days --> not precise multiple of 7 so the anniversary
+    will not be the same day as the wedding (one weekday earlier).
+
+    About half the anniversary/wedding days will be the same and the
+    other half will be off by one day.
+
+    Precisely enumerating all the possibilities:
+
+    From Jan 1, 1900 to Dec 31, 1951 there are 18992 possible days.
+
+    Using python datetime:
+
+        Total number of dates = 18992
+        Non Feb 29 dates = 18980
+        Same day of week 50th anniversary = 9431
+        Ratio = 9431/18980 = 49.69%
+
+## Problem 2
+
+    Solve this cryptic addition, with
+    ELEVEN divisible by 11:
+
+    THREE + THREE + FIVE = ELEVEN
+
+    -- Howard G. McIlvried III, PA Gamma'53
+
+Solution: done in the cryptic arithmetic notebook
+
+    THREE  =  56711
+    FIVE   =   8491
+    ELEVEN = 121913
+
+
+## Problem 3
+
+    As of 1999, 71 movies won Academy
+    Awards for best picture. Of
+    these, 33 appeared in the American
+    Film Institute's list of 100 best
+    pictures of all time, celebrating the
+    centennial of the industry. These facts
+    can be represented by a Venn
+    diagram, in which sets are represented
+    by circles with areas proportional
+    to the number of members in
+    the sets. If the 33 films in both
+    categories are represented by the
+    overlapping area of two such circles,
+    what is the distance between centers
+    of the two circles? Assume that the
+    larger circle has a diameter of 10 cm.
+    
+    -- Craig K. Galer, MI A'77
+
+Solution:
+
+    I will try to draw this with ASCII art --
+
+      
+                       o   -
+                        o/
+                        /o
+                       /  o
+                      /    o
+                     |     o
+                     |     o
+    +---A-------------------|-------B------------------
+                     |     o
+                     |     o
+                      \    o
+                       \  o
+                        \o
+                        o\
+                       o   -
+
+    OK - that was spectacularly bad.
+
+    Where the center of the larger circle is at point A and the
+    smaller circle is at point B.  Both are on the same line.
+
+    Circle A (larger) area represents 100 films.  Radius = 10/2 cm
+
+    Circle B area represents 71 films.  Radius = ?
+
+    Area(A)/100 = Area(B)/71 --> Area(B) = 0.71 * Area(A)
+
+    pi*Radius(B)**2 = 0.71*pi*5**2
+       Radius(B)    = sqrt(0.71) * 5 = 4.213 cm
+
+    The overlap area shold be 33% of the total area of the larger
+    circle.  This area is the sum of the outside section of the
+    smaller and larger circles of the arcs made by the intersection
+    of the circles and the centers of the circles.
+
+    Let alpha = half-angle for larger circle
+    Let beta  = half-angle for smaller circle
+
+    Radius(A)*sin(alpha) = Radius(B)*sin(beta)
+    
+    Distance between centers = Radius(A)*cos(alpha)+Radius(B)*cos(beta)
+
+    Let:
+
+        ra = radius of the larger circle (known = 5)
+        rb = radius of the smaller circle (known = 5*sqrt(0.71))
+        alpha = half-angle of larger pie slice (unknown)
+        beta  = half-angle of smaller pie slice (unknown)
+        d  = distance between circle centers (unknown)
+
+   Then:
+
+        ra*cos(alpha) + rb*cos(beta) = d
+
+    For overlap:
+
+        Area of overlap = 0.33*area of circle A (known)
+
+    For the pie slices - to calculate area of overlap:
+
+        Need to calculate area of full slice and then remove the
+        equilateral triangle.
+
+        For A: 2*alpha/(2*pi)*pi*ra**2 - ra*sin(alpha)*ra*cos(alpha)
+        For B: 2*beta/(2*pi)*pi*rb**2 - rb*sin(beta)*rb*cos(beta)
+
+        Total = 0.33 * pi * ra**2
+
+            alpha*ra**2 - ra**2*sin(alpha)*cos(alpha) +
+            beta*rb**2 - rb**2*sin(beta)*cos(beta) =
+            0.33*pi*ra**2
+
+        or:
+
+            ra**2 * (alpha - sin(alpha)*cos(alpha)) +
+            rb**2 * (beta  = sin(beta)*cos(beta)) =
+            ra**2 * (0.33*pi)
+
+    So - we have two equations in three unknowns: alpha, beta, d
+
+    At the point of intersection of the circles:
+
+        ra*sin(alpha) = rb*cos(beta)
+
+    Finally, this is three equations in three unknowns.
+
+    (Eq 1) ra*cos(alpha) + rb*cos(beta) = d
+    (Eq 2) ra**2 * (alpha - sin(alpha)*cos(alpha)) +
+           rb**2 * (beta  - sin(beta)*cos(beta)) =
+           ra**2 * (0.33*pi)
+    (Eq 3) ra*sin(alpha) = rb*sin(beta)
+
+    Actually, Eq 2 and 3 are two equations in two unknowns.  If we
+    can solve them then we can calculate d.
+
+        alpha-sin(alpha)*cos(alpha) +
+        0.71 * (beta - sin(beta)*cos(beta) = 0.33 * pi
+
+    I can only solve them numerically:
+
+        alpha = 0.9052415669785268
+        beta  = 1.204030528722836 
+
+    Distance between centers of circles:
+
+        d = 5*cos(alpha)+5*sqrt(0.71)*cos(beta)
+          = 4.59827905523423
+
+    Note that the center of the smaller circle has to be inside the
+    larger circle in order to get the 33% area overlap!
+
+
+## Problem 4
+
+    As each of three perfect logicians
+    enters a room, a letter is whispered
+    into his or her ear. When all three are
+    in the room, they are told that their
+    three letters spell one of the following
+    words: HOE, OAR, PAD, TOE,
+    or VAT. The first logician is asked,
+    "Do you know the word?" and
+    replies, "Yes." The second is asked
+    the same question and also replies,
+    "Yes." Finally the third is asked and
+    also says, "Yes." What is the word?
+    
+    -- Mind Teasers by G.J. Summers
+
+Solution:
+
+    I am assuming the whisper means the logicians can not overhear.
+
+    I am assuming they each get a different letter.
+
+    In order for the first logician to know the word they must have
+    been given a unique letter.  Unfortunately, there are many such
+    letters in this set.  The letter counts are given below:
+
+        H=1, O=3, E=2
+        O=3, A=3, R=1
+        P=1, A=3, D=1
+        T=2, O=3, E=2
+        V=1, A=3, T=2
+
+    The unique letters are: H, R, P, D, V
+
+    I give up.
+
+    Well -- I looked at the solution and I had actually sort of seen
+    the solution but I didn't really see it.  I noted that TOE did not
+    contain any unique letters so it could not be the solution.
+    Here is their argument:
+
+        If the first logician knows the word then they must have
+        a unique letter so the work can not be TOE.  We will
+        eliminate this word.
+
+        This leaves the following with the given letter frequencies:
+
+        H=1, O=2, E=1
+        O=2, A=3, R=1
+        P=1, A=3, D=1
+        V=1, A=3, T=1
+
+        If the second logician knows the word this means the word must
+        have two unique letters.  The work OAR does not have two
+        unique letters so it is eliminated.  This leaves:
+
+        H=1, O=1, E=1
+        P=1, A=2, D=1
+        V=1, A=2, T=1
+
+        For the third logician to know the word it must have three
+        unique letters -- this only leaves HOE.
+
+
+## Problem 5
+
+    What is the smallest positive integer
+    that has at least 1,000 different
+    integer factors? For example, 12 has
+    six factors: 1, 2, 3, 4, 6, and 12.
+    
+    -- Frederick J. Tydeman, CA Delta'73
+
+The best I could do was:
+
+        n = 2*2*2*2*2*2*2*3*3*3*5*7*11*13*17*1e-9
+          = 0.29405376 billion
+          = 2^7 * 3^3 *5*7*11*13*17
+
+        number of factors = 8*4*2^5 = 1024 factors
+
+Their solution is smaller as:
+
+        n = 245044800
+          = 2^6 * 3^2 * 5^2 *7*11*13*17
+
+        number of factors = 7*3*3*16 = 1008
+
+Essentially they have the same solution but they traded `2*3` for a `5`
+so it reduced their number of factors and total number.
+
+BTW -- they solved by trial and error!!!!!
+
+Solution: I am not sure how to calculate this by hand but we can use
+a variation on the prime factorization method of computing the factors
+of a number to make the calculation quite efficient.
+
+    If a number has given prime factors and multiplicities then the
+    number of factors is just the number of cross products.  For example,
+    give the number 12:
+
+    12 = 2*2*3
+
+    Factors = (1+2+2**2)*(1+3) --> 3*2 = 6 combinations
+            = 1, 2, 3, 4, 6, 12
+
+In python, sympy.factorint yields the prime factors and multiplicities.
+
+    The quickest way to >= 1000 factors is to use isolated primes:
+
+        n = 2*3*5*7*...
+
+    The number of factors is then:
+
+        num factors = 2*2*2* ...
+
+    Need 10 primes to reach 1024 so this would be:
+
+        n = 2*3*5*7*11*13*17*19*23*29
+
+    If I eliminate the 29 and raise the 2 to 2*2*2 is still get 1024
+    factors but the value has been reduced by a factor of 4/29.
+
+    I can eliminate the 23 and double the number of 2 factors (+1) by
+    adding 4 more 2's which is a reduction of 16/23:
+
+        n = 2^7 * 3*5*7*11*13*19
+
+    Alternately, I could double the number of 3 factors as:
+
+        n = 2^3 * 3^3 * 5*7*11*13*19
+
+    Which is a reduction of 9/23 so this is more efficient.
+
+    The next term is almost a wash.  I can eliminate 19 by adding
+    four more 2 terms for a 16/19 reduction:
+
+    So, playing around by hand I can find:
+
+        n = 2*2*2*2*2*2*2*3*3*3*5*7*11*13*17*1e-9
+          = 0.29405376 billion
+
+        number of factors = 8*4*2^5 = 1024 factors
+
+    If I pull out 5, 7, etc. it will drop the number of factors in half.
+    In order to raise the number of factors back up I need to then
+    (approx) double the multiplicity of 2 or 3 or triple the multiplicity
+    of the singletons (the multiplier is multiplicity+1 so need to go
+    from 1+1 to 3+1).
+
+    If I pull out a 17 I need to add 5*5 which is a larger product than
+    I removed so this strategy has limits.
+
+    I think the key is increasing the high value/low multiplicity factors and
+    trading them against adding more low value/high multiplicity factors.
+    As long as the total number of factors exceeds 1000 we can keep
+    doing this.
+
+    I don't know the optimum way to do this.  By trial and error?
+
+    Not sure how to reduce the number of factors from 1024 to 1000 and
+    gain on the value.
+
+    I will try exhaustive search but that could take a LONG time.
+    I will start with the first 100e6 values and see if we can find
+    a solution.  That took too long so I killed it.
+
+    I confirmed that the first solution about 293e6 is 294053760
+    as noted above.
+
+
+## Bonus
+
+    A horizontal water pipe, 1 m
+    in diameter, runs through a vertical
+    manhole that is 2 m in diameter, in
+    such a way that the center line of the
+    pipe intersects the center line of the
+    manhole. What volume of the pipe
+    lies within the manhole?
+    
+    -- Mathematical Visitor
+
+Solution:
+
+The ends of the water pipe are a bit difficult.
+
+The approximate solution is:
+
+    Length of water pipe ~ 2 m
+    Diameter of water pipe = 1 m
+
+    Volume ~ 2*pi*(1/2)**2 = pi/2 m^3 ~ 1.571 m^3
+
+Maybe this isn't as bad as I thought.  Consider a side view -- the cross
+section of the water pipe is a rectangle.  When looking from a top view
+the ends are curved.
+
+If we consider the side view:  the size of the rectangle depends on the
+distance away from the water pipe central axis.  The height depends on
+the water pipe curvature and the length depends on the manhole curvature.
+
+If we consider the z-axis in/out of the page then we need to integrate over
+the width of the water pipe:
+
+    h(z) = 2*sqrt(0.5**2-z**2)
+    l(z) = 2*sqrt(1.0**2-z**2)
+
+So: the differential volume is:
+
+    dV = h(z)*l(z)*dz = 2*sqrt(1/4-z**2)*2*sqrt(1-z**2)*dz
+       = 4 * sqrt((1/4-z**2)*(1-z**2))
+       = 2 * sqrt((1-4*z**2)*(1-z**2))
+
+Need to integrate from -0.5 to +0.5 meters.  Numerically using
+the R integrate() function:
+
+    V = 1.52004 with absolute error < 2.7e-10
+
+I tried this symbolically with sympy but could not get a closed form
+solution..
+
+
+## Computer Bonus
+
+    Find the largest
+    four-digit number that, when squared,
+    yields an answer containing only
+    digits in the original number.
+    
+    -- Don A. Dechman, TX '58
+
+Solution:
+
+    This is a rather simple exhaustive search for a computer bonus.
+    The run-time is almost instantaneous.
+
+    The value is 4832 with 4832^2 = 23348224
+
+    R-Code:
+
+    for (n in 9999:1000) {
+        s1=unlist(strsplit(as.character(n),''))
+        s2=unlist(strsplit(as.character(n*n),''))
+        if (all(s2 %in% s1)) {
+            print(n)
+            break
+        }
+    }
+

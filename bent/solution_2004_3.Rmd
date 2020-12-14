@@ -1,0 +1,331 @@
+---
+title: "Bent Fall 2004"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Fall 2004
+
+
+*EDITORIAL COMMENT:* I did not really enjoy this set of problems.
+About half the problems were simply not the kind of problems I enjoy.
+Problems 1 and 2 were ok and problem 5 was a standard cryptic.  The
+other four problems were just not my cup of tea.
+
+## Problem 1
+
+    At the end of the soccer season, it
+    was found that the total number of
+    goals scored by each of the 11
+    players on the team was a prime
+    number and that the average was
+    also a prime number. Furthermore,
+    no two players had scored the same
+    number of goals, nor had anyone
+    scored the same as the average. If
+    no one scored more than 45 goals,
+    how many goals did each player
+    score?
+
+    -- Nearly Impossible Brain Bafflers
+    by Tim Sole and Rod Marshall
+
+Solution:  need a list of the primes up to 45.
+
+```{r}
+library(gmp)
+
+p=c()
+for (i in 2:45) {
+    if (isprime(i)) { p=c(p,i) }
+}
+print(p)
+print(paste0("Number of primes = ",length(p),collapse=""))
+
+n=length(p)
+m=choose(n,11)
+print(paste0("Number of 11 player combinations = ",m,collapse=""))
+```
+
+We can just enumerate the combinations since there aren't too many of them.
+We can then check to verify the mean is a prime and not included in the
+player scores
+
+```{r}
+library(gtools)
+
+a=combinations(14,11,p)
+
+s=apply(a,1,mean)
+k=(s %in% p)
+
+print(paste0("Number of prime means = ",sum(k),collapse=""))
+
+print(cbind(a[k,],s[k]))
+```
+
+Only the final case has a mean that is different from all the player scores.
+
+    Players = 5    7   11   13   17   19   29   31   37    41    43
+    Mean = 23
+
+
+## Problem 2
+
+    What is the exact probability that
+    a randomly selected month (in the
+    Gregorian calendar) will have five
+    Sundays?
+
+    -- Howard G. McIlvried, PA Gamma'53
+
+Solution: I wonder what the Gregorian calendar means for the leap
+year?  I know the rules but can this affect the calculation?
+You can have 5 Sundays in a month of 29 days -- but not in 28.
+
+    For months with 31 days there are three possibilities (out of 7)
+    For months with 30 days there are two possibilities (out of 7)
+    For months with 29 days there is one possibility (out of 7)
+    For months with 28 days there is no possibility
+    
+For a year:
+
+    7 months have 31 days
+    4 months have 30 days
+    1 month has 28 or 29 days
+
+If I ignore interaction between months (since they ask for a random month):
+
+    Pr = (7/12)*(3/7)+(4/12)*(2/7)+(1/12)*(0/7) for non-leap years
+       = 29/84
+       ~ 0.3452381
+       
+    Pr = (7/12)*(3/7)+(4/12)*(2/7)+(1/12)*(1/7) for leap years
+       = 5/14
+       ~ 0.3571429
+
+For the most part leap years occur every 4 years except if divisible by 100
+except if divisible by 400.  In a 400 year span we "miss" 3 leap years so we
+have 97 leap years and 303 non-leap years.  Using these to weight the Pr from
+above we get:
+
+    Pr = (303*(29/84) + 97*(5/14))/400
+       = 557/1600
+       ~ 0.348125
+       
+Another way of calculating this: in a 400 year span we have the following:
+
+    Months of 31 days = 400*7, p=3/7
+    Months of 30 days = 400*4, p=2/7
+    Months of 29 days = 97,    p=1/7
+    Months of 28 days = 303,   p=0
+    
+    P = ((400*7*3 + 400*4*2 + 97)/7)/(400*12)
+      = 1671/4800
+      = 557/1600
+
+
+## Problem 3
+
+    Four men and their wives are
+    scheduled for a mixed-doubles
+    tennis tournament on two adjacent
+    courts for three consecutive time
+    periods. Everyone plays three
+    matches, each with a different partner
+    of the opposite sex and with no
+    repeated opponent. No one ever
+    plays either with or against his or
+    her own spouse. How many possible
+    tournaments are there, ignoring
+    permutations of courts and time
+    slots?
+
+    -- Byron R. Adams, TX A'58
+
+Solution:  I think this is a standard scheduling problem.
+Unfortunately, I never paid attention on how to make
+tournament schedules.  I am actually not sure I care.
+
+* We have 8 participants
+
+* Two adjacent courts
+
+* Three consecutive time periods
+
+* Everyone plays three matches
+
+* No repeated opponents
+
+* Not with or against spouse
+
+
+
+
+## Problem 4
+
+    Marrieds are complete liars in the
+    village of Loose Chippins, whereas
+    singles are wholly truthful. Take
+    that group of three men and three
+    women over there, for instance.
+    They are two couples and two
+    singles. If you asked Charlie
+    whether Bert is married to Queenie,
+    he would say "Urp." If you asked
+    Pauline if Pauline is married to
+    Charlie, she would say "Urp." If you
+    asked Alf if Alf is married to Rhona,
+    he would say "Ong." And if you
+    knew enough of the local dialect to
+    know whether "Urp" means "Yes"
+    and "Ong" means "No," or vice
+    versa, you could work out who is
+    married to whom. Who is married
+    to whom?
+
+    -- New Scientist
+
+Solution:  Let us summarize the facts
+
+    Marrieds are complete Liars
+    Singles always tell the truth
+    Two couples and two singles
+
+    1. Charlie: Bert married to Queenie?  Reply=Urp
+    2. Pauline: Pauline married to Charlie?  Reply=Urp
+    3. Alf: Alf married to Rhona?  Reply=Ong
+
+    People: Charlie, Bert, Queenie, Pauline, Alf, Rhona
+
+    Potential Status: M=1, S=0  with exactly 4 M and 2 S
+    
+    Let us eliminate Gay marriage so need exactly two men and two women marrieds
+
+The following combinations are possible:
+
+       Charlie Bert Queenie Pauline Alf Rhona
+    2        0    1       0       1   1     1
+    3        0    1       1       0   1     1
+    5        0    1       1       1   1     0
+    6        1    0       0       1   1     1
+    7        1    0       1       0   1     1
+    9        1    0       1       1   1     0
+    11       1    1       0       1   0     1
+    13       1    1       1       0   0     1
+    15       1    1       1       1   0     0
+
+
+    Assume Urp=Yes, Ong=No
+
+    1. If Charlie is single then Bert is married to Queenie
+       If Charlie is married then Bert is not married to Queenie
+       
+    2. If Pauline is single then Pauline is married to Charlie --> Contradiction
+       If Pauline is married then she is married to someone other than Charlie
+
+    3. If Alf is single then he is not married to Rhona
+       If Alf is married then he is married to Rhona
+
+        Conclusions:
+        
+        Pauline is married to someone other than Charlie
+       
+    After eliminating everything I can I get the following where 1=married, 0=single
+
+       Charlie Bert Queenie Pauline Alf Rhona
+    11       1    1       0       1   0     1 --> Bert+Pauline, Charlie+Rhona
+    15       1    1       1       1   0     0 --> Bert+Pauline, Charlie+Queenie
+
+    I don't know how to reduce this any further
+
+    
+    Assume: Urp=No, Ong=Yes
+    
+    1. If Charlie is single then Bert is not married to Queenie
+       If Charlie is married then Bert is married to Queenie
+       
+    2. If Pauline is single then she is not married to Charlie
+       If Pauline is married then she is married to someone other than Charlie
+       
+    3. If Alf is single then he is married to Rhona --> Contradiction
+       If Alf is married then he is not married to Rhona
+        
+        Conclusions:
+        
+        Alf is married to someone other than Rhona
+
+    After eliminating what I can
+
+       Charlie Bert Queenie Pauline Alf Rhona
+    3        0    1       1       0   1     1 --> Bert+Rhona, Alf+Queenie
+    5        0    1       1       1   1     0 --> Bert+Pauline, Alf+Queenie
+
+    I do not know how to reduce this any further.
+
+
+## Problem 5
+
+    TWO + TWENTY = TWELVE +
+    TEN, with the first three divisible by
+    their namesakes. Note: different
+    letters stand for different digits, and
+    same letter is always the same digit.
+
+    -- Technology Review
+
+Solution: solved in the cryptic arithmetic notebook
+
+    TWO    = 876
+    TWENTY = 872480
+    TWELVE = 872532
+    TEN    = 824
+
+
+## Bonus
+
+    On what day of the year is
+    twilight shortest at a place of given
+    latitude at sea level? Express your
+    answer in the form: March 21st +/-
+    f(latitude). Assume the inclination of
+    the ecliptic is 23 degrees 27'. Assume that the
+    angular distance of the sun from the
+    equinox (assumed to be noon March
+    21 for this problem) changes at an
+    average daily rate of 360 deg/365.25.
+    Assume twilight starts the moment
+    at which the midpoint of the sun is
+    intersected by the horizon. Assume
+    twilight ends when the midpoint of
+    the sun stands 6.5 degrees below the
+    horizon; this is civil twilight. Ignore
+    effects of atmospheric refraction. As a
+    check of your math, the shortest
+    twilight in Leipzig, Germany, (51 deg 20'
+    6" N latitude) is when?
+
+    -- 100 Great Problems of Elementary
+    Mathematics by Heinrich Dorrie
+
+TODO
+
+I have no idea how to do this.
+
+## Double Bonus
+
+    Given the base and
+    altitude of a triangle, with ruler and
+    compasses, find the length of a side
+    of the inscribed square.
+
+    -- Alsop, 1848
+
+TODO
+
+I have no idea how to do this.

@@ -1,0 +1,444 @@
+---
+title: "Bent Summer 2016"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Summer 2016
+
+
+## Problem 1
+
+    The planet Topsis is unusual in that each
+    "hemisphere" is a right-circular cone of
+    height 3000 km and base radius 4000 km. The
+    two cones are joined base to base, so that
+    the equator is the base circle and the
+    vertical distance between the poles is 6000
+    km. Topsy and Turvy are two cities located on
+    the planet's equator 180 degrees apart. To
+    the nearest km, what is the shortest distance
+    between the two cities, assuming that one
+    must travel along the surface of the planet?
+
+    -- Superior Mathematical Puzzles by Howard P.
+       Dinesman
+
+Solution:
+
+    Need the equivalent of a great circle route over
+    the surface of the right circular cone.
+    
+    Need to write expression for arc length and
+    then minimize it.  I could also try random walk.
+    
+    Maybe a quick web search will help.
+    
+    Seems like you can "flatten" the cone into a
+    circular segment and then just draw a straight
+    line on the flattened cone.
+    
+    If the height is 3000 km and the base radius is 4000 km
+    then the length of a side is 5000 km.  When the cone is
+    cut along one side and flattened the circle has a
+    radius of 5000 km.  The length of the outside of the circle
+    is just the circumference of the original cone base
+    which is 2*pi*4000 km.  For a circle of radius 5000 km
+    this will subtend and angle of 2*pi*4000/5000 = 1.6*pi radians.
+    
+    Points that were originally 180 degrees apart will be on the
+    outer edge of the circle separated by an arc length of
+    4000*pi.  This is a subtended angle of 0.8*pi when the
+    radius is 5000 km.  The half angle is 0.4*pi.
+    
+    The right triangle has hypotenuse of 5000 km and half
+    angle of 0.4*pi so half the distance is 5000*sin(0.4*pi).
+    The full distance is twice that so:
+    
+    d = 10000*sin(0.4*pi) ~ 9510.565 km
+
+
+## Problem 2
+
+    A fair coin is flipped ten thousand times.
+    What is the expected value of the absolute
+    difference between the number of heads and
+    the number of tails? Express your answer to
+    four significant figures.
+
+    -- Kevin M.T. Stewart, NJ Delta'77
+
+Solution:
+
+    We shall try Monte-Carlo
+    
+```{r}
+ntrials=100000
+
+n=0
+set.seed(1)
+for (trial in 1:ntrials) {
+    flips=sample(2,10000,replace=T)
+    n1=sum(flips==1)
+    n2=sum(flips==2)
+    n=n+abs(n1-n2)
+}
+print(n/ntrials) 
+
+```
+
+    Results
+    
+    Seed     trials   result
+    --------------------------
+    unknown  100000   79.97836
+    42       100000   80.27992
+    123      100000   80.27554
+    2020     100000   80.07424
+    1        100000   79.55706
+
+
+    Analytically:
+
+    P(T=49999) = C(10000,4999)/2^10000
+    P(T=N)=P(H=N) so Ptotal = 2*P
+    absolute difference is (5000-N)*2
+    
+    Together: p = sum(2*(5000-N)*2*C(10000,N)/(2^10000),N,4500,4999)
+    
+    For all n from 4500 to 5500: mean = 79.78646139382153
+
+    For various number of terms:
+    
+    n     Value
+    -----------------------
+    4000  79.78646139382153
+    4500  79.78646139382153
+    4600  79.78646139382063
+    4700  79.78646026183222
+    4800  79.76080088969908
+    4900  69.20379096537465
+
+
+## Problem 3
+
+    The digits 1, 2, and 3 can be combined in 27
+    different ways to form a three digit number,
+    e.g., 111, 112, 123, 232, 321, ..., 333.
+    Arrange nine 1's, nine 2's and nine 3's
+    around a circle so that each of the 27
+    combinations of these three digits appear
+    exactly once when reading the arrangement in
+    a clockwise direction. For example, the
+    sequence 1112321 would give the first five
+    values above. Express your answer as a 27
+    digit number, starting with 1112 and
+    proceeding around the circle.
+
+    -- Problem Solving Through Recreational
+       Mathematics by Bonnie Averbach and Orin Chein
+
+TODO
+
+    meh
+
+
+## Problem 4
+
+    Five soccer playing countries were entered in
+    2016 European Consolation Cup and played the
+    usual one game against each of the others.
+    Each nation played two games at home, two
+    games away, and there were no draws. Exactly
+    three of the games were won by the away side.
+    No two countries won the same number of
+    games. Azerbaijan won two. Belarus was away
+    at Azerbaijan and at Cyprus. Cyprus played
+    away at Azerbaijan. Denmark was home against
+    Estonia. How many games did each nation win?
+
+    -- A Tantalizer by Martin Hollis in New
+       Scientist
+
+TODO
+
+    meh
+
+
+## Problem 5
+
+    Starting with 1, write the positive integers
+    in continuous order without separating them
+    as if you were writing a single number:
+    1234567891011121314... The first and tenth
+    digits in this number each are clearly 1. In
+    addition to those first two, what are the
+    hundredth, thousandth, ..., through trillionth
+    digits in this number? That is, what digits
+    occupy places 10n, for n=0 through 12?
+    Express your answer as a sequence of 13
+    digits.
+
+    -- Mathematical Recreations by Maurice
+       Kraitchik
+
+TODO
+
+    meh
+
+
+## Bonus
+
+    Alf, Bert, Charlie, and Doug were the first
+    to volunteer as the crew for the British
+    spacecraft. At the time with which our story
+    is concerned, they were moving through space
+    at a speed, and in a direction, such that the
+    hands of their special chronometer, which
+    allowed for local variations in time, had,
+    since liftoff, been moving exactly twice as
+    fast as those of the Greenwich Mean Time
+    (GMT) clock. In the following exchange, all
+    references to the passing of time as recorded
+    by the GMT clock are in italics (time,
+    minutes, hours, etc.), and all references to
+    time recorded by the ship's chronometer are
+    in a regular font (time, minutes, hours,
+    etc.). The four space travelers speak, with
+    their statements starting at 5 minute
+    intervals:
+
+    Doug: Oh, Alf! Oh, Bert! That all should come
+    so clear! In less than half an hour,
+    tomorrow's here, and our today is one with
+    yesteryear.
+
+    Alf: Yes, your today perhaps, but not so
+    mine! You watch the clock; myself, I watch
+    the time. 10 minutes since I heard the hour
+    sound; and when another 23 minutes have
+    passed, then 2 1/2 hours will have elapsed,
+    since that moment we boarded, 34 minutes
+    before we left the ground.
+
+    Bert: Tomorrow and tomorrow and tomorrow!
+    When will they both arrive? In more than 2
+    hours. Alas! Before the time is what the time
+    is now, only a half an hour must pass. Oh,
+    Alf and Charlie, ere then I do pray, repent
+    of the lies you've told this day. (In case I
+    fail to make my meaning plain, you're liars
+    both. Try not to lie again!)
+
+    Charlie: I'm not a very clever chap. I cannot
+    tell the time. I cannot add, nor yet
+    subtract, much less compute a prime. I never
+    learnt to cut a rug, some say that I'm
+    uncouth. But unlike those liars Bert and
+    Doug, Alf and I do tell the truth.
+
+    Everything a speaker says is either all true
+    or else everything he says is false. Prior to
+    launch, the ship's chronometer is
+    synchronized with GMT, and each speaker knows
+    the veracity of every other speaker. What was
+    the time (GMT) when they lifted off?
+
+    -- Brain Puzzlers Delight
+       by E.R. Emmet
+
+TODO
+
+    meh
+
+
+## Computer Bonus
+
+    In 2015, after a long career teaching
+    mathematics, Dr. E. Trig retired. It was his
+    habit each year to ask his students to find
+    the smallest number which, when multiplied by
+    the year, would result in an integer all of
+    whose digits were either 0's or 1's. For
+    example, 5,568,978 times 1995 equals the
+    11-digit number 11,110,111,110. In 1945, the
+    first year he asked, most of his students
+    were able to find a suitable four digit
+    number. Of the years for which Dr. Trig posed
+    his question, which one had the longest
+    required number and what was that number?
+
+    -- An Enigma by Susan Denham
+       in New Scientist
+
+Solution:
+
+    Exhaustive search?
+
+    By far the worst case is for 1998.  The required multiplier is:
+    
+    556111667222778333889445
+    
+    Which yields a product of:
+    
+    1111111111111111111111111110
+    
+    I switched to Python.  This one particular solution consumes more than
+    99% of the total solution time.
+    
+    Originally I tried brute force with R:
+    
+    1945 was fast
+    1946 took a long time
+    1947 was fast
+    1948 is taking a long, long time
+    by the time it got to 1951 I had manually switched to Python
+    and then I terminated the R program.
+
+    Python:
+    1951 564326551
+    
+    R is still thinking about it
+    
+    I think I need a better generator function.  Increment by 1
+    is very slow.
+    
+    Could I just generate all the k-bit binary numbers and interpret as decimal?
+    
+    I can do this in python with bin() and int() but I don't know how to do
+    this in R.
+    
+    I rewrote in python and it runs blindingly fast until 1998 and then it stalls.
+    Not sure what is going on -- eventually it finished and the rest were fast.
+    The required multipliers are given below:
+    
+    Year Multiplier                  Solution Time
+    -------------------------------------------------------------------
+    1945 5198                        ( 0.0  seconds)
+    1946 5190185                     ( 0.0  seconds)
+    1947 51413                       ( 0.0  seconds)
+    1948 56473825                    ( 0.001978635787963867  seconds)
+    1949 564449                      ( 0.0  seconds)
+    1950 518                         ( 0.0  seconds)
+    1951 564326551                   ( 0.003988504409790039  seconds)
+    1952 5128125                     ( 0.000997304916381836  seconds)
+    1953 51720487                    ( 0.001995086669921875  seconds)
+    1954 5174565                     ( 0.0009963512420654297  seconds)
+    1955 563227622                   ( 0.004987955093383789  seconds)
+    1956 5112475                     ( 0.0009965896606445312  seconds)
+    1957 5115023                     ( 0.0009968280792236328  seconds)
+    1958 5618545                     ( 0.000997781753540039  seconds)
+    1959 5109750439                  ( 0.007979154586791992  seconds)
+    1960 561225                      ( 0.0009970664978027344  seconds)
+    1961 51                          ( 0.0  seconds)
+    1962 5663155                     ( 0.002992868423461914  seconds)
+    1963 566027                      ( 0.0009958744049072266  seconds)
+    1964 5096792775                  ( 0.005982875823974609  seconds)
+    1965 514                         ( 0.0  seconds)
+    1966 55951735                    ( 0.002998828887939453  seconds)
+    1967 51398633                    ( 0.0019958019256591797  seconds)
+    1968 50818598125                 ( 0.012966632843017578  seconds)
+    1969 5078776029                  ( 0.005980730056762695  seconds)
+    1970 5588833                     ( 0.0019936561584472656  seconds)
+    1971 51299341                    ( 0.001991748809814453  seconds)
+    1972 5633925                     ( 0.0019931793212890625  seconds)
+    1973 563107                      ( 0.0  seconds)
+    1974 507097265                   ( 0.002991199493408203  seconds)
+    1975 506836                      ( 0.0  seconds)
+    1976 506072875                   ( 0.0029947757720947266  seconds)
+    1977 506378913                   ( 0.003989696502685547  seconds)
+    1978 56172958094545              ( 0.1775679588317871  seconds)
+    1979 5053062709                  ( 0.005988359451293945  seconds)
+    1980 5611672278338945            ( 0.6978261470794678  seconds)
+    1981 5047960631                  ( 0.004985332489013672  seconds)
+    1982 555                         ( 0.0  seconds)
+    1983 55981347                    ( 0.001996278762817383  seconds)
+    1984 55953125                    ( 0.0029494762420654297  seconds)
+    1985 55466                       ( 0.0  seconds)
+    1986 5090635                     ( 0.001035928726196289  seconds)
+    1987 50830453                    ( 0.0009982585906982422  seconds)
+    1988 553325                      ( 0.0009989738464355469  seconds)
+    1989 503318809                   ( 0.0029921531677246094  seconds)
+    1990 557789                      ( 0.0  seconds)
+    1991 5580111                     ( 0.001001596450805664  seconds)
+    1992 557781125                   ( 0.0011982917785644531  seconds)
+    1993 557                         ( 0.0  seconds)
+    1994 557221665                   ( 0.0  seconds)
+    1995 5568978                     ( 0.0  seconds)
+    1996 556112225                   ( 0.0  seconds)
+    1997 500751633                   ( 0.015662431716918945  seconds)
+    1998 556111667222778333889445    ( 192.48510360717773  seconds)
+    1999 555777889                   ( 0.004984855651855469  seconds)
+    2000 5                           ( 0.0  seconds)
+    2001 4998001                     ( 0.000997781753540039  seconds)
+    2002 5                           ( 0.0  seconds)
+    2003 49925667                    ( 0.0009937286376953125  seconds)
+    2004 4990025                     ( 0.0009982585906982422  seconds)
+    2005 5541202                     ( 0.0009999275207519531  seconds)
+    2006 553888335                   ( 0.004943370819091797  seconds)
+    2007 5037873                     ( 0.0010373592376708984  seconds)
+    2008 54781375                    ( 0.0019979476928710938  seconds)
+    2009 49825789                    ( 0.002006053924560547  seconds)
+    2010 49801                       ( 0.0  seconds)
+    2011 4977628101                  ( 0.0052754878997802734  seconds)
+    2012 54721675                    ( 0.0  seconds)
+    2013 547                         ( 0.0  seconds)
+    2014 55169365                    ( 0.0  seconds)
+    2015 550874                      ( 0.0  seconds)
+    
+    Total solution time =  193.51430010795593  seconds
+
+
+Preserved for posterity but actually used Python to get solution.
+
+    
+```{r, eval=FALSE}
+library(gmp)
+
+for (year in 1945:2015) {
+    n1=as.bigz(year)
+    n2=as.bigz(1)
+    while(T) {
+        n3=n1*n2
+        if (all(strsplit(as.character(n3),"")[[1]] %in% c("0","1"))) {
+            print(as.numeric(c(n1,n2)))
+            break
+        }
+        n2=n2+1
+    }
+}
+
+```
+
+```{r}
+library(reticulate)
+
+```
+
+```{python}
+import time
+
+tstart=time.time()
+for n1 in range(1945,2016):
+    t1=time.time()
+    n2=1
+    while 1:
+        j=int(bin(n2)[2:])
+        if j%n1 == 0:
+            t2=time.time()
+            print(n1,j//n1,"   (",t2-t1," seconds)")
+            break
+        n2=n2+1
+tfinish=time.time()
+print("Total solution time = ",tfinish-tstart," seconds")
+```
+
+The Bent has the same solution.  One of the authors used REXX and
+another used Java.  They claimed run-times in the range of minutes
+to hours depending on the language and the hardware.  The program
+here runs in a little over 3 minutes.

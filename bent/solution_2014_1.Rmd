@@ -1,0 +1,293 @@
+---
+title: "Bent Spring 2014"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Spring 2014
+
+
+## Problem 1
+
+    In the domino game Mexican
+    Train, holding a double can be a
+    problem, since when a double is
+    played, a second domino of the
+    same denomination must be played
+    immediately, or else a domino from
+    the bone pile must be drawn; and,
+    if it doesn't match the double, you
+    lose control of your train. The other
+    night, I was playing Mexican Train
+    with friends using a double 12 set
+    (a double 12 set includes every
+    two number combination from 0-0
+    through 12-12); and, in picking
+    a hand of 11 dominos, I got four
+    doubles. What is the probability of
+    this?
+
+    -- H.G. McIlvried III, PA Gamma '53
+
+Solution:
+
+    Not sure I remember Dominoes ...
+    
+    Need the number of dominoes
+    The number of doubles
+    Multinomial probability without replacment (hypergeometric?)
+    
+
+## Problem 2
+
+    Solve the following cryptic
+    addition:
+
+             LETTERS
+            ALPHABET
+            --------
+            SCRABBLE
+
+    All the usual rules apply. Each letter
+    represents a different digit, and the
+    same letter always represents the
+    same digit. There are no leading
+    zeros. This one is fairly easy, so, as
+    Hercule Poirot would say, give the
+    little gray cells some exercise and
+    try it without a computer.
+
+    -- Classic Puzzles by Gyles Brandreth
+
+Solution: already solve by computer in cryptic arithmetic notebook.
+
+    Cryptic addition, easy - so try it without computer
+
+      LETTERS + ALPHABET = SCRABBLE
+
+    a=make_crypt_df('lettersalphabetscrabble')
+    k=(make_num(a,'letters')+make_num(a,'alphabet')==make_num(a,'scrabble'))
+    k=k & (a$l != 0) & (a$a != 0) & (a$s != 0)
+    sum(k)
+    [1] 1
+    a[k,]
+            l e t r s a p h b c
+    2574134 7 0 8 6 2 1 5 3 9 4
+
+
+## Problem 3
+
+    Suppose the moon had a hole
+    along its axis and an astronaut
+    dropped a golf ball in at the north
+    pole. What would be the ball's speed
+    (km/h) as it passed the center of
+    the moon on its way to the South
+    Pole? Assume the moon is a perfect
+    sphere with a radius of 1,737 km, a
+    uniform specific gravity of 3.346, and
+    frictionless travel of the ball. Use G
+    = 6.674E-11 m^3 /kg s^2 .
+
+    -- R.W. Rowland, MD B'51
+
+Solution:
+
+    I should be able to solve this -- I used to do
+    this with the earth back in the days of EE234.
+
+    The force is always toward the center of the
+    moon (e.g. in the -r direction.)  The mass that
+    is inside the radius contributes to attraction.
+    
+    F = ma = mr'' = -G*m*(rho*4/3*pi*r^3)/r^2
+    or
+    r'' + G*rho*4/3*pi*r = 0
+    
+    r(0) = R = 1737 km, r'(0)=0
+    
+    The solution is: r(t) = A*sin(w0*t) + B*cos(w0*t)
+    
+    Applying bounary conditions:
+    
+    r(0) = B = 1737000 m
+    r'(0) = A*w0 = 0
+    
+    So: r(t) = 1737000*cos(w0*t)
+    
+    where w0 = sqrt(G*rho*4/3*pi) ~ sqrt(9.354e-7) ~ 0.000967 R/s
+    T = 2*pi/w0 = 6496.5 seconds for complete trip
+    One way = 3248.25 seconds
+
+    The time when r=0 is when w0*t -> pi/2 ==> t = 1624.125 seconds
+    
+    At this point the speed is -B*w0 = 1737000*0.000967 = 1679.965 m/sec
+    or:  speed ~ 6047.873 km/hr.
+
+
+## Problem 4
+
+    The door to Prof. Adams
+    laboratory has one of those keypad
+    locks that requires entering five
+    digits to open. Unfortunately, he
+    has a hard time remembering the
+    combination, but he has figured
+    out a way to determine it. The five
+    digits are all different, and he has
+    observed that the first two digits
+    form a perfect square, while the last
+    two digits form a smaller perfect
+    square. Also, the middle digit is the
+    smallest. If he arranges the five
+    digits to form all possible five-digit
+    integers (leading zeros allowed) and
+    adds all these numbers, the sum is
+    a palindrome, with each of its digits
+    a multiple of three. What is the
+    combination?
+
+    --Adrian Somerfield in New Scientist
+
+TODO
+
+    meh?
+
+## Problem 5
+
+    In the accompanying figure,
+    connect nine pairs of points with
+    straight line
+    segments in such a
+    way that no three of
+    the six points are the
+    vertices of a triangle.
+    Present your answer
+    as nine two-digit integers, where the
+    two digits are the numbers of the
+    points being connected, for example,
+    14, 16, 46, ... would indicate 1 and
+    4 connected, 1 and 6 connected, 4
+    and 6 connected, etc. Of course,
+    this is not an allowed arrangement,
+    because 146 is a triangle.
+
+             2
+             *
+      6             3
+      *             *
+             1
+             *
+             
+         5       4
+          *     *
+
+    -- Math Puzzles for the Clever Mind
+    by Derrick Niederman
+
+Solution:
+
+    I peeked.
+    
+    Pick any three points = set A
+    Other three points = set B
+    
+    Connect each point in set A to every
+    point in set B.
+
+
+## Bonus
+
+    Select a random point in a
+    unit square. What is the expected
+    distance of this point from the lower
+    left-hand corner of the square? We
+    want an exact answer expressed
+    in terms of common mathematical
+    functions, such as log, sine, etc.
+
+    -- Stephen E. Bernacki, MA A '70
+
+Solution:
+
+    I peeked.
+    
+    They use polar coordinates and do half
+    the unit square.  One of the integrals
+    has sec(theta) as upper limit.
+    
+    I could not get anything quite as simple
+    as their solution:
+    
+    Expected distance = [sqrt(2)+log(1+sqrt(2))] / 3
+    
+    I get:
+    
+                           sqrt(2) + 2                  sqrt(2) - 2
+               sqrt(2) log(-----------) - sqrt(2) log(- -----------) + 4
+                                2                            2
+    (%o132)    ---------------------------------------------------------
+                                           3/2
+                                        3 2
+
+    Which I can manually simplify with a lot of work as:
+                                   
+             log(1+sqrt(2)) + sqrt(2)
+    (%o132)  ------------------------
+                          3
+
+    Which matches the result from the Bent.  I can't get Maxima to simplify
+    this much so I need to work on that.
+
+
+## Double Bonus
+
+    A magic square is an
+    NxN array of numbers such that the
+    sum of each row, column, and main
+    diagonal is the magic sum. The most
+    famous magic square is
+    the lo shu (shown here),
+
+        2   9   4
+        7   5   3
+        6   1   8
+
+    which is claimed to be
+    thousands of years old.
+    What we want is a 3x3 magic square
+    that, in addition to a magic sum, has
+    the added property that the sum of
+    the products of the three numbers
+    in each row equals the sum of the
+    products of the three numbers in
+    each column, and this also equals
+    the sum of the products of the three
+    numbers in each of the two main
+    diagonals, i.e., if the numbers in the
+    rows are (a, b, c), (d, e, f), and (g, h,
+    i), then abc + def + ghi = adg + beh
+    + cfi = aei + ceg. Although the nine
+    numbers in the magic square must
+    be nine different positive integers,
+    they do not need to be consecutive.
+    It is relatively easy to find such a
+    square by computer, but we want
+    an algorithm that generates all
+    fundamentally different squares,
+    that is, squares in which the nine
+    entries have no common factor.
+
+    -- A Gardner's Workout
+    by Martin Gardner
+
+TODO
+
+    I should really learn more about magic squares.
+    This would be a good place to start.
+    

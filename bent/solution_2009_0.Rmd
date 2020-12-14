@@ -1,0 +1,342 @@
+---
+title: "Bent Winter 2009"
+author: "R. G. Cronce"
+date: "12/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bent Brain Ticklers, Winter 2009
+
+
+## Problem 1
+
+    What is the smallest right triangle
+    that will fit completely inside another
+    right triangle, such that all six sides
+    of the two triangles have integral
+    values, and the larger triangle has
+    one side that is shorter than all three
+    sides of the smaller triangle?
+
+    -- Almost Impossible Brain Bafflers
+    by Tim Sole and Rod Marshall
+
+Solution:
+
+    May need to generate some right triangles and
+    try them.  I seems like the most likely candidate
+    for the small triangle would lay on its hypotenuse
+    along the lower side of the larger triangle with the
+    shortest leg of the smaller triangle nearest the
+    shortest leg of the larger triangle.
+    
+    Assume smaller triangle has sides a<b<c and larger
+    triangle has sides A<B<C.
+    
+    We require that the small triangle lay on side c on
+    leg B of the larger triangle.  The height of the
+    smaller triangle must fit under the hypotenuse of the
+    larger triangle.  This requires:
+    
+        H = a*sin(theta), theta = acos(a/c)
+        
+    The height of the larger triangle at this point is:
+    
+        H2 = A*(B-a*cos(theta))/B
+        
+    So we need: H2>H and A<a
+
+    Not really sure where to go from here.        
+
+```{r}
+# Generate some triangles and make a matrix
+zzz=matrix(ncol=3)
+
+for (a in 1:100) {
+    for (b in a:1000) {
+        for (c in b:1000) {
+            if (a^2+b^2 == c^2) {
+                zzz=rbind(zzz,c(a,b,c))
+            }
+        }
+    }
+}
+zzz=zzz[2:nrow(zzz),]
+```
+
+We can then look at these lists to find some candidates.  The smallest two
+triangles that we can consider are:
+
+    smaller = 6,8,10
+    larger  = 5,12,13
+    
+    If we put the smaller triangle with hypotenuse along the x-axis
+    theta = acos(6/10) --> height = 6*sin(acos(6/10)) = 4.8
+    
+    In theory this might fit inside the 5,12,13 triangle but it actually does not.
+    
+    Need to look deeper.
+    
+    Let's try this programmatically
+    
+```{r}
+# arrange the triangles in ascending area
+# The length of the sides is increasing across the columns of zzz
+# So the columns of zzz are a,b,c or A,B,C
+zzz=zzz[order(1/2*zzz[,1]*zzz[,2]),]
+# For each triangle search through all the larger triangles for one with a side
+# smaller than any of the sides in the current triangle and then check to see
+# if the current triangle can fit inside:
+done=0
+for (i in 1:(nrow(zzz)-1)) {
+    for (j in i:nrow(zzz)) {
+        if (min(zzz[j,])<min(zzz[i,])) {
+            # Check the height of the current triangle
+            theta=acos(zzz[i,1]/zzz[i,3])
+            h=zzz[i,1]*sin(theta)
+            # Check the height under the hypotenuse of triangle j
+            # H2 = A*(B-a*cos(theta))/B
+            h2=zzz[j,1]*(zzz[j,2]-zzz[i,1]*cos(theta))/zzz[j,2]
+            if (h2>h) {
+                # We have a winner
+                print("Winner")
+                print(zzz[i,])
+                print("inside")
+                print(zzz[j,])
+                done=1
+                break
+            }
+        }
+    }
+    if (done==1) { break }
+}
+
+```
+
+A triangle of 12x16x20 will fit inside a triangle of 11x60x61
+
+
+
+## Problem 2
+
+    Find the smallest positive integer
+    such that, if you place a 4 in front of
+    it, you get a number that is exactly
+    four times as large as you get if you
+    place a 4 at the end of the number.
+
+    -- The Numerology of Dr. Matrix by
+    Martin Gardner
+
+Solution:
+
+    Can I do this with exhaustive search or is it
+    trickier than that?
+    
+```{r}
+    for (i in 1:1000000) {
+        n1=as.numeric(paste0(4,i))
+        n2=as.numeric(paste0(i,4))
+        if (n1==4*n2) {
+            print(i)
+            break
+        }
+    }
+```
+
+Apparently exhaustive search works:
+
+    n  = 10256
+    
+    n1 = 410256  \ n1 = 4*n2
+    n2 = 102564  /
+
+
+## Problem 3
+
+    Al has two 12-hour clocks that,
+    when fully wound, will run for nearly
+    eight days. Both clocks were keeping
+    different times, with each being
+    wrong by a different exact number of
+    minutes per day, although less than
+    one hour each. Al took his clocks to
+    the local clock mender, who works
+    only from 9:30 a.m. to 5 p.m. Monday
+    through Friday. He immediately
+    wound both clocks fully and set them
+    to the correct time, a whole number
+    of minutes after the hour, and put
+    them on the shelf for observation.
+    The following Monday, as he went
+    to take down the clocks to start
+    working on them, they started to
+    strike eight o'clock simultaneously.
+    This occurred some hours and minutes
+    past the correct time. What day
+    and exact time did the clock mender
+    set them originally?
+
+    -- Puzzles, Mathematical Diversions,
+    and Brainteasers by Erwin Brecher
+
+TODO
+
+
+## Problem 4
+
+    Two dominoes are chosen at random
+    from a 28-domino, double-six
+    set. What is the probability that an
+    end-to-end chain of all the dominoes
+    can be formed with the two chosen
+    dominoes at the ends, with one in the
+    first position, and the other in the
+    last position? The usual rule applies
+    that the numbers on the ends of
+    adjoining dominoes must match.
+
+    -- Classical Mathemagic by R. Blum, A.
+    Hart-Davis, B. Longe, and D. Niederman
+
+TODO
+
+    Somehow I just don't get excited about
+    dominoes.
+
+
+## Problem 5
+
+    A number of identical planes, each
+    with a tank that will hold just enough
+    fuel to travel exactly halfway around
+    the world, are based on a small island
+    on the equator. If the planes can refuel
+    only from the island or from another
+    plane, what is the smallest number of
+    planes that are required for one plane
+    to complete an equatorial trip around
+    the world, with each plane involved
+    returning safely to the island? Assume
+    that a plane can refuel and transfer
+    fuel instantaneously and that all
+    planes travel at the same speed and
+    use fuel at the same uniform rate. Ignore
+    rotation of the earth and winds.
+
+    -- Almost Impossible Brain Bafflers
+    by Tim Sole and Rod Marshall
+
+TODO
+
+    I looked at the solution in the Bent.
+    Only three planes are required.  They
+    start out together, go 1/8 of the way and
+    plane A transfers fuel to B.  B and C
+    continue until B has to turn back and
+    gives C the excess fuel.  By this time
+    A can take off the other direction and
+    meet C and get it around the world.
+    
+    I might have missed one more refueling
+    in there -- but you get the idea.
+
+
+## Bonus
+
+    In the game of Yahtzee, players
+    try to achieve specific combinations
+    of five dice. A player first tosses
+    all five dice and then retosses those
+    that don't have the desired values
+    and then finally repeats this process
+    for a third toss. Suppose you are
+    trying to maximize the number of 6s.
+    After your tosses, your score is the
+    sum of all the 6s thrown. What is the
+    expected value of your score? Your
+    maximum score is 30 since you stop at
+    any time that you have tossed five 6s.
+
+    -- Howard G. McIlvried III, PA Gamma'53
+
+Solution: sounds like Monte-Carlo time
+
+```{r}
+ntrials=100000
+
+set.seed(2020)
+score=0
+for (trial in 1:ntrials) {
+    s=sample(6,5,replace=T)
+    score=score+6*sum(s==6)
+    n=sum(s!=6)
+    if (n!=0) {
+        s=sample(6,n,replace=T)
+        score=score+6*sum(s==6)
+        n=sum(s!=6)
+        if (n!=0) {
+            s=sample(6,n,replace=T)
+            score=score+6*sum(s==6)
+        }
+    }
+}
+
+score/ntrials
+```
+
+For 1e5 trials the mean score is ~ 12.6
+
+    Seed   Result
+    --------------
+    42     12.65988
+    123    12.62184
+    2020   12.61902
+    
+    The closed form solution from the Bent is
+    
+    455/36 = 12.6389
+
+    They originally derived it with combinatorics and it was ugly.
+    
+    They also had a solution from a reader that is quite elegant.
+    
+    Consider one die.  The probability that you do not get a 6 in
+    three rolls is (5/6)^3.  Thus, the probability that you get (at least)
+    one 6 is 1-(5/6)^3.  The score for this die is 6*(1-(5/6)^3).
+    
+    The same logic applies to all 5 dice so the result is:
+    
+    5*6*(1-(5/6)^3) = 30*91/216 = 455/36 = 12.63889
+
+
+## Computer Bonus
+
+    Fermat, in about
+    1650, asked for all solutions in positive
+    integers for x**2 + 2 = y**3. It turns
+    out that x = 5, y = 3 is the only solution.
+    Now consider x**2 - 15 = y**3. One
+    solution in positive integers is x = 4,
+    y = 1. Find all other solutions.
+
+    -- Don A. Dechman, TX A'57
+
+Solution:
+
+    Performing exhaustive search with sympy.
+    Up to y=1e9 the solutions are:
+    
+    x        y
+    ----------------
+    4        1
+    1138     109
+    
+    The Bent notes these as the only solutions but
+    provides no explanation as to how these are the ONLY
+    solutions.  Yes - it is easy to generate these numbers
+    but how do we know there are no other solutions?
