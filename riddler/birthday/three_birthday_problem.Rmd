@@ -1,0 +1,128 @@
+---
+title: "Three Birthday Problem"
+author: "R. G. Cronce"
+date: "10/22/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+This all started with a simple problem: how many people do you need for more than 50% probability that three or more of them share the same birthday.
+
+This is substantially more difficult to answer than the standard two person problem.
+
+We can attempt to solve this with Monte-Carlo as shown below:
+
+```{r}
+birthday <- function(num_people=10, num_trials=100000, num_collisions=3) {
+  n=0
+  for (i in 1:num_trials) {
+    m=tabulate(sample(365,num_people,replace=T))
+    n=n+(any(m>=num_collisions))
+  }
+  return(n/num_trials)
+}
+```
+
+We can explore the space and get a rough idea of the answer:
+
+```{r}
+n=c()
+p=c()
+for (num_people in seq(10,200,10)) {
+  n=c(n,num_people)
+  p=c(p,birthday(num_people,100000,3))
+}
+```
+
+
+Examining the results shows the answer is probably between 80 and 90:
+
+```{r}
+plot(n,p,type='b')
+abline(h=0.5,col='red')
+grid()
+```
+
+Zoom in on the region of interest:
+
+```{r}
+n=c()
+p=c()
+for (num_people in seq(80,90)) {
+  n=c(n,num_people)
+  p=c(p,birthday(num_people,100000,3))
+}
+
+```
+
+the result shows that the answer is very close to n=87.  We will have to work a little to see
+if the result is above or below this value:
+
+```{r}
+plot(n,p,type='b')
+grid()
+abline(h=0.5,col='red')
+```
+
+Let us repeat the simulation for multiple trials of n=87:
+
+```{r}
+p=c()
+for (i in 1:10) {
+  p=c(p,birthday(87,100000,3))
+}
+```
+
+What do the results say?
+
+```{r}
+p
+```
+
+This is going to be difficult.  Sometimes the results are above 50% and sometimes below.
+We can pool these 10 trials together but ... it might not be enough:
+
+```{r}
+mean(p)
+```
+
+We can use a t-test:
+
+```{r}
+t.test(p,mu=0.5)
+```
+
+Unfortunately, the 95% confidence interval includes the 0.5 value.  We simply don't have enough
+samples to make a conclusion.
+
+We can simply increase the number of samples and check again.  Let us try 1e6 samples:
+
+```{r}
+p=c()
+for (i in 1:10) {
+  p=c(p,birthday(87,1000000,3))
+}
+t.test(p,mu=0.5)
+```
+
+From this we can conclude that n=87 is not sufficient to ensure 50% of the time that 3 people share the same birthday.
+
+We can check 88, but that is relatively easy so we can drop back to 100K samples:
+
+```{r}
+p=c()
+for (i in 1:10) {
+  p=c(p,birthday(88,100000,3))
+}
+t.test(p,mu=0.5)
+```
+
+Which is clearly significant.
+
+Conclusion: need n=88 people to ensure 50% change that 3 or more share the same birthday.
+

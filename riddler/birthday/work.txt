@@ -1,0 +1,121 @@
+From the math_forum_derivation email:
+
+Notation:
+
+P(n,m) = number of permutations of n items taken m at a time
+
+    P(n,m) = n!/(n-m)!
+
+C(n,m) = number of combinations of n items taken m at a time
+
+    C(n,m) = n!/( (n-m)! * m! )
+
+
+N = number of people in the group
+K = number of pairs of people
+
+
+
+Claim: (no two share a birthday)
+
+    P_N(0) = P(365,N)/365^N
+
+
+Derivation:
+
+    P_N(0) = 365/365 * 364/365 * 363/365 * 362/385 * ... * (365-N+1)/365
+           = (365*364*363* ... * (365-N+1))/365^N
+           = 365!/(365-N)!/365^N
+           = P(365,N)/365^N
+
+
+Claim: exactly one pair shares a birthday
+
+    P_N(1) = 365*C(N,2)*P(365-1,N-2)/365^N
+
+
+    365    = number of different days that could be the pair
+        This could be written as C(365,1)
+    C(N,2) = number of ways to get a pair with N people
+    P(364,N-2) = number of ways to permute remaining N-2 people over the
+        available 365-1 birthdays
+
+Rewriting:
+
+             Number of ways
+             a pair of people  Single
+             can share a       birthdays
+             birthday          remaining
+             <---------------> <---------->
+    P_N(1) = (C(365,1)*C(N,2))*P(365-1,N-2)/365^N
+    
+
+
+Formula for K different pairs of birthdays with N-2*K distinct birthdays
+
+Claim:
+
+  P_N(K) = C(365,K)*C(N,2)*C(N-2,2)*...*C(N-2K+2,2)*P(365-K,N-2K)/365^N
+                    |-----------------------------|
+                                |
+                                V
+
+  P_N(K) = C(365,K)*       P(N,2K)/2^K             *P(365-K,N-2K)/365^N
+
+
+Derivation:
+
+    C(365,K) = number of ways to pick K pairs
+    C(N,2)*C(N-2,2)*...*C(N-2*K,2) = 
+
+        C(N,2) = number of ways to get a pair from N people
+        C(N-2,2) = number of ways to get a pair from N-2 people
+        ...
+        C(N-2*K+2,2) = number of ways to get a pair from N-2*K+2 people
+
+    There are K terms multipied together.  These could be written as:
+
+        C(N-0*2,2)
+        C(N-1*2,2)
+        ...
+        C(N-(K-1)*2,2)
+
+    Which makes it more obvious that there are exactly K terms.
+
+
+    P(365-K,N-2K) = number of ways to permute remaining 365-K birthdays
+        over the N-2*K people
+
+    1/365^N = denominator for all the expressions
+ 
+
+The successive C(...,2) terms are:
+
+    C(N,2)*C(N-2,2)*C(N-4,2)*...*C(N-2*K+2,2)
+
+    N!          (N-2)!       (N-4)!          (N-2*K+2)!
+    --------  * ---------- * --------- ... * -----------
+    (N-2)! 2!   (N-4)! 2!    (N-6)! 2!       (N-2*K)! 2!
+
+Cancelling the common terms from the denominator to succeeding numerator
+and collecting up the K copies of 2! = 2^K:
+
+
+    N!                1
+    --------  * ... * -----------
+            1         (N-2*K)! 2^K
+
+
+    P(N,2*K) =  N!
+    --------    ------------
+    2^K         (N-2*K)! 2^K
+
+So:
+
+    P_N(K) = C(365,K) * P(N,2*K) * P(365-K,N-2*K)/(2^K * 365^N)
+
+
+Questions:
+
+    1. Does this work?
+    2. How do we extend to four birthdays?
