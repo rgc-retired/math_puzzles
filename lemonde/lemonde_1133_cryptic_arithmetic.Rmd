@@ -1,0 +1,108 @@
+---
+title: "Cryptic Arithmetic"
+author: "R. G. Cronce"
+date: "10/21/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Le Monde 1133
+
+Another one of Xi'an's solutions to a Le Monde puzzle.  The statement on R-bloggers
+is wrong (it might a spell check issue) but it is correct on Xi'an blog site.
+
+[R-Bloggers (erroneous)](https://www.r-bloggers.com/2020/03/le-monde-puzzle-1133)
+
+[Xi'an Blog](https://xianblog.wordpress.com/2020/03/28/le-monde-puzzle-1133/)
+
+This is his approach to solving a cryptic arithmetic problem:
+
+    ADULE - ELUDA = POINT
+    
+    With each character a different digit.  No value starts with a zero.
+    
+    What is the largest possible value of POINT?
+
+The problem also looks for a solution to:
+
+    ADULE + ELUDA = POINT
+
+The code he provides dumps all the feasible solutions -- it does not find the
+largest value of POINT.  I added the code to just dump the final solution.
+
+Note -- this code does not explore all the permutations -- it is done with sampling.
+
+    
+```{r}
+library(dplyr)
+
+num_trials=1e6
+
+dify<-function(adule) 
+  (sum(adule*10^(4:0))-sum(rev(adule)*10^(4:0)))
+
+num2dig<-function(dif) (dif%/%10^(0:4))%%10
+
+sl=NULL
+for (t in 1:num_trials){
+  adule=sample(0:9,5)
+  while((dify(adule)<=0)||(!prod(adule[c(1,5)])))
+     adule=sample(0:9,5)
+point=rev(num2dig(dify(adule)))
+if ((!sum(duplicated(point)))&(prod(point%in%(0:9)[-adule-1])))
+  sl=rbind(sl,c(adule,point))}
+sl=as.matrix(distinct(as.data.frame(sl),.keep_all = TRUE))
+
+# Added by RGC
+k=which.max(apply(sl,1,function(x) {sum(x[6:10]*(10^(4:0)))} ))
+print(sl[k,])
+adule = sum(sl[k,1:5]*(10^(4:0)))
+eluda = sum(sl[k,5:1]*(10^(4:0)))
+point = sum(sl[k,6:10]*(10^(4:0)))
+print(sprintf("%d - %d = %d",adule,eluda,point))
+
+```
+
+Solving the second half of the problem involves changing dify() to calculate the
+sum instead of the difference.  This has been done below:
+
+
+```{r}
+library(dplyr)
+
+dify<-function(adule) 
+  (sum(adule*10^(4:0))+sum(rev(adule)*10^(4:0)))
+
+num2dig<-function(dif) (dif%/%10^(0:4))%%10
+
+sl=NULL
+for (t in 1:num_trials){
+  adule=sample(0:9,5)
+  while((dify(adule)<=0)||(!prod(adule[c(1,5)])))
+     adule=sample(0:9,5)
+point=rev(num2dig(dify(adule)))
+if ((!sum(duplicated(point)))&(prod(point%in%(0:9)[-adule-1])))
+  sl=rbind(sl,c(adule,point))}
+sl=as.matrix(distinct(as.data.frame(sl),.keep_all = TRUE))
+
+# Added by RGC
+k=which.max(apply(sl,1,function(x) {sum(x[6:10]*(10^(4:0)))} ))
+print(sl[k,])
+adule = sum(sl[k,1:5]*(10^(4:0)))
+eluda = sum(sl[k,5:1]*(10^(4:0)))
+point = sum(sl[k,6:10]*(10^(4:0)))
+print(sprintf("%d + %d = %d",adule,eluda,point))
+
+```
+
+Note that if you don't try enough random samples you may not get the solution(s).
+I tried num_trials = 1e2, 1e3, 1e4 and I get progressively more correct
+solutions but even with 1e4 the solution is not always correct.
+
+I left num_trials at 1e6 for the values above.
+
+I have confirmed the solutions above with permutations.
+

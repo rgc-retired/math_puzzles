@@ -1,0 +1,1146 @@
+---
+title: "Lemonde 1020: Liars and Truthtellers"
+output: 
+  html_notebook:
+    toc: TRUE
+---
+
+
+# Overview
+
+Three logic problems are presented that employ a circle of liars and
+truth-tellers.  For each problem, the responses of the members of the circle
+may be used to determine the maximum number of liars in the group.  The
+solutions presented here attempt to enumerate all possible sequences of
+members.
+
+For more details see the [original Web posting](http://www.statsblogs.com/2017/09/14/le-monde-puzzle-1020/).
+
+
+## Problem Statements
+
+1. A circle of 16 liars and truth-tellers is such that everyone states that
+their immediate neighbours are both liars. How many liars can there be? 
+
+2. A circle of 12 liars and truth-tellers is such that everyone state that
+their immediate neighbours are one liar plus one truth-teller. How many liars
+can there be?
+
+3. A circle of 8 liars and truth-tellers is such that four state that their
+immediate neighbours are one liar plus one truth-teller and four state that
+their immediate neighbours are both liars . How many liars can there be?
+
+## Purpose of this Notebook
+
+This notebook is as much about trying to understand the author's solutions as
+it is about solving the puzzle(s).  I find the code to be cryptic and there is
+no explanation of the algorithm or comments in the code to help.  On the other
+hand, there are some very interesting coding techniques used by the author and
+the general approach of using Monte Carlo to solve problems rather than
+exhaustive enumeration is intriguing.
+
+## Observations and Conclusions
+
+After spending some time with the code and these problems I make the
+following conclusions:
+
+* Using Monte Carlo simulations to solve deterministic problems is
+  interesting.  I would never have thought of doing that.  I am still
+  struggling with understanding how many trials are required to ensure
+  the solution space is fully explored - but there are times when the
+  randomized solution is far more compact than exhaustive search.
+
+* The indexing and vectorization of the calculations is actually very
+  impressive (but terse).  I really liked the ability of indexing with embedded
+  logic conditions to nearly eliminate the need for if-else testing.  The tour
+  de force is the author's solution to problem 3.
+
+  Of particular note are the following:
+
+  1. Wrap-around logic for (1-based) vector indexing.  Given an item
+     as vec[i], the previous/next item in the vector are found as shown
+     below.  This allows vectorization of expressions and extremely
+     compact code.
+
+    * Predecessor logic: `vec[i-1+veclen*(i==1)]`
+
+    * Successor logic: `vec[i%%veclen+1]`
+
+  2. Multiplication/Addition of logic vectors in place of if-then-else.
+     See the original author's code for Problem 3 for an example of
+     this.  Combined with the wrap-around logic this yields single
+     line vectorized expressions in place of multiple, nested if tests.
+  
+* I found mistakes in the code for two of the author's solutions.  The
+  stated solutions were correct in all cases, but the code did not generate
+  the correct results in problem 3 and in problem 2 it rarely found one
+  of the solutions.  I don't know if this was a publication/typo issue
+  or something else.  (To be fair, I also had a mistake in my exhaustive
+  search code for problem 3 but I quickly found/fixed it.)
+  
+  Deeper question: the author's code is very terse.  Does this yield
+  higher defect rates?  Or am I over-analyzing this?
+
+
+# Problem #1
+
+Repeating the problem statement
+
+    1. A circle of 16 liars and truth-tellers is such that everyone states that
+       their immediate neighbours are both liars. How many liars can there be? 
+
+Per the original author:
+
+    These questions can easily be solved by brute force simulation. For the
+    first setting, using 1 to code truth-tellers and -1 liars, I simulate
+    acceptable configurations as (see code below)
+
+With a cryptic conclusion:
+
+    which produces 8, 9, and 10 as possible (and obvious) values.
+
+## Author's Code for Problem #1
+
+The author's original code is given here:
+
+```{r}
+# Original code
+tabz=rep(0,16)
+tabz[1]=1 #at least one
+tabz[2]=tabz[16]=-1
+for (i in 3:15){
+  if (tabz[i-1]==1){
+   tabz[i]=-1}else{
+   if (tabz[i+1]==-1){
+    tabz[i]=1}else{
+    if (tabz[i+1]==1){
+     tabz[i]=-1}else{
+     if (tabz[i-2]==-1){
+      tabz[i]=1}else{
+       tabz[i]=sample(c(-1,1),1)
+}}}}}
+# Added by RGC
+print(c('Num Liars =',sum(tabz==-1)))
+tabz
+```
+
+I don't understand the *conclusion* from above.  Why is the solution set
+considered as *obvious*?
+
+The original code has no output and only runs one trial to generate a single
+solution in tabz[].  The code is not deterministic so you have to run it
+multiple times to cover the solution space.  Running some trials manually, I
+could only get it to produce 10 and 9 as the possible number of liars.  It is
+possible I didn't try hard enough since the case of 8 liars is rare.
+
+* How does this code cover the solution space and verify the results?
+
+I added a loop and I can get it to generate 8, 9, or 10 with varying
+probabilities.  The comments and format changes were added during an analysis
+of the code but the source itself should be identical to the code from the
+author.
+
+```{r}
+# Author solution wrapped in a loop to try many
+# iterations.  Also changed the indentation to
+# make the structure more obvious.
+#
+# Call
+#    tabz[i-1] = left neighbor - always known
+#    tabz[i+1] = right neighbor - might be unknown
+
+num_liars <- rep(0,16)
+num_trials <- 100000
+for (trial in 1:num_trials) {
+  tabz=rep(0,16)
+  tabz[1]=1 #at least one
+  tabz[2]=tabz[16]=-1
+  for (i in 3:15){
+    if (tabz[i-1]==1) {         # Left neighbor tells truth
+      tabz[i]=-1
+    } else {                    # Left neighbor is liar
+      if (tabz[i+1]==-1) {      # Right neighbor is liar
+        tabz[i]=1
+      } else {                  # Right neighbor tells truth or undefined
+        if (tabz[i+1]==1) {     # Right neighbor tells truth
+          tabz[i]=-1
+          print("Should never print")
+          print(tabz)
+          break
+        } else {                # Right neighbor undefined
+          if (tabz[i-2]==-1) {  # This prevents three liars in a row
+            tabz[i]=1
+          } else {              # No rule applies - randomly pick veracity
+            tabz[i]=sample(c(-1,1),1)
+          }
+        }
+      }
+    }
+  }
+  m <- sum(tabz==-1)   # Added by RGC
+  num_liars[m] <- num_liars[m]+1
+}
+print(c('Total trials =',num_trials))
+cbind(num_liars=1:16,solution_count=num_liars,probability=num_liars/num_trials)
+```
+
+I don't know how many trials to run.  If I use 10 trials I rarely get
+the 8 liar solution.  If I use 100 trials I get the 8 liar solution most
+of the time.  If I use 100K trials I see all three solutions all the
+time.
+
+I don't know how to prove that this is the complete solution set.
+
+----
+
+I can get a lower and upper bound on the possible solutions from the
+constraints (more details below):  (1) Every truth-teller has two liars for
+neighbors, and (2) can never have three liars in a row since that would make
+the middle liar a truth-teller.
+
+Using these we can find the maximum number of truth-tellers as:
+
+    L-T-L-T-L-T-L-T-L-T-L-T-L-T-L-T-wrap back around to start
+
+This is the lower bound on number of liars (8).
+
+With the constraint on liars we get and maximum of liars with:
+
+    L-T-L-L-T-L-L-T-L-L-T-L-L-T-L-L-wrap back around to start
+
+But this has (circularly) too many liars in sequence.  We can't move any
+of the L or T locations without getting three liars in a row so the actual
+upper bound must be one less: the maximum number of liars is 10.
+
+**Conclusion:** Number of liars is between 8 and 10 (inclusive).
+
+As a note: this hasn't demonstrated 9 as a feasible solution but it is
+trivial to modify the maximum liar sequence to add one more truth
+teller to achieve 9 liars.
+
+After thinking about the problem for a while - it is apparent that any
+feasible solution needs to satisfy the following two conditions:
+
+* Rule 1: Truth-teller must be surrounded by two liars
+
+* Rule 2: Can't have three liars in a row
+
+Consider traversing the circle.  These rules imply that only certain
+sequences are valid.  If we look at two-member groups, the next
+member in sequence is defined as follows:
+
+* L-L: next member is T (followed by L)
+* L-T: next member is L
+* T-L: next member is random
+
+Note that we only need consider three cases.  T-T is illegal since it
+would make a truth-teller a liar.
+
+We can further simplify this by looking two members in the past.  Given
+the current member is i, then:
+
+* if tabz[i-2] is Liar then tabz[i] is opposite of tabz[i-1]
+* if tabz[i-2] is Truth-teller then tabz[i] is random
+
+The final condition is continuity of the circle at the end:
+
+* L-?-L: center member must be T
+* T-?-L: center member must be L
+
+In other words, when we reach the last member, it must be the opposite
+of the previous member of the group.
+
+So it seems that the sequence can be constructed in a partially
+deterministic way.
+
+* Starting with L-T-L for index 16, 1, and 2
+* Generate members for index 3-14 using tabz[i-2]
+* Generate member for index 15 using tabz[i-1]
+
+## RGC rewrite of Author's Code for Problem #1
+
+```{r}
+# Use Booleans instead of +1/-1
+gen_sequence <- function() {
+  liar <- FALSE
+  truther <- TRUE
+  tabz <- rep(liar,16)
+  tabz[1] <- truther
+  for (i in 3:14) {
+    if (tabz[i-2]) {
+      tabz[i] <- sample(c(liar,truther),1)
+    } else {
+      tabz[i] <- !tabz[i-1]
+    }
+  }
+  tabz[15] <- !tabz[14]
+  return(tabz)
+}
+
+run_simulation <- function(num_trials=100000) {
+  num_liars <- rep(0,16)
+  for (i in 1:num_trials) {
+    s <- 16-sum(gen_sequence())
+    num_liars[s] <- num_liars[s]+1
+  }
+  return(cbind(num_liars=1:16,solutions=num_liars,p=num_liars/num_trials))
+}
+
+run_simulation(100000)
+```
+
+The author's solution is coded in a slightly different way.  The code
+starts with L-T-L and then builds the members of the circle sequentially
+by following these rules:
+
+1. If the previous member is a truth-teller then the current member must be a
+   liar. (Rule 1)
+
+2. If the previous member is a liar and the following member is a liar then the
+   current member must be a truth-teller.  This condition ensures continuity
+   around the circle at member 15-16.  Except for member 15, however, the
+   veracity of the following member is unknown. (Rule 1)
+
+3. If the following member is a truth-teller then the current member must be
+   a liar.  (Rule 1) Except for member 15 the next member is not known.
+   In the case of member 15, however, the following member is known to be a
+   liar so this rule can never be true.  I confirmed this by putting
+   in a diagnostic print/break that did not trigger in 200000 trials
+   so I am reasonably confident in my conclusion.
+
+4. If the previous two members are liars then the current member must
+   be truth-teller. (Rule 2)
+
+5. If no rule applies, generate a random choice
+
+If you do this *enough* times you should cover the solution space.
+I don't know how to quantify, a priori, how many trials are required.
+That is the problem with Monte Carlo sims - when do you have enough samples?
+
+
+## Probabilities of the Monte Carlo Sim
+
+I think we should be able to determine the odds of finding the 8 liar
+solution (since it is unique) starting as follows:
+
+   L-T-L
+   
+The next element is T (50%) which then defines the next element as L.
+
+  L-T-L-T-L
+  
+Each time we add T-L to the list is a 50% probability.  To get to the full
+length sequence we do this 6 times:
+
+  L-T-L-T-L-T-L-T-L-T-L-T-L-T-L-?
+  
+The final element is forced to be T by condition 2 in the code above.  In
+this case then, the odds of finding this solution must be `r 1/2^6`.
+
+So, the odds of not finding this in N trials is:
+
+$$P_{miss} = \left( 1-\frac{1}{2^6} \right)^N$$
+
+The odds of not finding/finding the 8 liar solution can be tabulated as:
+
+```{r}
+num_trials <- c(10,20,30,40,44,50,100,1000,10000)
+p_miss <- unlist(lapply(num_trials,function(N) {(1-2^-6)^N}))
+p_hit <- 1-p_miss
+cbind(num_trials=num_trials,p_miss=p_miss,p_hit=p_hit)
+
+```
+
+So with 10 trials we have 85% chance of missing the 8 liar case.  With 100
+trials we have 21% chance of a miss.  With 1000 trials we have less than
+a 1 in a million chance of missing.  For 10K trials the probability is
+vanishingly small.
+
+Calculating the odds for 9 or 10 liars is much more complicated since there
+are many combinations that can yield these cases and each path will have
+a slightly different probability.  Here are two difference sequences that
+each have 10 liars.  Each 50% probability is marked with a caret (^).
+
+    L-T-L-L-T-L-L-T-L-L-T-L-L-T-L-T
+          ^     ^     ^     ^        
+          +-----+-----+-----+--------- Four random chances
+    
+    L-T-L-T-L-T-L-L-T-L-L-T-L-L-T-L
+          ^   ^   ^     ^     ^      
+          +---+---+-----+-----+------- Five random chances
+
+So the probabilistic simulation is twice as likely to generate the first
+sequence as the second.
+
+The previous simulations generate feasible solutions of length 9 and 10
+about equally with a much smaller number of 8 liar solutions.
+
+The exhaustive enumeration (see below) has a total of 37 feasible
+solutions with the following distribution:
+
+    10 liars: 15 cases
+    9  liars: 21 cases
+    8  liars:  1 case
+    
+Since the probabilities of randomly generating a particular solution
+depends on the number of random choices it is difficult to directly compare
+this distribution with that obtained in the Monte Carlo sim.
+
+One way to calculate the actual probabilities is the following:
+
+1. Start with: seq=L-T-L, prob=1.0
+
+2. Generate the next item according to the rules above.  In the event
+   of a random choice - bifurcate the solution and create both new
+   sequences with the new prob = prob/2.
+   
+3. Repeat step 2 until a sequence reaches 15 elements.  The final element
+   is deterministic so it will not change the probability.
+   
+The coding may be recursive or it might be a repeating loop.  In any event,
+the solution is reached when all sequences reach the full length of 16
+members.
+
+```{r}
+# RGC Solution: enumeration of feasible solutions
+
+last <- function(x) {
+  return(tail(x,1))
+}
+second_last <- function(x) {
+  return(head(tail(x,2),1))
+}
+
+starting_list <- list(s=c(0,1,0),p=1.0)
+
+# Mast list of all feasible solutions and the probability
+ll <- list(starting_list)
+
+done <- FALSE
+while (!done) {
+  # Assume we are done and then go through the main list
+  done <- TRUE
+  idx <- 1
+  while (idx <= length(ll)) {
+    # Examine the sequence and figure out what to do
+    s <- ll[[idx]]$s
+    if (length(s)>15) {
+      # Sequence is full length - skip it
+      idx <- idx+1
+    } else if (length(s)==15) {
+      # Finish this one off
+      ll[[idx]]$s <- append(s,1-last(s))
+      idx <- idx+1
+    } else {
+      done <- FALSE
+      if (second_last(s)==0) {
+        # Deterministic next element so add it
+        ll[[idx]]$s <- append(s,1-last(s))
+        idx <- idx+1
+      } else {
+        # Clone the current vector and drop p by factor of 2
+        # Since these each need more processing do not increment
+        # the index
+        new_p <- ll[[idx]]$p/2
+        s1 <- append(s,0)
+        s2 <- append(s,1)
+        # Modify the current solution
+        ll[[idx]] <- list(s=s1,p=new_p)
+        # Add new candidate at end of the list
+        m <- length(ll)
+        ll[[m+1]] <- list(s=s2,p=new_p)
+        # print(c('Total candidates = ',length(ll)))
+      }
+    }
+  }
+}
+
+# Now total up the probabilities
+p_total <- rep(0,16)
+n_cases <- rep(0,16)
+for (i in ll) {
+  m <- sum(i$s == 0)
+  n_cases[m] <- n_cases[m]+1
+  p_total[m] <- p_total[m]+i$p
+}
+cbind(num_liars=1:16,p_total=p_total,n_cases=n_cases)
+```
+
+Algebraically the probabilities are:
+
+    8 liars  ->  1/64
+    9 liars  -> 31/64
+    10 liars -> 32/64
+
+This matches well with the Monte Carlo simulations for a large number
+of trials above.
+
+
+## Exhaustive Search for Problem #1
+
+I would prefer an enumeration of the possible cases or an exhaustive search.
+
+The code above enumerates all possible cases.
+
+The code below performs exhaustive search.  It starts with positions 1,2,
+and 16 defined as the original author does and then enumerates all possible
+combinations of the remaining 13 positions.  This is only 2^13 cases and
+seems like a reasonable thing to try.
+
+In the end - I agree with the solution presented by the author but I
+still don't like probabilistic solutions to problems with deterministic
+answers.  I grudgingly admit, however, that I am impressed with the
+ability of this code to cover the solution space - given enough random
+trials.
+
+```{r}
+# RGC Solution: exhaustive search
+
+truth_teller <- 1
+liar <- 0
+
+to_binary <- function(x,nbits=13) {
+  n=rep(0,nbits)
+  for (i in 1:nbits) {
+    n[i] <- x %% 2
+    x <- x %/% 2
+  }
+  return(n)
+}
+
+valid_solution <- function(x) {
+  valid <- TRUE
+  for (i in 3:(length(x)-1)) {
+    if (x[i]==truth_teller) {
+      if ( (x[i-1]==truth_teller) | (x[i+1]==truth_teller) ) {
+        # Bad solution - truth_teller lied
+        valid <- FALSE
+        break
+      }
+    } else {
+      if ( (x[i-1]==liar) & (x[i+1]==liar)) {
+        # Bad solution - liar told truth
+        valid <- FALSE
+        break
+      }
+    }
+  }
+  return(valid)
+}
+
+tabz=rep(0,16)
+tabz[1]=truth_teller #at least one
+tabz[2]=tabz[16]=liar
+solution=c()
+for (i in 0:8191) {
+  tabz[3:15] <- to_binary(i)
+  if (valid_solution(tabz)) {
+    solution <- c(solution,tabz)
+  }
+}
+# Each row is a valid solution
+solution <- t(matrix(solution,nrow=16))
+nnn <- c()
+for (i in 1:nrow(solution)) {
+  nnn <- c(nnn,sum(solution[i,]==0))
+}
+print('Number of liars:')
+sort(unique(nnn))
+```
+
+So - exhaustive search yields all three solutions.  In addition, the various
+solutions can be enumerated:
+
+```{r}
+for (i in sort(unique(nnn))) {
+  print(c('Number of liars =',i))
+  print(c("Num cases =",sum(nnn==i)))
+  for (m in which(nnn==i)) {
+    print(paste0(solution[m,],collapse=""))
+  }
+  print("")
+}
+```
+
+
+# Problem #2
+
+Repeating the problem:
+
+    2. A circle of 12 liars and truth-tellers is such that everyone state that
+       their immediate neighbours are one liar plus one truth-teller. How many
+       liars can there be?
+
+Per the original author:
+
+    The second puzzle is associated with the similar R code
+
+```{r}
+tabz=sample(c(-1,1),12,rep=TRUE)
+rong=FALSE
+while (!rong){
+ for (i in sample(12)){
+  if (tabz[i-1+12*(i==1)]*tabz[i%%12+1]==-1){
+   tabz[i]=1}else{ 
+   tabz[i]=sample(c(-1,1),1)}
+  }
+  rong=TRUE
+  for (i in (1:12)[tabz==1])
+    rong=rong&(tabz[i-1+12*(i==1)]*tabz[i%%12+1]==-1)
+  if (rong){
+   for (i in (1:12)[tabz==-1])
+     rong=rong&(tabz[i-1+12*(i==1)]*tabz[i%%12+1]!=-1)
+  }}
+sum(tabz==-1)
+```
+
+With the conclusion:
+
+    with numbers of liars (-1) either 12 (obvious) or 4.
+
+I have executed the code and it seems that it *always* yields 4 liars as the
+solution.  I have wrapped the code in a loop below to see if more trials
+finds both solutions.  I have changed the format and added comments but
+it should be identical to the code above:
+
+```{r}
+num_trials <- 100
+num_liars <- rep(0,12)
+
+for (i in 1:num_trials) {
+  # Random candidate solution
+  tabz=sample(c(-1,1),12,rep=TRUE)
+  rong=FALSE
+  # Keep adjusting the solution until a feasible solution is found
+  while (!rong){
+    # Take the 12 members in a random order
+    for (i in sample(12)) {
+      # If the two neighbors are opposite veracity
+      if (tabz[i-1+12*(i==1)]*tabz[i%%12+1]==-1) {
+        # then this member must be a truth-teller
+        tabz[i]=1
+      } else {
+        # I don't understand the original code.
+        #
+        # The two neighbors are the same veracity so this
+        # must be a liar -- for some unknown reason the
+        # original author uses random veracity.  Is this
+        # to break out of an infinite loop?  I changed this
+        # to force the current member to be a liar and it
+        # generates the all liar solution much more often
+        # and requires far fewer trials.
+        #
+        # With random logic required 10000 trials to find
+        # the 12 liars solution only 3 times.
+        #
+        # With correction in place the 12 liars solution is
+        # found about 1/4 of the time which matches the expected
+        # result from exhaustive enumeration.
+        #
+        # Original code:
+        # tabz[i]=sample(c(-1,1),1)
+        #
+        # Correct code:
+        tabz[i]=-1
+      }
+    }
+    # Check validity of the candidate solution
+    # Assume it is correct
+    rong=TRUE
+    # For every truth-teller verify the neighbors are opposites
+    # Note that (1:12)[tabz==1] is the same as which(tabz==1)
+    for (i in (1:12)[tabz==1])
+      rong=rong&(tabz[i-1+12*(i==1)]*tabz[i%%12+1]==-1)
+    # If still a valid seqence, check the liars
+    # You could always check the liars at a slight performance penalty
+    # The logic would still work.
+    if (rong) {
+        # For every liar verify the neighbors are the same veracity
+        for (i in (1:12)[tabz==-1])
+          rong=rong&(tabz[i-1+12*(i==1)]*tabz[i%%12+1]!=-1)
+    }
+    # If we get here and rong is still TRUE then we are done
+    #
+    # If rong is FALSE then we repeat the process taking a new random
+    # permutation of the 12 members and *tweaking* the veracity.
+    #
+    # Since the sequencing is done with random permutations it is
+    # difficult to know a priori how long this will execute.
+  }
+  m=sum(tabz==-1)
+  num_liars[m] <- num_liars[m]+1
+}
+cbind(1:12,num_liars)
+```
+
+Well -- if I run enough trials I find both solutions.  Running this code
+for 10000 trials takes a while so I really don't like the original code
+approach to using random veracity.  I don't know the theoretical distribution
+of the results but this does not give me much confidence that all the
+possible solutions have been found.
+
+With the correction in place the number of cases required to find both
+solutions has been reduced by 2-3 orders of magnitude.
+
+Exhaustive search is only 2^12 = 4096 cases and should run much faster.
+Let us try that:
+
+```{r}
+# RGC Exhaustive search
+# Liar = 0
+# Truth-teller = 1
+
+# to_binary() defined above
+
+# Return element before x[i] with wrap-around
+# Coded as tabz[i-1+12*(i==1)] by original author
+pred <- function(x,i) {
+  if (i==1) {
+    return(tail(x,1))
+  }
+  return(x[i-1])
+}
+
+# Return element after x[i] with wrap-around
+# Coded as tabz[i%%12+1] by original author
+succ <- function(x,i) {
+  if (i==length(x)) {
+    return(x[1])
+  }
+  return(x[i+1])
+}
+
+# Check for valid solution
+valid_solution <- function(x) {
+  for (i in 1:12) {
+    if (x[i]==1) {
+      if (pred(x,i)==succ(x,i)) { # Truth-teller lied
+        return(FALSE)
+      }
+    } else {
+      if (pred(x,i)!=succ(x,i)) { # Liar told the truth
+        return(FALSE)
+      }
+    }
+  }
+  return(TRUE)
+}
+
+# Exhaustive search
+num_liars=rep(0,12)
+for (i in 1:2^12) {
+  s <- to_binary(i,12)
+  if (valid_solution(s)) {
+    m=sum(s==0)
+    num_liars[m] <- num_liars[m]+1
+    print(s)
+  }
+}
+cbind(1:12,num_liars)
+```
+
+Only 4 of the 8192 possible combinations are valid.
+
+Note that the 4 liar solutions are just circular shifts of the same pattern.
+
+This can be derived if we consider the center member of a three member group.  
+
+The are four infeasible patterns involving three members:
+
+* 0-0-1: liar told the truth
+* 1-0-0: liar told the truth
+* 0-1-0: truth-teller lied
+* 1-1-1: truth-teller lied
+
+This leaves four feasible patterns involving three members:
+
+* 0-0-0
+* 1-0-1
+* 0-1-1
+* 1-1-0
+
+If we look at this, we can see that the third member is defined by the
+first two members.  In fact, the third member is always the exclusive-OR
+of the previous two members.
+
+This means we can extend any group of two members to three members.
+If we then look at the last two members we can extend to four.
+This may be continued until the entire sequence is completed and we can
+assess the feasibility by continuity with the first member of the circle.
+
+Applying the feasible patterns above to the possible starting cases yields:
+
+* 0-0-0-0-0-0-0-0-0-0-0-0-wrap around to start
+* 1-0-1-1-0-1-1-0-1-1-0-1-wrap around to start
+* 0-1-1-0-1-1-0-1-1-0-1-1-wrap around to start
+* 1-1-0-1-1-0-1-1-0-1-1-0-wrap around to start
+
+Which generates the four patterns found above.
+
+----
+
+# Problem #3
+
+Repeating the problem:
+
+    3. A circle of 8 liars and truth-tellers is such that four state that
+       their immediate neighbours are one liar plus one truth-teller and
+       four state that their immediate neighbours are both liars . How 
+       many liars can there be?
+
+Per the original author:
+
+    The final puzzle is more puzzling in that figuring out the validating
+    function (is an allocation correct?) took me a while, the ride back
+    home plus some. I ended up with the following code that samples liars
+    (-1) and thruth-seekers (1) at random, plus forces wrong and right
+    answers (in 0,1,2) on these, and check for the number of answers
+    of both types:
+
+```{r}
+rong=FALSE
+while (!rong){
+ tabz=sample(c(-1,1),8,rep=TRUE) #truth
+ tabz[1]=1;tabz[sample(2:8,1)]=-1
+ tt=(1:8)[tabz==1];lr=(1:8)[tabz==-1]
+ statz=rep(0,8) #stmt
+ statz[tt]=(tabz[tt-1+8*(tt==1)]*tabz[tt%%8+1]==-1)+
+           2*(tabz[tt-1+8*(tt==1)]+tabz[tt%%8+1]==-2)
+ #answering 0 never works
+ statz[lr]=2*(tabz[lr-1+8*(lr==1)]*tabz[lr%%8+1]==-1)+
+          (tabz[lr-1+8*(lr==1)]+tabz[lr%%8+1]==-1)+
+           sample(c(1,2),8,rep=TRUE)[lr]*
+           (tabz[lr-1+8*(lr==1)]+tabz[lr%%8+1]==1)
+ rong=(sum(statz==1)==4)&(sum(statz==2)==4)}
+
+c(sum(tabz==-1),tabz)
+```
+
+Conclusion:
+
+    with solutions 3, 4, 5 and 6.
+
+My comment: **Huh?**  I have tried running this manually and I always get
+the same solution with 4 liars.  I will try that code in a loop and see
+if we get anything with more trials.
+
+```{r}
+
+# Original author solution wrapped in a function
+# I think the solution is supposed to be in tabz (?)
+#
+# lr    = index values of liars
+# tt    = index values of truth-tellers
+# statz = replies from members of tabz
+# For truth-tellers:
+#    1 = L-T or T-L as neighbors
+#    2 = L-L as neighbors
+#    0 = T-T as neighbors (Invalid solution)
+# For liars:
+#    2 = L-T or T-L as neighbors (Liar lies)
+#    1 = L-L as neighbors (Liar lies)
+#    Random = T-T as neighbors (Liar makes up answer)
+# tabz  = liar/truth-teller solution
+
+gen_solution <- function() {
+rong=FALSE
+while (!rong){
+ tabz=sample(c(-1,1),8,rep=TRUE) #truth
+ tabz[1]=1;tabz[sample(2:8,1)]=-1
+ tt=(1:8)[tabz==1];lr=(1:8)[tabz==-1]
+ statz=rep(0,8) #stmt
+ statz[tt]=(tabz[tt-1+8*(tt==1)]*tabz[tt%%8+1]==-1)+
+           2*(tabz[tt-1+8*(tt==1)]+tabz[tt%%8+1]==-2)
+ #answering 0 never works
+ # Original code doesn't work
+ # The sum of two tabz members can never equal -1 or +1
+ # so the random replies never gets activated. I think
+ # he meant for the sums to -2 or +2 to find neighbors
+ # that are both Liars (-2) or truth-tellers (+2).
+ if (FALSE) {
+ statz[lr]=2*(tabz[lr-1+8*(lr==1)]*tabz[lr%%8+1]==-1)+
+             (tabz[lr-1+8*(lr==1)]+tabz[lr%%8+1]==-1)+  # RGC: never true
+             sample(c(1,2),8,rep=TRUE)[lr]*
+             (tabz[lr-1+8*(lr==1)]+tabz[lr%%8+1]==1)    # RGC: never true
+ } else {
+ statz[lr]=2*(tabz[lr-1+8*(lr==1)]*tabz[lr%%8+1]==-1)+  # RGC: Liar lies
+             (tabz[lr-1+8*(lr==1)]+tabz[lr%%8+1]==-2)+  # RGC: Liar lies
+             sample(c(1,2),8,rep=TRUE)[lr]*
+             (tabz[lr-1+8*(lr==1)]+tabz[lr%%8+1]==2)    # RGC: Liar random
+ }
+ rong=(sum(statz==1)==4)&(sum(statz==2)==4)}
+ return(tabz)
+}
+
+num_liars <- rep(0,8)
+num_trials <- 100
+l <- list()
+for (i in 1:num_trials) {
+  s <- gen_solution()
+  m <- sum(s==-1)
+  num_liars[m] <- num_liars[m]+1
+  found <- FALSE
+  if (length(l)==0) {
+    l[[1]] <- s
+  }
+  for (j in 1:length(l)) {
+    if (all(l[[j]]==s)) {
+      found <- TRUE
+    }
+  }
+  if (!found) {
+    l[[length(l)+1]] <- s
+  }
+}
+
+print("Feasible number of liars:")
+print(which(num_liars!=0))
+print("Unique solutions saved in list = l")
+print("")
+print("Simulated solutions:")
+cbind(num_liars=1:8,num_solutions=num_liars)
+
+```
+
+OK - the original code always generates one of the two same sequences.
+
+I fixed the problem and it works now.
+
+----
+
+Let us try exhaustive search on 2^8 cases:
+
+```{r}
+# to_binary() from above
+# pred() from above
+# succ() from above
+
+valid_solution <- function(x) {
+  n1 <- 0   # Answer: 1 Liar, 1 Truth-teller
+  n2 <- 0   # Answer: 2 Liars
+  n3 <- 0   # Answer: Unknown - Liar with TT,TL, or LT neighbors
+  n4 <- 0   # Answer: 2 Truth-tellers -> invalid sequence
+  for (i in 1:8) {
+    if (x[i]==1) {
+      if (pred(x,i) != succ(x,i)) {
+        n1 <- n1+1   # Truther with L-T/T-L neighbors
+      } else if ((pred(x,i)==0)&(succ(x,i)==0)) {
+        n2 <- n2+1   # Truther with L-L neighbors
+      } else {
+        n4 <- n4+1   # Truther with T-T neighbors
+                     # Invalid sequence - could force return here
+      }
+    } else {
+      if ((pred(x,i)==0)&(succ(x,i)==0)) {
+        n1 <- n1+1   # Liar with LL neighbors
+      } else {
+        n3 <- n3+1   # Liar can lie
+      }
+    }
+  }
+  return( list(n1=n1,n2=n2,n3=n3,n4=n4) )
+}
+
+num_liars <- rep(0,8)
+for (i in 0:255) {
+  s <- to_binary(i,8)
+  # Check if sequence is valid
+  #    - No answers of T-T, and
+  #    - Known L-T/T-L no more than 4, and
+  #    - Known L-L no more than 4
+  # Remainder will be liars telling lies and they can answer
+  # however they need to make the sequence *valid*
+  l <- valid_solution(s)
+  if ((l$n4==0) & (l$n1<=4) & (l$n2<=4)) {
+    m=sum(s==0)
+    # print(c(m,":",s))
+    num_liars[m] <- num_liars[m]+1
+  }
+}
+cbind(num_liars=1:8,solutions=num_liars)
+```
+
+First try exhaustive search only finds solutions of 3, 4, and 5 liars.
+Did I miss something?
+
+Yes -- liar surrounded by anything other than L-L can reply
+however they want to make the *correct* total.  Modified the logic and I
+now get solutions of 3,4,5, or 6 liars.
+
+The original author claims there are solutions of 3, 4, 5, and 6 liars.
+
+He appears to be correct.
+
+Need to think about this.
+
+Answers are always:
+
+1. One Liar + One Truth-teller
+2. Both Liars
+
+Let's consider all three member combinations.  What is the reply of the
+member in the middle of the sequence?  The reply is either #1 or #2 or a lie
+or an invalid response (two truth-tellers).
+
+    Combo  Case
+    ---------------
+    L-L-L  n1
+    L-L-T  n2
+    L-T-L  n2
+    L-T-T  n1
+    T-L-L  n2
+    T-L-T  Either
+    T-T-L  n1
+    T-T-T  Invalid
+    
+Seven of the cases are deterministic.  Only T-L-T allows the liar to lie
+in a way we can't predict.
+
+Not sure this is going anywhere.
+
+How about trying to generate the prime implicants for all the valid
+sequences.  I had an old program called pigen.c that I might be able to
+find.  If not - I wil have to recreate it in R (that does not sound like
+a lot of fun).  Whew!  Found it in my old cd repo.  Compilation and a
+simple test case seem to work properly.  Now I need to figure out how
+to write output from R!
+
+```{r}
+# Generate ASCII output file with the valid sequences.
+# Each line of the output file should consist of precisely
+# 8 digits (1 or 0) that represent the minterms.
+
+# Using the logic from above:
+# valid_sequence() needs to be checked and the sequences put into
+# a matrix.
+
+sss=c()
+for (i in 0:255) {
+  s <- to_binary(i,8)
+  # Check if sequence is valid
+  #    - No answers of T-T, and
+  #    - Known L-T/T-L no more than 4, and
+  #    - Known L-L no more than 4
+  # Remainder will be liars telling lies and they can answer
+  # however they need to make the sequence *valid*
+  l <- valid_solution(s)
+  if ((l$n4==0) & (l$n1<=4) & (l$n2<=4)) {
+    sss=c(sss,s)
+  }
+}
+sss=matrix(sss,ncol=8,byrow=TRUE)
+for (i in 1:nrow(sss)) {
+  write(paste0(sss[i,],collapse=""),"problem3.txt",append=TRUE)
+}
+
+```
+
+The output of this works fine to feed into pigen.  Unfortunately, the
+results are somewhat disappointing.  Given the 106 different patterns of
+valid sequences the pigen process only reduces this to 32.  The prime
+implicants are:
+
+    101-0--0
+    1010--0-
+    1-010--0
+    10-10--0
+    -1010--0
+    0101-0--
+    01-010--
+    010-10--
+    -0101-0-
+    0-1010--
+    10--01-0
+    10--010-
+    -01-010-
+    -010-10-
+    --0101-0
+    -0-1010-
+    1-0--010
+    10--0-10
+    -10--010
+    010--01-
+    --01-010
+    --010-10
+    --0-1010
+    0--0101-
+    01-0--01
+    010--0-1
+    -010--01
+    0-10--01
+    0--01-01
+    0--010-1
+    -0--0101
+    0--0-101
+
+I suspect there is a XOR pattern buried in here but I'm not sure.
+
+Maybe I got greedy -- let us try each class of solutions.
+
+Wow - that is even more disappointing than the previous result.  There
+is **no** simplification possible which is blindingly obvious after a bit
+of thought.  If two sequences have the same number of liars they must
+differ in two positions - hence they can never be combined.
+
+Looking at the cases of 3 liars, 4 liars, etc. individually shows that there
+are a few basic patterns that occur multiple times as circular shifts.
+Let's see what this yields:
+
+```{r}
+# Check if two vectors are just circular shifts
+circ_shift <- function(x1,xcompare) {
+  x2 <- xcompare
+  # Return TRUE if x2 is a circular shift of x1
+  m <- length(x2)
+  if (length(x1) != m) return(FALSE)
+  for (i in 1:m) {
+    if (identical(x1,x2)) {
+      return(TRUE)
+    } else {
+      temp <- x2[1]
+      x2[1:(m-1)] <- x2[2:m]
+      x2[m] <- temp
+    }
+  }
+  return(FALSE)
+}
+unique_set <- function(x) {
+  # Return the unique rows from matrix x
+  # A row is considred unique if it is not a circular shift of any
+  # other row.
+  zzz <- x
+  nc <- ncol(x)
+  output=c()
+  while (nrow(zzz)>0) {
+    t <- zzz[1,]
+    m <- c()
+    for (i in 1:nrow(zzz)) {
+      m <- c(m,circ_shift(t,zzz[i,]))
+    }
+    output=c(output,zzz[which(m)[1],])
+    zzz <- zzz[!m,]
+  }
+  output <- matrix(output,ncol=nc,byrow=TRUE)
+  return(output)
+}
+
+zzz <- unique_set(sss)
+zzz
+```
+
+So - the original set of 106 solutions has been reduced to 15 after removing
+solutions that are simply circular shifts of other solutions.
+
+The unique solutions are given below:
+
+```{r}
+for (num_liar in c(3,4,5,6)) {
+  m <- apply(zzz,1,function(x) {sum(x==0)==num_liar})
+  print(c("Num liars = ",num_liar))
+  print(zzz[m,])
+  print("")
+}
+```
+
+You could consider these as *basis solutions*.
+

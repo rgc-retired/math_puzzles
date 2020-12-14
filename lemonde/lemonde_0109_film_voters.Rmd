@@ -1,0 +1,62 @@
+---
+title: "lemonde_0109"
+author: "R. G. Cronce"
+date: "November 25, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Le Monde Puzzle 0109
+
+[LeMonde Puzzle on Feedly](https://feedly.com/i/entry/XGq6cYRY3hH9/vdZr0WOJiPdAe0u6dQ2ddUFEsTqP10=_15fe19d787c:1f17e41:d77c33d7)
+
+[R-Bloggers Website](https://www.r-bloggers.com/2017/11/le-monde-puzzle-1029)
+
+[Xi'an's Blog Website](https://xianblog.wordpress.com/2017/11/22/le-monde-puzzle-1029/)
+
+
+A film theatre has a waiting room and several projection rooms. With four films on display. A first set of 600 spectators enters the waiting room and vote for their favourite film. The most popular film is projected to the spectators who voted for it and the remaining spectators stay in the waiting room. They are joined by a new set of 600 spectators, who then also vote for their favourite film. The selected film (which may be the same as the first one) is then shown to those who vote for it and the remaining spectators stay in the waiting room. This pattern is repeated for a total number of 10 votes, after which the remaining spectators leave. What are the maximal possible numbers of waiting spectators and of spectators in a projection room?
+
+RGC Note: I am not sure I fully understand the constraints of this problem.
+It isn't clear to me if people get to change their vote on each round or if they
+are *stuck* with their original vote.
+
+```{r}
+# This is the recursive solution for the maximum audience size
+#
+# Invoke this as: optiz(c(0,0,0,0),0), or
+#                 optiz(c(150,150,150,150),1)
+#
+# to get the maximum audience size of 1619
+
+# I do not understand this at all
+#
+# I think it is trying all people in one group, half in each of two,
+# one third in each of three, and then one fourth in each of four.
+# It is then trying every combination of these to find the maximum
+# number of people in the audience.
+#
+# At least I can say, there are 4 loops with t=1, 16 with t=2, 64 with t=3.
+# I am using a leap of induction to guess at the reason for the 4^n increase.
+
+optiz=function(votz,t){
+  if (t==9){ return(sort(votz)[3]+600)
+  }else{
+    # Attempt at debugging - a LOT of output is produced
+    if (t==2) {
+       print(c("Round =",t,'Votz = ',votz))
+    }
+    goal=optiz(sort(votz)+c(0,0,600,-max(votz)),t+1)
+    goal=rep(goal,4)
+    for (i in 2:4){
+      film=sort(votz);film[4]=0;film=sort(film)
+      size=sum(film[(4-i+1):4])+600
+      film[(4-i+1):4]=ceiling(size/i)
+      while (sum(film[(4-i+1):4])>size) film[4]=film[4]-1
+      goal[i]=optiz(sort(film),t+1)}
+    return(max(goal))}}
+```
+

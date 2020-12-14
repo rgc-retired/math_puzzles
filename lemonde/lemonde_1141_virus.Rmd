@@ -1,0 +1,108 @@
+---
+title: "Virus Simulation"
+author: "R. G. Cronce"
+date: "10/19/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Simulation of a Virus
+
+LeMonde #1141
+
+Another concoction from Xi'an - in honor of Conway's passing and the Game of Life.
+This is a simulation of a virus on an 8x8 board.  Assuming two or more sick neighbors
+will infect a cell - what is the minimum number of infected cells that results in
+the entire board being infected?
+
+[R-Blogger's Website](https://www.r-bloggers.com/2020/05/le-monde-puzzle-1141)
+
+[Xi'ans Blog](https://xianblog.wordpress.com/2020/05/04/le-monde-puzzle-1141/)
+
+Code was taken from tio.run (Try It Online) that was linked from his article.  The code is
+actually in the URL and (apparently) gets loaded into tio when you visit the site.
+
+[Code](https://tio.run/#%23dZLtboMgFIb/cxX0hwtMycqyD2NLb6QxS7diRqJoKK5LjNfuDvgxdZ2Jyjnv6@ObA6brivIL7xnOav1hVanJe2nOtEEYK30WhCcvTxQKLZXY3kNrEOA@bpw17cWjb2zgGQRxmgonLXshX1oJZ71CwX67HcIH/TXDzQxsjYQX4zR48BH@6Ydz1kxg8Qr2ymbyKuRaW0BXYujBk2GgpAcOSI4xaEba2gyTh7JFCGUqz29vi5bXN1cI2Ljpk@unyiUm5FIXZDTQPWzd3bJ1cJVfUdpgNI5WjIbdX3r7G3DJEgL4Tka2rGCNstJgYuF4YJ5w@ezT9qyTNeqbbKM4iuk4i8upqHLpD1g0rB8TIEWcUhiMO2cZJm4OQ@DG/WbKz/jOOrZPXRmlLQEd4rSo634A)
+
+I copy/pasted the code below so I can *try* to understand it.
+
+I infer from the results that 7 cells are required - but the code does not dump the
+actual board configuration.  That is available in `tord`.
+
+After looking at the code it appears that the number printed is one less than the
+number of infected cells.  So - I guess the answer is really 8 cells.
+
+After a cursory examination of the code I must admit that the arithmetic in the mov() function
+is an amazing tour-de-force of index manipulation.  The `!!` essentially changes the scope
+so `!!ind%8` just generates a vector that can be used to index `ind`.  If you try to use
+`ind[ind%%8]` you don't get what you expect.  If you use `ind[!!ind%%8]` it generates the
+values from 1:64 skipping all the multiples of 8.  This is done to generate the index
+values of the left (top?) neighbor.  In a similar way he adds together the values from
+the bord in the left/right/top/bottom positions and accumulates them in a matrix nei[].
+He then updates any cells where the nei[] value exceeds 1.
+
+This is definitely not readable - but it seems to work.  Note that `%/%` is integer
+division.  It also appears that any index values of 0 just disappear from the returned vectors
+but I didn't work it all out in detail.
+
+My first thought on solving this was to use 2D convolution but it appears that is
+not built into R so I ended up installing a bunch of stuff just to get 2D convolution.
+The filter2() function from the EBImage package seems to work.  I also looked at the
+magick package - but it doesn't work for a matrix input - only a matrix kernel.  I
+also looked at the Imagine package - which works - but the convolution routine does
+not handle edge conditions and marks all the edges as NA.  You need to manually pad
+the input matrix with the boundary value, run the convolution, then extract the
+center portion of the matrix.  Ugly!  Might want to uninstall magick and Imagine but
+they are installed for now.
+
+In any case, once you get a 2D convolution routine you can just run a kernel to add
+up the four neighbors and use some ifelse logic.  The result is fairly clean.
+Assume zzz=board, k=convolution matrix, then:
+
+    k=matrix(c(0,1,0,1,0,1,0,1,0),3,3)                 # kernel for the four neighbors
+    ...
+    zzz <- ifelse(filter2(zzz,k,boundary=0)>1,1,zzz)   # New virus value
+    ...
+
+Will simulate the next generation of the virus (e.g. the mov() function).  Keep iterating
+until the number of cells reaches 64 or it stops increasing -- same as the logic below.
+
+Note that this would be trivial to update if the threshold was three neighbors but I don't
+know if the logic below would be so simple.
+
+```{r}
+
+mov <- function(bord){
+  ind=(1:64)
+  nei=0*ind
+  ind=ind[!bord]
+  nei[ind[!!ind%%8]]=bord[ind[!!ind%%8]+1]
+  nei[ind[!!(1-ind%%8)]]=nei[ind[!!(1-ind%%8)]]+
+        bord[ind[!!(1-ind%%8)]-1]
+  nei[ind[!!(ind-1)%/%8]]=nei[ind[!!(ind-1)%/%8]]+bord[ind[!!(ind-1)%/%8]-8]
+  nei[ind[!!(7-(ind-1)%/%8)]]=nei[ind[!!(7-(ind-1)%/%8)]]+bord[ind[!!(7-(ind-1)%/%8)]+8]
+  bord[ind[nei[ind]>1]]=1  
+  return(bord)
+  }
+
+
+fill <- function(bord){
+  new_bord=mov(bord)
+  while ((sum(new_bord)<64)&(sum(new_bord)>sum(bord))){ 
+    bord=new_bord;new_bord=mov(bord)}
+  return((sum(new_bord)==64))}
+ 
+top=64
+for (t in 1:1e5){
+  bord=matrix(0,8,8)
+  bord[sample(1:64,sample(2:top,1))]=1
+  if (fill(bord)){top=sum(bord)-1;tord=bord;print(top)}
+}
+
+
+
+```
+

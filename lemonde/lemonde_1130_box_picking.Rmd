@@ -1,0 +1,87 @@
+---
+title: "Pick Some Boxes"
+author: "R. G. Cronce"
+date: "10/21/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Le Monde 1130: Pick some boxes
+
+[R-Bloggers Website](https://www.r-bloggers.com/2020/02/le-monde-puzzle-1130)
+
+[Xi'an blog Website](https://xianblog.wordpress.com/2020/02/07/le-monde-puzzle-1130/)
+
+
+    Abishag and Caleb fill in alternance a row of N boxes in a row by picking
+    one then two then three etc. consecutive boxes. When a player is unable
+    to find enough consecutive boxes, the player has lost.
+    
+    Who is winning when N=29? When N=30?
+
+Solution (per Xi'an):
+
+    returns Abishag as the winner for N=29 (as well as for N=1,2,7,…,13,19,…,29)
+    and Caleb as the winner for N=30 (as well as for N=3,…,6,14,…,18). I am actually
+    surprised that the recursion operates that deep, even though this means a sqrt(N)
+    depth for the recursion. While the code took too long to complete, the function
+    operates for N=100. A side phenomenon is the apparent special case of N=47,
+    which makes Abishag the looser, while N=46 and N=48 do not.
+    
+    This is an unusual pattern as otherwise (up to N=59), there are longer and longer
+    stretches of adjacent wins and looses as N increases.
+
+There is a recursive function provided by Xi'an to solve this problem.  The
+reuturn value is (apparently) TRUE for Abishag as the winner.
+
+When I run this code I do not get the same results as Xi'an.  The code does not run
+with N=1.  I do not see the anomaly for N=47.  I agree that the code is very slow
+once N is more than (about) 30.
+
+```{r}
+
+f<-function(b=!1:N,r=0){
+  for(i in 1:(N-r)){
+    if(p<-!max(b[j<-i+r:0])){
+      q=b;q[j]=1
+      if(p<-!f(q,r+1))break}}
+  p}
+
+```
+
+using this to tabulate some results:
+
+```{r}
+t1=Sys.time()
+abishag_wins=c()
+for (i in 2:50) {
+  N=i
+  r=f()
+  abishag_wins=append(abishag_wins,r)
+  if (r) { print(c(N,"Abishag"))} else { print(c(N,"Caleb")) }
+}
+t2=Sys.time()
+
+print("Abishag wins:")
+print(which(abishag_wins)+1)
+
+print("Caleb wins:")
+print(which(!abishag_wins)+1)
+
+print("Run lengths:")
+print(rle(abishag_wins))
+
+print(c("Run time",t2-t1))
+```
+
+Note that the lengths of alternating runs appear to be intermixed sequences of primes
+with run lengths:
+
+    for Ashibag: 2, 7, 11, 13
+    for Caleb:   3, 5, 7,  ???
+    
+With the final sequence for Caleb terminated by the upper limit of this simulation.
+Even this modest upper limit of 50 takes a substantial amount of run time.

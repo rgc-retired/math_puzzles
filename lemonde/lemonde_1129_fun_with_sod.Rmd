@@ -1,0 +1,38 @@
+---
+title: "Fun with Sum of Digits"
+author: "R. G. Cronce"
+date: "10/21/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Le Monde 1129: Fun with Sum of Digits
+
+[R-Bloggers Website](https://www.r-bloggers.com/2020/02/le-monde-puzzle-1129)
+
+[Xi'an Website](https://xianblog.wordpress.com/2020/02/10/le-monde-puzzle-1129/)
+
+The problem is repeated below:
+
+    When the three consecutive numbers 110, 111 and 112, they all are multiples
+    of the sum of their digits. Are there 4 consecutive numbers with three digits
+    like this? A contrario, does there exist 17 consecutive numbers with three
+    digits such that they cannot be divided by the sum of their digits? 18?
+
+
+
+```{r}
+library(gtools)
+
+bez=!(100:999)%%apply(baseOf(100:999),1,sum)
+(100:897)[bez[-(1:3)]*bez[-c(1:2,900)]*bez[-c(1,899:900)]*bez[-(898:900)]==1]
+```
+
+and for the other problem:
+
+```{r}
+max(diff((1:899)[!!diff(bez)]))
+```

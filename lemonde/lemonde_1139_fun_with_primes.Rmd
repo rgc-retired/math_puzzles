@@ -1,0 +1,43 @@
+---
+title: "Fun with Primes"
+author: "R. G. Cronce"
+date: "10/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## LeMonde 1139
+
+Another one of Xi'an blog gems with a very terse solution.
+
+[R-bloggers website](https://www.r-bloggers.com/2020/04/le-monde-puzzle-1139)
+
+[Xi'an blog](https://xianblog.wordpress.com/2020/04/24/le-monde-puzzle-1139/)
+
+The problem involves finding numbers where the difference in divisors are also
+divisors of the given number.  Specifically:
+
+    The integer n=36 enjoys the property that all the differences between its ordered
+    divisors are also divisors of 36. Find the only 18≤m≤100 that enjoys this property
+    such that all its prime dividers are of multiplicity one. Are there other such m’s?
+
+The code is given below:
+
+```{r}
+library(primes)
+
+y=z=18:2000
+for(x in y)z[y==x]=!sum(x%%diff((1:x)[!x%%(1:x)]))
+y=y[z==1]
+for(k in generate_primes(2,max(y)))y=y[!!y%%k^2]
+
+y
+```
+
+At least up to 100K, the only solutions are 42 and 1806.  The problem only asked to check the
+range 18 to 100 which only has one solution (42) but this has been checked 1 to 100000.  I modified
+the upper limit to 2K for the saved file since it runs much faster.
+

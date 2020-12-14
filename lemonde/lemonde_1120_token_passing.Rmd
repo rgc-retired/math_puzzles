@@ -1,0 +1,78 @@
+---
+title: 'Le Monde 1120: Token passing game'
+author: "R. G. Cronce"
+date: "10/21/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Le Monde 1120
+
+[R-Bloggers Website](https://www.r-bloggers.com/2020/01/le-monde-puzzle-1120)
+
+[Xi'an Blog Website](https://xianblog.wordpress.com/2020/01/14/le-monde-puzzle-1120/)
+
+Another Xi'an special.
+
+    A board game as Le weekly Monde current mathematical puzzle:
+
+    11 players in a circle and 365 tokens first owned by a single player.
+    Players with at least two tokens can either remove one token and give
+    another one left or move two right and one left. How quickly does the
+    game stall, how many tokens are left, and where are they?
+
+As usual, Xi'an only provides a partial solution:
+
+```{r}
+
+od=function(i)(i-1)%%11+1
+
+muv<-function(bob){
+  if (max(bob)>1){
+    i=sample(rep((1:11)[bob>1],2),1)
+    dud=c(0,-2,1)
+    if((runif(1)<.5)&(bob[i]>2))dud=c(2,-3,1)
+    bob[c(od(i+10),i,od(i+1))]=bob[c(od(i+10),i,od(i+1))]+dud
+  }
+  bob}
+
+```
+
+Expanding this to actually solve the problem and investigate the number of
+moves in a typical game:
+
+```{r}
+library(dplyr)
+
+num_games=1000
+start_config=rep(0,11); start_config[1]=365
+
+num_steps=c()
+solution=c()
+for (i in 1:num_games) {
+  bob=start_config
+  n=0
+  while(max(bob)>1) { n=n+1; bob=muv(bob) }
+  num_steps=append(num_steps,n)
+  solution=rbind(solution,bob)
+}
+solution=distinct(as.data.frame(solution))
+
+print("Starting Configuration:")
+print(start_config)
+print(c("Number of distinct solutions:",nrow(solution)))
+print("Distinct solutions:")
+print(as.matrix(solution))
+print("Number of steps to find solution:")
+summary(num_steps)
+
+```
+
+To duplicate the histogram from the article:
+
+```{r}
+hist(num_steps,freq=FALSE)
+```

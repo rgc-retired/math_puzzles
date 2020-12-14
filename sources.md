@@ -21,3 +21,10 @@ on-line and in print.  Among the best are:
 
     New puzzles are published every one or two weeks.
 
+
+[R-Bloggers Website](https://www.r-bloggers.com/2017/11/le-monde-puzzle-1029)
+[Xi'an's Blog Website](https://xianblog.wordpress.com/2017/11/22/le-monde-puzzle-1029/)
+
+    These two sites are linked and explore problems from LeMonde.
+    The links here are to particular problems but Xi'an looks at
+    many other puzzles as well.

@@ -1,0 +1,381 @@
+---
+title: "LeMonde #1053: Coin Denominations"
+output: html_notebook
+---
+
+[Website](http://www.statsblogs.com/2018/06/20/le-monde-puzzle-1053/ )
+
+
+# Overview
+
+1. If coins come in units of 1, x, and y, what is the optimal value of
+   (x,y) that minimises the number of coins representing an arbitrary
+   price between 1 and 149? 
+
+2. If the number of units is now four, what is the optimal choice?
+
+```{r}
+library(tidyverse)
+```
+
+
+# Problem 1
+
+From the original author:
+
+    The first question is fairly easy to code
+
+```{r}
+coinz <- function(x,y){
+  z=(1:149)
+  if (y<x){xx=x;x=y;y=xx}
+  ny=z%/%y
+  nx=(z%%y)%/%x
+  no=z-ny*y-nx*x
+  return(max(no+nx+ny))
+}
+
+```
+
+    and returns M=12 as the maximal number of coins, corresponding to x=4       and y=22. And a price tag of 129.
+
+----
+
+While the statement from the author is true (based on the algorithm he
+coded here), there are a large number of combinations that generate the
+same *minimal* number of coins.  In addition, the price that requires
+12 coins (129) is not unique.  In fact, the patterns make for rather
+interesting plots.
+
+Having said all that, the author notes down below that the algorithm
+above is not optimal.  There are ways to use fewer coins than using
+the remainder division above. (See the cos() function near the end).
+
+* Why is this not optimal?
+
+I can easily demonstrate that it is not optimal.  Consider a case of
+attempting to reach a price of 8 using coins of values 1, 4, and 5.
+Using the algorithm above would yield:
+
+    1 coin = 5
+    0 coins = 4
+    3 coins = 1
+    4 coins total
+    
+Versus using 2 of the coins with a value of 4.  In general, how do we
+ensure we are getting a minimal set?  More of that at the end of this
+notebook.
+
+----
+
+Going back to the algorithm used above:
+
+I think I have seen this problem before where the additional constraint
+was to minimize the value of x+y.  This results in a unique coin
+combination but still has two purchase prices with the same number
+of coins.  In the case of x=4, y=22 the prices are 129 and 147.
+
+There are 39 combinations of coin values that result in the minimum
+coin count of 12.  Some of these coin combinations have a single
+maximum, 2 maxima, and 3 maxima.  These combinations are enumerated
+below.  First, all results.  Second, the best worst-case performance.
+Finally, the number of maxima for each of the best results.
+
+```{r}
+coinz2 <- function(x,y){
+  z=(1:149)
+  if (y<x){xx=x;x=y;y=xx}
+  ny=z%/%y
+  nx=(z%%y)%/%x
+  no=z-ny*y-nx*x
+  return(data.frame(z=z,count=no+nx+ny))
+}
+
+m=c()
+for (x in 2:148) {
+  for (y in x:149) {
+    s=coinz2(x,y)
+    m=rbind(m,c(x,y,max(s$count)))
+  }
+}
+m=data.frame(m)
+names(m)=c("x","y","worst")
+m
+```
+
+```{r}
+mbest <- m[m$worst==min(m$worst),]
+mbest
+```
+
+Even for a given combination of coins, there may be multiple different
+purchase totals that result in the maximum number of coins.
+
+For example, with x=4, y=22 we have:
+
+```{r}
+s=coinz2(4,22)
+which(s$count==max(s$count))
+```
+
+Both of these totals will require 12 coins.  The number of coins
+versus price is shown below:
+
+```{r}
+plot(s$z,s$count)
+```
+
+We can determine the number of maxima for each coin configuration
+as shown below:
+
+```{r}
+nmax=c()
+for (i in 1:nrow(mbest)) {
+  x=mbest[i,]$x
+  y=mbest[i,]$y
+  s=coinz2(x,y)
+  nmax=c(nmax,length(which(s$count==max(s$count))))
+}
+mbest=cbind(mbest,nmax)
+mbest %>% group_by(nmax) %>% summarize(n=n())
+```
+ 
+ Combinations with 3 maxima:
+ 
+```{r}
+mbest[mbest$nmax==3,]
+```
+
+```{r}
+mm <- mbest[mbest$nmax==3,]
+for (i in seq(nrow(mm))) {
+  s=coinz2(mm[i,'x'],mm[i,'y'])
+  plot(s$z,s$count)
+}
+```
+
+Which prices are the hardest to reach?
+
+```{r}
+print('Prices requiring most coins:')
+for (i in seq(nrow(mm))) {
+  s <- coinz2(mm[i,'x'],mm[i,'y'])
+  z <- s$z[s$count==12]
+  print(c("Coin Values:",1,mm[i,'x'],mm[i,'y']))
+  print(z)
+}
+```
+
+
+# Problem 2
+
+From the original author:
+
+    For the second question, one unit is necessarily 1 (!) and there is
+    just an extra loop to the above, which returns M=8, with other units
+    taking several possible values:
+
+    [1] 40 11  3
+    [1] 41 11  3
+    [1] 55 15  4
+    [1] 56 15  4
+
+----
+
+Similar to the code above (using the non-optimal algorithm) we can make
+the nested loops and find the *optimal* combinations:
+
+```{r}
+# From above with three coins
+# Note: we know this isn't optimal - but want to reproduce
+# the results as presented in the Web posting.
+coins <- function(w,x,y) {
+  # We require 1<w<x<y
+  s <- c(w,x,y)
+  s <- sort(s)
+  w=s[1]; x=s[2]; y=s[3]
+  z=1:149
+  ny <- z %/% y
+  nx <- (z%%y) %/% x
+  nw <- ((z%%y) %% x) %/% w
+  no <- z-ny*y-nx*x-nw*w
+  return(max(no+nw+nx+ny))
+}
+
+mbest=999
+mworst=0
+for (w in 2:147) {
+  for (x in w:148) {
+    for (y in x:149) {
+      m=coins(w,x,y)
+      if (m<mbest) { mbest = m }
+      if (m>mworst) { mworst = m }
+    }
+  }
+}
+c(mbest,mworst)
+```
+
+Let's find the coin combinations that yield the optimal result:
+
+```{r}
+moptimal=c()
+for (w in 2:147) {
+  for (x in w:148) {
+    for (y in x:149) {
+      m=coins(w,x,y)
+      if (m==mbest) {
+        moptimal=rbind(moptimal,c(w,x,y))
+      }
+    }
+  }
+}
+moptimal=data.frame(moptimal)
+names(moptimal)=c('w','x','y')
+moptimal
+```
+
+The author adds:
+
+A quick search revealed that this problem (or a variant) is solved in
+many places, from stackexchange (for an average-why average?, as it does
+not make sense when looking at real prices-number of coins, rather than
+maximal), to a paper by Shalit calling for the 18¢ coin, to Freakonomics,
+to Wikipedia, although this is about finding the minimum number of
+coins summing up to a given value, using fixed currency denominations
+(a knapsack problem). This Wikipedia page made me realise that my
+solution is not necessarily optimal, as I use the remainders from the
+larger denominations in my code, while there may be more efficient
+divisions. For instance, running the following dynamic programming code
+
+
+```{r}
+coz=function(x,y){
+  minco=1:149
+  if (x<y){ xx=x;x=y;y=xx}
+  for (i in 2:149){
+    if (i%%x==0)
+      minco[i]=i%/%x
+    if (i%%y==0)
+      minco[i]=min(minco[i],i%/%y)
+    for (j in 1:max(1,trunc((i+1)/2)))
+          minco[i]=min(minco[i],minco[j]+minco[i-j])
+      }
+  return(max(minco))}
+```
+
+returns the lower value of M=11 (with x=7,y=23) in the first case and M=7
+in the second one.
+
+Test this out below:
+
+```{r}
+mbest=999
+for (x in 2:148) {
+  for (y in x:149) {
+    m<-coz(x,y)
+    if (m<mbest) { mbest=m }
+  }
+}
+mbest
+```
+
+So this code is more efficient than the original strategy of removing
+the maximum number of maximum denomination coins.  The first strategy
+resulted in a minimum of 12 coins, here we achieve the result with 11
+coins.
+
+```{r}
+moptimal=c()
+for (x in 2:148) {
+  for (y in x:149) {
+    m<-coz(x,y)
+    if (m==mbest) { moptimal<-rbind(moptimal,c(x,y)) }
+  }
+}
+moptimal<-data.frame(moptimal)
+names(moptimal)<-c('x','y')
+moptimal
+```
+
+There are 28 combinations that have an optimal coverage.
+
+* How do we prove this works?
+
+- If the price is an exact multiple of the largest denomination coin
+  then the min coin count is the number of these coins
+- If the price is an exact multiple of the second largest coin then
+  the min coin count might be the number of these coins
+- Find the smallest number of coins based on the sum of each pair
+  of prices that sum up to the target price.
+
+Here is a commented version of the code with storage of the actual
+coin combination that creates each total.
+
+```{r}
+# Determine the minimum number of coins required to achieve any
+# amount in the range [1,149].  The coins are defined to have the
+# following denominations:
+#
+#    1 < y < x
+#
+# The return value is a data frame consisting of the following
+# columns:
+#
+#    index = total value
+#    minco = minimum number of coins required
+#
+#    One combination of minco coins with the correct total
+#    is represented by the final three columns
+#
+#    no = number of coins with value = 1
+#    ny = number of coins with value = y
+#    nx = number of coins with value = x
+#
+# Note that there is no guarantee that the no,ny,nx combination
+# is unique.  The only guarantee is that minco gives the smallest
+# number of coins.
+coz2=function(x,y) {
+  minco=1:149
+  no=1:149
+  nx=rep(0,149)
+  ny=rep(0,149)
+  no[1]=1
+  if (x<y){ xx=x;x=y;y=xx }
+  for (i in 2:149) {
+    if (i%%x==0) {
+      minco[i]=i%/%x
+      nx[i]=i %/% x
+      ny[i]=0
+      no[i]=0
+    }
+    if (i%%y==0) {
+      if ( (i%/%y)<minco[i] ) {
+        minco[i] = i %/% y
+        nx[i] = 0
+        ny[i] = i %/% y
+        no[i] = 0
+      }
+    }
+    for (j in 1:max(1,trunc((i+1)/2))) {
+      if ( (minco[j]+minco[i-j]) < minco[i]) {
+        minco[i]=minco[j]+minco[i-j]
+        nx[i]=nx[j]+nx[i-j]
+        ny[i]=ny[j]+ny[i-j]
+        no[i]=no[j]+no[i-j]
+      }
+    }
+  }
+  d=data.frame(minco=minco,no=no,ny=ny,nx=nx)
+  return(d)
+}
+
+nmax=c()
+for (i in seq(nrow(moptimal))) {
+  d=coz2(moptimal[i,'x'],moptimal[i,'y'])
+  nmax=c(nmax,sum(d$minco==max(d$minco)))
+}
+
+which(nmax==max(nmax))
+```
+
