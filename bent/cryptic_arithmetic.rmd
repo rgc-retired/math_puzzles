@@ -1,0 +1,1703 @@
+---
+title: "Cryptic Arithmetic Problems"
+author: "R. G. Cronce"
+date: "12/3/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Cryptic Arithmetic Problems
+
+From the Bent of Tau Beta Pi
+
+Extracted from the *Brain Ticklers* section of Bent issues since 2000.
+
+
+```{r}
+source('rgc_lib.R')
+```
+
+## 2000_1 Problem 4
+
+A cryptic multiplication problem:
+
+    SINK * THEM = DEEPDEEP
+    
+```{r}
+a=make_crypt_df('sinkthemdeepdeep')
+x_sink=make_num(a,'sink')
+x_them=make_num(a,'them')
+x_deepdeep=make_num(a,'deepdeep')
+k=(x_sink*x_them == x_deepdeep)
+print(paste0('Number of solutions = ',sum(k),collapse=""))
+print(t(a[k,]))
+print(paste0('sink     = ',x_sink[k],collapse=""))
+print(paste0('them     = ',x_them[k],collapse=""))
+print(paste0('deepdeep = ',x_deepdeep[k],collapse=""))
+```
+
+## 2000_2 Problem 3
+
+Cryptic addition:
+
+    OLD + SALT + TOLD + TALL = TALES
+    
+```{r}
+a=make_crypt_df('oldsalttoldtalltales')
+
+x_old=make_num(a,'old')
+x_salt=make_num(a,'salt')
+x_told=make_num(a,'told')
+x_tall=make_num(a,'tall')
+x_tales=make_num(a,'tales')
+k=(x_old+x_salt+x_told+x_tall == x_tales)
+k=k & (a$o != 0) & (a$s != 0) & (a$t != 0)
+
+print(paste0('Number of solutions = ',sum(k),collapse=""))
+print(t(a[k,]))
+print(paste0('old     = ',x_old[k],collapse=""))
+print(paste0('salt     = ',x_salt[k],collapse=""))
+print(paste0('told     = ',x_told[k],collapse=""))
+print(paste0('tall     = ',x_tall[k],collapse=""))
+print(paste0('tales    = ',x_tales[k],collapse=""))
+```
+
+## 2000_3 Problem 4
+
+Cryptic division with repeating decimal
+
+    EVER / NNNNN = .ONAND ONAND ...
+    
+```{r}
+a=make_crypt_df('evernnnnnonand')
+x_ever = make_num(a,'ever')
+x_nnnnn = make_num(a,'nnnnn')
+x_onand = make_num(a,'onand')
+k = (floor(100000*x_ever/x_nnnnn) == x_onand)
+k = k & (a$e != 0) & (a$n != 0) & (a$o != 0)
+```
+
+```{r}
+print(paste0('Number of solutions = ',sum(k),collapse=""))
+print(t(a[k,]))
+print(paste0('ever     = ',x_ever[k],collapse=""))
+print(paste0('nnnnn    = ',x_nnnnn[k],collapse=""))
+print(paste0('onand    = ',x_onand[k],collapse=""))
+```
+
+## 2001_1 Problem 2
+
+Cryptic arithmetic problem that is not solvable in base 10:
+
+    TEN * TEN - TEN = NINETY
+    
+Find the smallest base for which a solution exists
+
+@@@ TODO
+
+
+## 2001_2 Problem 3
+
+Cryptic mixed mode problem:
+
+    FLY is exactly divisible by GO
+    GO * FLY = KITES
+    
+```{r}
+a=make_crypt_df('GOFLYKITES')
+x_go=make_num(a,'GO')
+x_fly=make_num(a,'FLY')
+x_kites=make_num(a,'KITES')
+k = (x_go*x_fly == x_kites) & (a$G != 0) & (a$F != 0) & (a$K != 0)
+k = k & ((x_fly %% x_go) == 0)
+```
+
+```{r}
+print(paste0('Number of solutions = ',sum(k),collapse=""))
+print(t(a[k,]))
+print(paste0('go       = ',x_go[k],collapse=""))
+print(paste0('fly      = ',x_fly[k],collapse=""))
+print(paste0('kites    = ',x_kites[k],collapse=""))
+```
+
+
+## 2001_3 Problem 3
+
+Cryptic with value constraint
+
+    ADAM + AND + EVE + ON + A = RAFT
+    
+with
+
+    ADAM and EVE as close as possible
+
+
+```{r}
+a=make_crypt_df('adamandeveonaraft')
+x_adam=make_num(a,'adam')
+x_and=make_num(a,'and')
+x_eve=make_num(a,'eve')
+x_on=make_num(a,'on')
+x_a=make_num(a,'a')
+x_raft=make_num(a,'raft')
+k = (x_adam+x_and+x_eve+x_on+x_a == x_raft) & (a$a != 0) & (a$e != 0) & (a$o != 0) & (a$r != 0)
+```
+
+```{r}
+print(paste0('Number of solutions = ',sum(k),collapse=""))
+print("Picking minimum difference between adam and eve:")
+n=which.min(x_adam[k]-x_eve[k])
+print(t(a[k,][n,]))
+print(paste0('adam     = ',x_adam[k][n],collapse=""))
+print(paste0('and      = ',x_and[k][n],collapse=""))
+print(paste0('eve      = ',x_eve[k][n],collapse=""))
+print(paste0('on       = ',x_on[k][n],collapse=""))
+print(paste0('a        = ',x_a[k][n],collapse=""))
+print(paste0('raft     = ',x_raft[k][n],collapse=""))
+```
+
+
+## 2002_1 Problem 3
+
+Standard addition:
+
+    YELLOW + YELLOW + RED = ORANGE
+    
+
+```{r}
+a=make_crypt_df("yellowredorange")
+x_yellow=make_num(a,"yellow")
+x_red = make_num(a,"red")
+x_orange = make_num(a,"orange")
+k=(x_yellow+x_yellow+x_red == x_orange)
+k=k & (a$y != 0) & (a$r != 0) & (a$o != 0)
+print(paste0("Number of solutions = ",sum(k),collapse=""))
+print(t(a[k,]))
+print_num(a,"yellow",k)
+print_num(a,"red",k)
+print_num(a,"orange",k)
+```
+
+
+
+
+## 2002_2 Problem 2
+
+Standard addition:
+
+    THREE + THREE + FIVE = ELEVEN
+    
+with
+
+    ELEVEN divisible by 11
+
+
+```{r}
+a=make_crypt_df('threefiveeleven')
+x_three=make_num(a,'three')
+x_five=make_num(a,'five')
+x_eleven=make_num(a,'eleven')
+k=(x_three+x_three+x_five == x_eleven)
+k=k & (a$t != 0) & (a$f != 0) & (a$e != 0)
+k=k & (x_eleven %% 11 == 0)
+print(paste0("Number of solutions = ",sum(k),collapse=""))
+print(t(a[k,]))
+print_num(a,'three',k)
+print_num(a,'five',k)
+print_num(a,'eleven',k)
+```
+
+
+## 2002_3 Problem 2
+
+Standard multiplication:
+
+    PEN * INK = LETTER
+    
+
+```{r}
+a=make_crypt_df('peninkletter')
+x_pen=make_num(a,'pen')
+x_ink=make_num(a,'ink')
+x_letter=make_num(a,'letter')
+k=(x_pen*x_ink == x_letter) & (a$p != 0) & (a$i != 0) & (a$l != 0)
+print(t(a[k,]))
+print_num(a,'pen',k)
+print_num(a,'ink',k)
+print_num(a,'letter',k)
+```
+
+
+## 2003_1 Problem 4
+
+Cryptic with some constraints
+
+    VIER is a perfect square
+    NEUN is a perfect square
+    
+    if told VIER you could deduce NEUN
+    if told NEUN you could deduce VIER
+    
+
+    a=make_crypt_df('vierneun')
+    x_vier=make_num(a,'vier')
+    x_neun=make_num(a,'neun')
+    k=(x_vier == floor(sqrt(x_vier))^2)
+    k=k&(x_neun == floor(sqrt(x_neun))^2)
+    k=k&(a$v != 0)&(a$n != 0)
+    sum(k)
+    [1] 9
+    a[k,]
+           v i e r n u
+    19512  1 3 6 9 4 2
+    19517  1 3 6 9 5 2
+    26357  1 7 6 4 5 2
+    66247  4 3 5 6 1 2
+    71657  4 7 6 1 5 2
+    94766  6 2 4 1 9 0
+    106801 7 0 5 6 1 2
+    115480 7 5 6 9 1 8
+    115493 7 5 6 9 4 2
+    x_vier[k,]
+    [1] 1369 1369 1764 4356 4761 6241 7056 7569 7569
+    x_neun[k,]
+    [1] 4624 5625 5625 1521 5625 9409 1521 1681 4624
+
+    So the question is now to use VIER to deduce NEUN and vice versa.
+    Each value must be unique (else can't be used to deduce other).
+
+    VIER can not be 1369 or 7569 since they are not unique
+    NEUN can not be 4624, 5625, or 1521 since they are not unique
+
+    This leaves (after replacing non-unique entries with xxxx):
+
+    VIER  = xxxx xxxx 1764 4356 4761 6241 7056 xxxx xxxx
+    NEUN  = xxxx xxxx xxxx xxxx xxxx 9409 xxxx 1681 xxxx
+
+    They only feasible combination is solution set 94766:
+
+    VIER = 6241
+    NEUN = 9409
+
+
+## 2003_2 Problem 3
+
+Simultaneous cryptics:
+
+    FIVE - FOUR = ONE
+    FIVE + FIVE = EVEN
+
+
+```{r}
+a=make_crypt_df('fivefouroneeven')
+x_five=make_num(a,'five')
+x_four=make_num(a,'four')
+x_one=make_num(a,'one')
+x_even=make_num(a,'even')
+k=(x_five-x_four == x_one) & (x_five+x_five == x_even)
+k=k & (a$f != 0) & (a$o != 0) & (a$e != 0)
+print(t(a[k,]))
+print_num(a,'five',k)
+print_num(a,'four',k)
+print_num(a,'one',k)
+print_num(a,'even',k)
+```
+    
+    
+## 2004_0 Problem 2
+
+Also true in Spanish.  They request we not use a computer!
+
+    DOS * DOS = CUATRO
+    
+
+```{r}
+a=make_crypt_df('doscuatro')
+x_dos=make_num(a,'dos')
+x_cuatro=make_num(a,'cuatro')
+k=(x_dos*x_dos == x_cuatro)
+k=k & (a$d != 0) & (a$c != 0)
+print(t(a[k,]))
+print_num(a,'dos',k)
+print_num(a,'cuatro',k)
+```
+
+
+
+## 2004_2 Problem 1
+
+Missing digits in a cryptic multiplication:
+
+        * * 7 *
+          * 7 *
+      ---------
+      * * * * *
+    * * * 2 *
+    8 * 5 *
+    -----------
+    * * * * * *
+
+    This is actually fairly difficult.
+    Make some observations:
+
+    1. The last digit of the multiplier must be large enough to make
+       the 4 digit value **7* into a 5 digit value *****
+    2. The first digit of the multiplier must be small enough to make
+       the 4 digit value of **7* into a 4 digit value 8*5*
+    3. The digit above the 8 must be a 1.  It can't be a zero and it
+       can't be two or more since that would result in a 7 digit answer.
+
+    So -- we can search for the following:
+
+    1. All 4 digit numbers of the form '..7.'
+    2. The product of the 4 digit number * 7 yields '1..2.'
+    3. The product of the 4 digit number * (1:9) yields '8.5.'
+
+    b=as.character(0:9999)
+    b=b[grepl('..7.',b)]
+    a=as.integer(b)
+    k1=grepl('^1..2.$',as.character(a*7))
+    k2=grepl('^8.5.$',as.character(a*1))
+    k2=k2 | grepl('^8.5.$',as.character(a*2))
+    k2=k2 | grepl('^8.5.$',as.character(a*3))
+    k2=k2 | grepl('^8.5.$',as.character(a*4))
+    k2=k2 | grepl('^8.5.$',as.character(a*5))
+    k2=k2 | grepl('^8.5.$',as.character(a*6))
+    k2=k2 | grepl('^8.5.$',as.character(a*7))
+    k2=k2 | grepl('^8.5.$',as.character(a*8))
+    k2=k2 | grepl('^8.5.$',as.character(a*9))
+
+    a[k1&k2] --> 1475 (the top four digit number)
+
+    > 1475*(1:9)
+    [1]  1475  2950  4425  5900  7375  8850 10325 11800 13275    
+
+    So - the only multiple that matches '8.5.' is multiplication by 6.
+    This must be the left-most digit of the bottom multiplier.
+
+    The product required for the right-most digit is either 7, 8, or 9.
+
+    The problem is now:
+
+        1 4 7 5
+          6 7 *
+      ---------
+      * * * * *
+    1 0 3 2 5
+    8 8 5 0
+    -----------
+    * * * * * *
+
+    Let's try the three possibilities for the right-most multiplier digit.
+
+    1475*(677:679)
+    [1]  998575 1000050 1001525
+
+    Only 677 results in a 6 digit product.  So:
+
+    Final solution:
+
+        1 4 7 5
+          6 7 7
+      ---------
+      1 0 3 2 5
+    1 0 3 2 5
+    8 8 5 0
+    -----------
+    9 9 8 5 7 5
+    
+
+## 2004_3 Problem 5
+
+Cryptic addition with constraints
+
+    TWO + TWENTY = TWELVE + TEN
+    
+    The first three divisible by their namesakes
+    
+```{r}
+a=make_crypt_df('twotwentytwelveten')
+x_two=make_num(a,'two')
+x_twenty=make_num(a,'twenty')
+x_twelve=make_num(a,'twelve')
+x_ten=make_num(a,'ten')
+k=(x_two+x_twenty == x_twelve+x_ten)
+k=k & (a$t != 0)
+k=k & (x_two %% 2 == 0)
+k=k & (x_twenty %% 20 == 0)
+k=k & (x_twelve %% 12 == 0)
+print(t(a[k,]))
+print_num(a,'two',k)
+print_num(a,'twenty',k)
+print_num(a,'twelve',k)
+print_num(a,'ten',k)
+```
+
+## 2005_3 Problem 1
+
+Multiple cryptics:
+
+    A/DE + B/FG + C/HJ = 1
+    
+    A < B < C
+
+    None of the digits are zero!
+    
+To eliminate roundoff problems, reformulate over a common denominator:
+
+    A*FG*HJ + B*DE*HJ + C*DE*FG = DE*FG*HJ
+    
+```{r}
+a=make_crypt_df('adebfgchj')
+x_a=make_num(a,'a')
+x_de=make_num(a,'de')
+x_b=make_num(a,'b')
+x_fg=make_num(a,'fg')
+x_c=make_num(a,'c')
+x_hj=make_num(a,'hj')
+k=(x_a*x_fg*x_hj + x_b*x_de*x_hj + x_c*x_de*x_fg == x_de*x_fg*x_hj)
+k=k & apply(a,1,function(x) {!any(x==0)})
+k=k & (a$a<a$b) & (a$b < a$c)
+print(paste0('Number of solutions = ',sum(k)))
+print(t(a[k,]))
+```
+
+
+## 2006_0 Problem 3
+
+Multiple cryptics with each term positive, negative, zero, or fractional.  Multiple letters may
+have the same value but each letter has the same value in all equations:
+
+    U+N = 1
+    D+E+U+X = 2
+    T+R+O+I+S = 3
+    Q+U+A+T+R+E = 4
+    C+I+N+Q = 5
+    S+I+X = 6
+    S+E+P+T = 7
+    H+U+I+T = 8
+    N+E+U+F = 9
+    D+I+X = 10
+    O+N+Z+E = 11
+    D+O+U+Z+E = 12
+    T+R+E+I+Z+E = 13
+    Q+U+A+T+O+R+Z+E = 14
+    Q+U+I+N+Z+E = 15
+    
+    What is the value of S+A+I+N+T+T+R+O+P+E+Z?
+    
+    Can probably solve this be eliminating terms and simplifying or
+    we can brute force this as described below:
+
+    This can be written in the form of simultaneous equations.  There
+    are 15 equations in 17 unknowns.  They can be solved with qr.solve()
+    in R with the following results:
+
+    Problem matrix (zzz):
+
+       u n d e x t r o i s q a c p h f z  b
+    1  1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  1
+    2  1 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0  2
+    3  0 0 0 0 0 1 1 1 1 1 0 0 0 0 0 0 0  3
+    4  1 0 0 1 0 1 1 0 0 0 1 1 0 0 0 0 0  4
+    5  0 1 0 0 0 0 0 0 1 0 1 0 1 0 0 0 0  5
+    6  0 0 0 0 1 0 0 0 1 1 0 0 0 0 0 0 0  6
+    7  0 0 0 1 0 1 0 0 0 1 0 0 0 1 0 0 0  7
+    8  1 0 0 0 0 1 0 0 1 0 0 0 0 0 1 0 0  8
+    9  1 1 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0  9
+    10 0 0 1 0 1 0 0 0 1 0 0 0 0 0 0 0 0 10
+    11 0 1 0 1 0 0 0 1 0 0 0 0 0 0 0 0 1 11
+    12 1 0 1 1 0 0 0 1 0 0 0 0 0 0 0 0 1 12
+    13 0 0 0 2 0 1 1 0 1 0 0 0 0 0 0 0 1 13
+    14 1 0 0 1 0 1 1 1 0 0 1 1 0 0 0 0 1 14
+    15 1 1 0 1 0 0 0 0 1 0 1 0 0 0 0 0 1 15
+
+
+    qr.solve(zzz[,1:17],zzz[,18])
+
+    Solution set:
+
+    u   4.5
+    n  -3.5
+    d  -7.0
+    e   4.5
+    x   0.0
+    t -13.5
+    r   0.5
+    o  10.0
+    i  17.0
+    s -11.0
+    q  -7.5
+    a  15.5
+    c  -1.0
+    p  27.0
+    h   0.0
+    f   3.5
+    z   0.0
+
+    The desired sum: SAINTTROPEZ = 33
+
+
+
+## 2006_2 Problem 3
+
+Standard cryptic multiplication:
+
+    WIT * WILL = THIRST
+    
+```{r}
+a=make_crypt_df('witwillthirst')
+x_wit=make_num(a,'wit')
+x_will=make_num(a,'will')
+x_thirst=make_num(a,'thirst')
+k=(x_wit*x_will == x_thirst)
+k=k & (a$w != 0) & (a$t != 0)
+print(paste0('Number of solutions = ',sum(k)))
+print(t(a[k,]))
+print_num(a,'wit',k)
+print_num(a,'will',k)
+print_num(a,'thirst',k)
+```
+
+
+
+## 2007_0 Problem 3
+
+Standard cryptic multiplication:
+
+    LYNDON * B = JOHNSON
+    
+    > a=make_crypt_df('lyndonbjohnson')
+    > x_lyndon=make_num(a,'lyndon')
+    > x_b=make_num(a,'b')
+    > x_johnson=make_num(a,'johnson')
+    > k=(x_lyndon+x_b == x_johnson) & (a$l != 0) & (a$b != 0) & (a$j != 0)
+    > sum(k)
+    [1] 0
+    > k=(x_lyndon*x_b == x_johnson) & (a$l != 0) & (a$b != 0) & (a$j != 0)
+    > sum(k)
+    [1] 1
+    > a[k,]
+            l y n d o b j h s
+    2056615 5 7 0 1 4 6 3 2 8
+    > x_lyndon[k]
+    [1] 570140
+    > x_b[k]
+    [1] 6
+    > x_johnson[k]
+    [1] 3420840
+
+
+## 2007_0 Computer Bonus
+
+Cryptic exponentiation with approximate equality constraint:
+
+    TAU ** (.BETA) = PI
+    
+    find TAU and BETA that give PI closest to integer
+    Note the leading decimal point in front of BETA
+    
+           t a u b e p i
+    593221 9 7 2 1 5 0 3
+    > x_tau[k,]
+    [1] 972
+    > x_beta[k,]
+    [1] 1597
+    > x_pi[k,]
+    [1] 3
+
+
+## 2007_1 Problem 5
+
+Multiple cryptics with a fruitbasket:
+
+    MELONS
+    PLUMS
+    APPLES
+    LEMONS
+    
+    3 APPLES  > 2 MELONS  > 35 PLUMS
+    210 PLUMS > 99 LEMONS > 16 APPLES
+    
+    What is the size of a BANANA?
+    
+    > a=make_crypt_df('melonsplumsappleslemons')
+    > x_apples=make_num(a,'apples')
+    > x_plums=make_num(a,'plums')
+    > x_melons=make_num(a,'melons')
+    > x_lemons=make_num(a,'lemons')
+    > k=(3*x_apples > 2*x_melons) &
+        (2*x_melons > 35*x_plums) &
+        (210*x_plums > 99*x_lemons) &
+        (99*x_lemons > 16*x_apples)
+    > k=k & (a$m != 0) & (a$p != 0) & (a$a != 0) & (a$l != 0)
+    > sum(k)
+    [1] 1
+    > a[k,]
+            m e l o n s p u a
+    3266023 9 0 1 2 3 8 5 4 6
+
+    By inspection, b=7 since it is the only missing digit:
+
+    > banana=763636
+
+
+## 2007_2 Problem 3
+
+Cryptic division with missing digits:
+
+              - - a -
+        -----------------
+    - - | d - - - - x
+          k - -
+          ---------------
+              - -
+              t -
+              -----------
+              m - -
+              m - -
+              -----------
+              x - x
+              h - -
+              -----------
+                k -
+    
+@@@ TODO
+  
+  
+## 2008_0 Problem 1
+  
+  Cryptic with logic:
+  
+      FOUR is a perfect square
+      FIVE is a Fibonacci number
+      SIX is a semi-prime (product of two prime numbers)
+      
+      Ann, Beth, and Clara found a different solution
+      
+      FOUR, FIVE, and SIX in Clara's solution not in Ann's or Beth's.
+      
+      What is Clara's solution?
+
+
+    1. There are only two 4 digit Fibonacci numbers with 4 distinct digits:
+
+        1597 and 2584
+
+    2. There are 36 4 digit perfect squares with 4 distinct digits.  The
+       only ones that start with the same digit as the Fibonacci numbers
+       are of the form 1*** or 2***.  Furthermore, the perfect squares
+       can not have any duplicate digits with the Fibonacci numbers other
+       than the leading digit.  This limits the solution sets to:
+
+        FOUR   FIVE
+        -------------------------------
+        1597   1024
+        2584   2601 2916
+
+    3. Three digit semi-primes: there are lots of them (265).  The middle
+       digit must match the second digit of FIVE and the other digits
+       can not occur in FOUR or FIVE.  This reduces the solution set
+       to the following:
+
+
+        FOUR   FIVE     SIX
+        -------------------
+        1597   1024     803  <-- Clara's solution
+        2584   2601     763
+        2584   2916     793
+
+        Clara's solution must be the unique row (the first one).
+        
+        Can't say which one is Ann or Beth.
+
+
+## 2008_1 Problem 3
+  
+  Cryptic addition:
+  
+      SEND + MORE = MONEY
+      
+      reply:
+      
+      ALAS + LASS + NO + MORE = CASH
+      
+      Find solution with biggest NO
+      
+    > a=make_crypt_df('alaslassnomorecash')
+    > x_alas=make_num(a,'alas')
+    > x_lass=make_num(a,'lass')
+    > x_no=make_num(a,'no')
+    > x_more=make_num(a,'more')
+    > x_cash=make_num(a,'cash')
+    > k=(x_alas+x_lass+x_no+x_more == x_cash)
+    > k=k & (a$a != 0) & (a$l != 0) & (a$n != 0) & (a$m != 0) & (a$c != 0)
+    > sum(k)
+    [1] 15
+    > x_no[k]
+     [1] 37 57 86 96 37 57 86 85 75 68 68 68 65 57 38
+    > which.max(x_no[k])
+    [1] 4
+    > a[k,][4,]
+           a l s n o m r e c h
+    423046 1 2 5 9 6 3 8 4 7 0  
+
+
+## 2009_1 Problem 3
+  
+  Cryptic division with repeating decimal:
+  
+      TBPI / AAAAA = .ONANDONANDON ...
+      Want solution with largest value of PI
+      
+  rewrite this to avoid the repeating decimal
+
+      TBPI / AAAAA = ONAND / 99999
+  or
+
+      TBPI * 99999 = ONAND * AAAAA
+
+    a=make_crypt_df('tbpiaaaaaonand')
+    x_tbpi=make_num(a,'tbpi')
+    x_aaaaa=make_num(a,'aaaaa')
+    x_onand=make_num(a,'onand')
+    k=(x_tbpi*99999 == x_onand*x_aaaaa)
+    k=k & (a$t != 0) & (a$a != 0) & (a$o != 0)
+    sum(k)
+    [1] 1
+    a[k,]
+            t b p i a o n d
+    1393561 7 6 1 0 2 3 4 5
+    x_tbpi[k]
+    [1] 7610
+    x_aaaaa[k]
+    [1] 22222
+    x_onand[k]
+    [1] 34245
+    x_tbpi[k]/x_aaaaa[k]
+    [1] 0.3424534
+    x_tbpi[k]*99999
+    [1] 760992390
+    x_aaaaa[k]*x_onand[k]
+    [1] 760992390
+  
+  
+## 2009_2 Problem 3
+  
+  Cryptic addition:
+  
+      SEVEN + THREE + TWO = TWELVE
+      
+      TWO is the product of two primes
+      
+    a=make_crypt_df('seventhreetwotwelve')
+    x_seven=make_num(a,'seven')
+    x_three=make_num(a,'three')
+    x_two=make_num(a,'two')
+    x_twelve=make_num(a,'twelve')
+    k=(x_seven+x_three+x_two == x_twelve)
+    k=k & (a$s != 0) & (a$t != 0)
+    sum(k)
+    [1] 2
+    a[k,]
+            s e v n t h r w o l
+    3006236 8 2 5 4 1 9 7 0 6 3
+    3006956 8 2 5 6 1 9 7 0 4 3
+    x_two[k,]
+    [1] 106 104
+    system('factor 106')
+    106: 2 53  <-- Candidate solution
+    system('factor 104')
+    104: 2 2 2 13  <-- Not a product of two primes
+
+    First solution is the correct one.
+
+ 
+## 2009_3 Problem 2
+  
+  Cryptic addition:
+  
+      ALCOHOL + ALCOHOL + ... + ALCOHOL = HANGOVER
+      
+      How much ALCOHOL is required?
+      
+    a=make_crypt_df('alcoholhangover')
+    x_alcohol=make_num(a,'alcohol')
+    x_hangover=make_num(a,'hangover')
+    k=(x_hangover == floor(x_hangover/x_alcohol)*x_alcohol)
+    k=k&(a$a!=0)&(a$h!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+            a l c o h n g v e r
+    1226065 3 4 5 1 9 2 0 6 7 8
+    x_alcohol[k,]
+    [1] 3451914
+    x_hangover[k,]
+    [1] 93201678
+    x_hangover[k,]/x_alcohol[k,]
+    [1] 27
+
+
+## 2010_0 Problem 4
+
+  Cryptic logic:
+
+      TEN is one more than a perfect square that is divisible by 9
+      NINETY is divisible by 9
+      SIX perfect squares between TEN and NINETY
+
+      What is the value of SENT?
+
+
+    1. There are a limited number of 3 digit numbers that can be TEN.
+       If we use the perfect square, divisible by 9, and distinct digits
+       we have the following possibilities:
+
+        TEN = 145, 325, 730, 901
+   
+       Since N begins NINETY it can't be zero we can remove 730
+
+       Thus: TEN = 145, 325, 901
+
+    2. There are a lot of 5 digit numbers divisible by 9 but if we add
+       constraints for the values of TEN and limits on non-zero digits
+       it becomes manageable.
+
+       A brute force search of number of perfect squares between the
+       limits of TEN and NINETY requires less than 200 sequences.
+
+       We create a list of perfect square (0:775)^2 and then count the
+       number between TEN and NINETY for each feasible sequence.
+
+    Solution:
+
+        TEN = 901
+        NINETY = 151092
+        SIX = 358
+
+        SENT = 3019
+
+    Note that there are only 7 symbols used (TENIYSX)
+
+
+
+## 2010_1 Problem 5
+
+  Cryptic fractions where none of the letters is zero:
+
+      AB/CD + EF/GHJ = A
+
+  Rearrange to eliminate fractions:
+
+      AB * GHJ + EF * CD = A * CD * GHJ
+
+    source('rgc_lib.R')
+    a=make_crypt_df('abcdefghj')
+    x_ab=make_num(a,'ab')
+    x_cd=make_num(a,'cd')
+    x_ef=make_num(a,'ef')
+    x_ghj=make_num(a,'ghj')
+    x_a=make_num(a,'a')
+    k=(x_ab*x_ghj + x_ef*x_cd == x_a*x_cd*x_ghj)
+    a[k,][apply(a[k,],1,function(x) {all(x != 0)}),]
+            a b c d e f g h j
+    2062764 5 7 1 2 9 6 3 8 4
+
+    m=2062764
+    x_ab[m,] = 57
+    x_cd[m,] = 12
+    x_ef[m,] = 96
+    x_ghj[m,] = 384
+    x_a[m,] = 5
+
+    ab/cd + ef/ghj = 57/12 + 96/384
+                   = 19/4 + 1/4
+                   = 20/4
+                   = 5
+
+
+## 2011_1 Problem 1
+
+  Cryptic multiplication with unknowns
+
+                  R N A G E L
+                * * * * * * *
+                ---------------
+                  R N A G E L
+                L R N A G E
+              E L R N A G
+            G E L R N A
+          A G E L R N
+        N A G E L R
+      R N A G E L
+      -----------------------
+      R * * N * A G * * E * L 
+
+      The asterisks are wildcards.  There are no leading zeros.
+      What is the value of RNAGEL?
+
+    1. Create all the values of RNAGEL and then check for multiplication
+       by a single digit to generate the cyclic shifts and non-zero leading
+       digits.  There are only two feasible solutions:
+
+    > a[k,]
+          r n a g e l
+    20534 1 4 2 8 5 7
+    22423 1 5 3 8 4 6
+
+    2. Based on the final sum we conclude that N must be less than 5
+       since there is no carry out to affect the most-significant digit.
+
+    Conclude that the first solution is valid:
+
+    > a[k,]
+          r n a g e l
+    20534 1 4 2 8 5 7
+
+    Working the problem backwards we can fill in all the wild-cards:
+
+                  R N A G E L
+                1 3 2 6 4 5 1
+                ---------------
+                  R N A G E L
+                L R N A G E
+              E L R N A G
+            G E L R N A
+          A G E L R N
+        N A G E L R
+      R N A G E L
+      -----------------------
+      R 8 9 N 9 A G 1 0 E 0 L 
+      1 8 9 4 9 2 8 1 0 5 0 7
+
+
+## 2011_2 Problem 2
+
+  Cryptic addition in Base 11
+
+      USA + FDR = WPA
+      USA + WPA = PARK
+
+    a=make_crypt_df('usafdrwpapark',num_base=11)
+    dim(a)
+    [1] 19958400        9
+    x_usa=make_num(a,'usa',11)
+    x_fdr=make_num(a,'fdr',11)
+    x_wpa=make_num(a,'wpa',11)
+    x_park=make_num(a,'park',11)
+    k=(x_usa+x_fdr==x_wpa) & (x_usa+x_wpa == x_park)
+    k=k&(a$u!=0)&(a$f!=0)&(a$w!=0)&(a$p!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+             u  s a f d r w p k
+    10793931 5 10 4 3 2 0 9 1 8
+
+    x_usa[k,]
+    [1] 719
+    x_fdr[k,]
+    [1] 385
+    x_wpa[k,]
+    [1] 1104
+    x_park[k,]
+    [1] 1823
+
+    Note that 's' has a value of 'a' using conventional notation.
+    All of the x_* values are in base 10!!!
+
+
+## 2012_0 Problem 5
+
+  A distinct positive integer has been assigned to each letter of the
+  alphabet such that the letters of PLUTO add to 40; URANUS 36; NEPTUNE 29;
+  SATURN 33; JUPITER 50; MARS 32; EARTH 31; MOON 36; VENUS 39; MERCURY 33;
+  and SUN 18.
+
+  What is the value of PLANETS?
+
+  Don't use a computer!
+
+@@@ TODO
+
+    I tried without the computer but I gave up ...
+    Tried using a computer and failed with qr.solve yielding negative solutions ...
+    
+    Not sure where to go ...
+    
+    PLUTO   40
+    URANUS  36
+    NEPTUNE 29
+    SATURN  33
+    JUPITER 50
+    MARS    32
+    EARTH   31
+    MOON    36
+    VENUS   39
+    MERCURY 33
+    SUN     18
+
+    To get all the letters in planets we need:
+    
+    P: JUPITER, NEPTUNE, PLUTO
+    L: PLUTO
+    A: EARTH, MARS, SATURN, URANUS
+    N: MOON, NEPTUNE, SATURN, SUN, URANUS, VENUS
+    E: EARTH, JUPITER, MERCURY, NEPTUNE, VENUS
+    T: EARTH, JUPITER, NEPTUNE, PLUTO, SATURN
+    S: MARS, SATURN, SUN, URANUS, VENUS
+    
+
+    PLANETS = PLUTO - UO + ANES
+
+    VENUS  - SUN = VE  = EV  = 39-18 = 21
+    
+    SATURN - SUN = ATR = ART = 33-18 = 15 \ U = T+3
+    URANUS - SUN = URA = ARU = 36-18 = 18 /
+
+    I can use this to eliminate U from all the equations:
+
+    PLUTO   = 40 = PLTTO + 3   = LOPTT  + 3
+    URANUS  = 36 = TRANTS + 6  = ANRSTT + 6
+    NEPTUNE = 29 = NEPTTNE + 3 = EENNPTT + 3
+    SATURN  = 33 = SATTRN + 3  = ANRSTT + 3
+    JUPITER = 50 = JTPITER + 3 = EIJPRTT + 3
+    VENUS   = 39 = VENTS + 3   = ENSTV + 3
+    MERCURY = 33 = MERCTRY + 3 = CEMRRTY + 3
+    SUN     = 18 = STN + 3     = NST + 3
+    MARS    = 32 = AMRS
+    EARTH   = 31 = AEHRT
+    MOON    = 36 = MNOO
+
+    PLANETS = PLANE(U-3)S = PLAE + 15
+
+    Now I am stuck .....
+
+
+    See the file `planets.txt` for the matrix.
+    Unfortunately qr.solve() gives negative solutions and the solutions are not unique.
+    If we allow this then:
+    
+    Solution: PLANETS = 31
+
+    Solution to the equations gives messy decimal numbers since there is a denominator
+    of 7.  If we multiply all the solution by 7 we get something pretty:
+    
+    p   50
+    l -125
+    u   88
+    t   67
+    o  200
+    r   -2
+    a   40
+    n -148
+    s  186
+    e  147
+    j    0
+    i    0
+    m    0
+    h  -35
+    v    0
+    c    0
+    y    0
+
+    
+
+## 2012_1 Problem 1
+
+  Cyptic fractions:
+
+      O/NE + T/WO + S/IX = NI/NE
+
+      TWO is divisible by 2
+      SIX is divisible by 6
+      NINE is divisible by 9
+      TEN is divisible by 7
+
+  Putting over a common demoninator:
+
+      O * WO*IX + T * NE*IX + S * NE*WO = NI * WO*IX
+
+    a=make_crypt_df('onetwosixnine')
+    x_o=make_num(a,'o')
+    x_ne=make_num(a,'ne')
+    x_t=make_num(a,'t')
+    x_wo=make_num(a,'wo')
+    x_s=make_num(a,'s')
+    x_ix=make_num(a,'ix')
+    x_ni=make_num(a,'ni')
+    k=(x_o*x_wo*x_ix + x_t*x_ne*x_ix + x_s*x_ne*x_wo == x_ni*x_wo*x_ix)
+    k=k & (a$o != 0)
+        & (a$n != 0)
+        & (a$t != 0)
+        & (a$w != 0)
+        & (a$s != 0)
+        & (a$i != 0)
+    k=k & (make_num(a,'two') %% 2 == 0)
+    k=k & (make_num(a,'six') %% 6 == 0)
+    k=k & (make_num(a,'nine') %% 9 == 0)
+    k=k & (make_num(a,'ten') %% 7 == 0)
+    sum(k)
+    [1] 1
+    > a[k,]
+            o n e t w s i x
+    1138194 6 2 4 7 5 9 1 8
+
+    So:
+
+      O/NE + T/WO + S/IX = NI/NE
+   
+      6/24 + 7/56 + 9/18 = 21/24
+
+      2/8  + 1/8  + 1/2  = 7/8 
+
+
+## 2012_2 Problem 2
+
+  Cryptic multiplication:
+
+      ABCDEF = BCDEFA * M
+
+    a=make_crypt_df('abcdefm')
+    x_abcdef=make_num(a,'abcdef')
+    x_bcdefa=make_num(a,'bcdefa')
+    x_m=make_num(a,'m')
+    k=(x_abcdef == x_bcdefa * x_m)
+    k=k & (a$a != 0) & (a$b != 0) & (a$m != 0)
+    sum(k)
+    [1] 1
+    > a[k,]
+           a b c d e f m
+    559534 9 2 3 0 7 6 4
+
+      ABCDEF = BCDEFA * M
+      923076 = 230769 * 4
+      
+
+## 2012_3 Computer Bonus
+
+  Cryptic in Base 12 with constraint
+
+      J * FROULA = RETIRE * S
+
+      REST should have maximum value
+
+
+    I switched to Python to use itertools for this since I didn't want to try
+    creating a dataframe with 480e6 rows.  I am just dumping the solutions and
+    then I will maximize REST by inspection.
+    
+    The run-time is not fast (~ 1500-2000 seconds) but it should at least finish.
+
+      j   f   r   o   u   l   a   e   t   i   s      rest (base-12)
+    ( 2, 10,  7,  1,  5,  4,  6,  0,  8, 11,  3) --> 7038
+    ( 2, 10,  7,  5,  8,  4,  6,  0, 11,  9,  3) --> 703b
+    ( 3,  2,  0,  4,  1,  5, 10,  6,  7,  8, 11) --> 06b7, also r=0
+    ( 3,  2,  0,  4,  5,  1, 10,  6,  7,  9, 11) --> 06b7, also r=0
+    ( 3,  2,  0,  5,  7,  9, 10,  6,  8,  1, 11) --> 06b8, also r=0
+    ( 5,  1,  0,  6, 10,  3,  4,  8, 11,  9,  7) --> 087b, also r=0
+    ( 5,  3,  9, 10,  1, 11,  0,  6,  7,  4,  2) --> 9627
+    ( 6,  2,  1,  3,  7,  8,  0,  4, 10,  5,  9) --> 149a
+    ( 7,  2,  5,  6,  1, 11,  0,  8, 10,  4,  3) --> 583a
+    (11,  0,  2,  5, 10,  6,  9,  3,  4,  8,  1) --> 2xxx, also f=0
+    (11,  0,  2,  6, 10,  5,  8,  4,  3,  7,  1) --> 2xxx, also f=0
+    (11,  0,  2,  8,  6,  4,  7,  5,  9, 10,  1) --> 2xxx, also f=0
+    (11,  0,  4, 10,  8,  2,  7,  5,  9,  6,  1) --> 4xxx, also f=0
+    (11,  1, 10,  4,  5,  9,  6,  3,  0,  7,  2) --> a320 (maximum REST)
+    
+    Solution:
+    
+    Maximum REST = a320 (base-12) = 17736 (base-10)
+
+      j  f  r  o  u  l  a  e  t  i  s
+      2 10  7  1  5  4  6  0  8 11  3
+      2 10  7  5  8  4  6  0 11  9  3
+      5  3  9 10  1 11  0  6  7  4  2
+      6  2  1  3  7  8  0  4 10  5  9
+      7  2  5  6  1 11  0  8 10  4  3
+     11  1 10  4  5  9  6  3  0  7  2  --> REST = a320 (base-12)
+
+
+## 2013_2 Problem 5
+
+  Cryptic addition with constraint
+
+      BEAVER + TIGER = RABBIT
+
+      TIGER should have largest possible value
+
+    a=make_crypt_df('beavertigerrabbit')
+    x_beaver=make_num(a,'beaver')
+    x_tiger=make_num(a,'tiger')
+    x_rabbit=make_num(a,'rabbit')
+    k=(x_beaver+x_tiger == x_rabbit)
+    k=k & (a$b != 0) & (a$t != 0) & (a$r != 0)
+    > a[k,]
+           b e a v r t i g
+    446833 2 5 1 4 3 6 0 7
+    447565 2 5 1 7 3 6 0 4
+
+    First solution has maximum TIGER = 60753
+
+
+## 2014_0 Problem 3
+
+  Cryptic addition, simultaneous equations with unknowns
+
+      * * * * * *
+      * * * * * *
+      F O U R * *     * S E V E N * *
+      S E V E N *     * S E V E N * *
+      -----------     ---------------
+      E L E V E N     F O U R T E E N
+
+@@@ TODO
+
+
+## 2014_1 Problem 2
+
+  Cryptic addition, easy - so try it without computer
+
+      LETTERS + ALPHABET = SCRABBLE
+
+    a=make_crypt_df('lettersalphabetscrabble')
+    k=(make_num(a,'letters')+make_num(a,'alphabet')==make_num(a,'scrabble'))
+    k=k & (a$l != 0) & (a$a != 0) & (a$s != 0)
+    sum(k)
+    [1] 1
+    a[k,]
+            l e t r s a p h b c
+    2574134 7 0 8 6 2 1 5 3 9 4
+
+
+## 2014_3 Problem 1
+
+  Cryptic addition
+
+      PIERRE + ELLIOTT = TRUDEAU
+
+    a=make_crypt_df('pierreelliotttrudeau')
+    k=(make_num(a,'pierre')+make_num(a,'elliott')==make_num(a,'trudeau'))
+    k=k&(a$p!=0)&(a$e!=0)&(a$t!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+           p i e r l o t u d a
+    868143 2 4 6 1 8 5 7 3 0 9
+
+
+## 2015_1 Problem 1
+
+  Cryptic addition with constraint
+
+      DONATE - MONEY - TO - THE + NEW = ENDOW + MENT
+
+      Maximum value of ENDOWMENT
+
+    a=make_crypt_df('donatemoneytothenewendowment')
+    x1=make_num(a,'donate')-make_num(a,'money')-make_num(a,'to')-make_num(a,'the$
+    x2=make_num(a,'endow')+make_num(a,'ment')
+    k=(x1==x2)
+    k=k&(a$d!=0)&(a$m!=0)&(a$t!=0)&(a$n!=0)&(a$e!=0)
+    sum(k)
+    [1] 2
+    make_num(a,'endowment')[k,]
+    [1] 481267483 491267493
+    a[k,]
+           d o n a t e m y h w
+    433454 1 2 8 0 3 4 7 5 9 6
+    438494 1 2 9 0 3 4 7 5 8 6
+
+    The second solution has maximum ENDOWMENT
+
+
+## 2015_2 Problem 5
+
+  Cryptic square root:
+
+      TBP = sqrt(PUZZLE + 1)
+
+
+    a=make_crypt_df('tbppuzzle')
+    k=(make_num(a,'tbp')^2 == (make_num(a,'puzzle')+1))
+    k=k&(a$t!=0)&(a$p!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+           t b p u z l e
+    550374 9 0 8 2 4 6 3
+
+
+## 2015_3 Problem 5
+
+  Cryptic addition:
+
+       TWELVE
+       TWELVE
+         NINE
+         NINE
+         NINE
+         NINE
+         FIVE
+         FIVE
+       ------
+      SEVENTY
+
+    a=make_crypt_df('twelveninefiveseventy')
+    x_twelve=make_num(a,'twelve')
+    x_nine=make_num(a,'nine')
+    x_five=make_num(a,'five')
+    x_seventy=make_num(a,'seventy')
+    k=(x_twelve+x_twelve+x_nine*4+x_five+x_five == x_seventy)
+    sum(k)
+    [1] 1
+    a[k,]
+            t w e l v n i f s y
+    2147267 5 9 2 0 3 8 4 7 1 6
+
+    x_twelve[k,]  == 592032
+    x_nine[k,]    == 8482
+    x_five[k,]    == 7432
+    x_seventy[k,] == 1232856
+
+
+## 2016_1 Problem 1
+
+  Cryptic multiplication:
+
+      TRY * THIS = TICKLER
+
+    a=make_crypt_df('trythistickler')
+    k=(make_num(a,'try')*make_num(a,'this') == make_num(a,'tickler'))
+    k=k&(a$t != 0)
+    sum(k)
+    [1] 1
+    a[k,]
+            t r y h i s c k l e
+    3620205 9 8 6 2 0 3 7 4 1 5
+
+    TRY = 986
+    THIS = 9203
+    TICKLER = 9074158
+
+
+## 2016_3 Problem 1
+
+  Cryptic fraction:
+
+      ONE / FIVE = . TWO
+
+      with TWO being even.
+      Note the decimal point in the equation!
+
+    a=make_crypt_df('onefivetwo')
+    k=(make_num(a,'one')*1000 == make_num(a,'five')*make_num(a,'two'))
+    k=k&(a$o!=0)&(a$f!=0)&(a$t!=0)
+    sum(k)
+    [1] 2
+    make_num(a,'two')[k,]
+    [1] 264 375
+    a[k,]
+           o n e f i v t w
+    897834 4 9 5 1 8 7 2 6
+    963122 5 2 8 1 4 0 3 7
+
+    Note the first solution has TWO = 264 (even) as requested.
+
+
+## 2017_0 Problem 1
+
+  Cryptic addition:
+
+      PUZZLE + PUZZLE + PUZZLE + PUZZLE = WINTER
+
+    a=make_crypt_df('puzzlewinter')
+    k=(make_num(a,'puzzle')*4 == make_num(a,'winter'))
+    k=k&(a$p!=0)&(a$w!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+           p u z l e w i n t r
+    832790 2 3 7 1 6 9 5 0 8 4
+    make_num(a,'puzzle')[k,]
+    [1] 237716
+    make_num(a,'winter')[k,]
+    [1] 950864
+
+
+## 2017_1 Problem 2
+
+    Cryptic triangular numbers: n*(n+1)/2
+    
+    ONE
+    THREE
+    SIX
+    TEN
+    
+    Usual rules for cryptics (no leading zeros, etc).
+
+    is_triangular=function(n) {
+        m=trunc((sqrt(8*n+1)-1)/2)
+        return(n == (m*(m+1))/2)
+    }
+
+    a=make_crypt_df('onethreesixten')
+    x_one=make_num(a,'one')
+    x_three=make_num(a,'three')
+    x_six=make_num(a,'six')
+    x_ten=make_num(a,'ten')
+    k=a[,'o']!=0 & a[,'t']!=0 & a[,'s']!=0
+    k=k & is_triangular(x_one)
+    k=k & is_triangular(x_three)
+    k=k & is_triangular(x_six)
+    k=k & is_triangular(x_ten)
+    a[k,]
+    x_one[k,]
+    x_three[k]
+    x_six[k]
+    x_ten[k]
+
+    > a[k,]
+            o n e t h r s i x
+    1588797 4 3 5 1 7 9 8 2 0
+    > x_one[k]
+    [1] 435
+    > x_three[k]
+    [1] 17955
+    > x_six[k]
+    [1] 820
+    > x_ten[k]
+    [1] 153
+
+
+## 2017_3 Problem 5
+
+  Cryptic addition:
+
+      FIVE + FIVE + TEN + TEN + TEN + TEN + THIRTY = EIGHTY
+
+    a=make_crypt_df('fivetenthirtyeighty')
+    x1=make_num(a,'five')*2+make_num(a,'ten')*4+make_num(a,'thirty')
+    x2=make_num(a,'eighty')
+    k=(x1==x2)&(a$f!=0)&(a$t!=0)&(a$e!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+            f i v e t n h r y g
+    2923964 8 0 5 2 1 4 9 3 7 6
+
+
+## 2018_0 Problem 1
+
+  Cryptic addition:
+
+      SLEET + SNOW = FROSTY
+
+    a=make_crypt_df('sleetsnowfrosty')
+    k=(make_num(a,'sleet')+make_num(a,'snow')==make_num(a,'frosty'))
+    k=k&(a$s!=0)&(a$f!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+            s l e t n o w f r y
+    3615471 9 8 5 2 3 7 4 1 0 6
+
+
+## 2018_1 Double Bonus
+
+  Cryptic addition in base 13:
+
+      HOWIE + FRED + CHUCK + JEFF = JUDGE
+
+      JUDGE is prime
+      FRED, CHUCK, and JEFF are prime
+      HOWIE is the product of 7 prime factors
+
+    I switched to python itertools (see jeff.py)
+    
+    Searching on FRED, JEFF, JUDGE (7 symbols) still results in 7679 solutions
+    Let's add chuck (three more symbols)
+    
+    This makes the problem worse since there are 13*12*11 times as many
+    permutations to consider.
+    
+    Make need to just bite the bullet and try all the combinations even though
+    it is a lot of them.
+    
+    sympy has isprime() and factorint() to help make the computations but it will
+    still take a long time to investigate 13! permutations.  This is 6.3e9 cases.
+    The run-time is about 4 hours!
+
+    We could add some limits to the search:
+    
+    J, F, C, and H must be non-zero
+    Can't say anything about other digits since base-13 primes can have any final digit!
+
+    Checking on the primality constraints yields 9951 feasible solutions.
+    These have been stored in `jeff_solution.txt` using numpy savetxt.
+    
+    Adding the equation of JEFF+FRED+CHUCK+HOWIE = JUDGE reduces
+    the solution to a unique case.
+    
+    Maybe I should have checked the equation first and then checked primality -- not sure
+    which is the most efficient.  I added the equation condition to the python code and
+    the solution is actually slower so ... a more efficient algorithm may be required.
+    
+    I tried just generating and counting the permuations (without any calculations) and
+    that would take ~30 minutes so maybe 3-4 hours isn't too bad.
+
+    In [217]: a[k]
+    Out[217]:
+           j   e  f  r  d  u  g  c  h  k  o  w   i
+    9798  12  11  6  1  5  4  9  7  3  2  8  0  10
+
+    x_jeff[k]  =  28307    ( cb66 - base 13)
+    x_fred[k]  =  13499    ( 61b5 - base 13)
+    x_chuck[k] = 207287    (73472 - base 13)
+    x_howie[k] = 103400    (380ab - base 13)
+    x_judge[k] = 352493    (c458b - base 13)
+
+
+## 2018_3 Problem 1
+
+  Cryptic addition:
+
+      SIXTEEN + TWENTY + TWENTY + TEN + TWO + TWO = SEVENTY
+
+    a=make_crypt_df('sixteentwentytentwoseventy')
+    x1=make_num(a,'sixteen')+
+       make_num(a,'twenty')*2+
+       make_num(a,'ten')+
+       make_num(a,'two')
+    x2=make_num(a,'seventy')
+    k=(x1==x2)
+    k=k&(a$s!=0)&(a$t!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+            s i x t e n w y o v
+    1125065 3 0 9 2 6 5 7 8 1 4
+
+
+## 2019_0 Problem 1
+
+  Cryptic addition:
+
+      CORNELL + STUDENT = ENDURES
+
+    a=make_crypt_df('cornellstudentendures')
+    k=(make_num(a,'cornell')+make_num(a,'student') == make_num(a,'endures'))
+    k=k&(a$c!=0)&(a$s!=0)&(a$e!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+            c o r n e l s t u d
+    2007354 5 4 8 1 9 7 3 6 2 0
+
+
+## 2019_1 Problem 1
+
+  Cryptic addition in base 11:
+
+      TICKLER = STRAINS + BRAINS
+
+    source('rgc_lib.r')
+    a=make_crypt_df('ticklerstrainsbrains',11)
+    x_tickler=make_num(a,'tickler',11)
+    x_strains=make_num(a,'strains',11)
+    x_brains=make_num(a,'brains',11)
+    k=(x_tickler == x_strains+x_brains)
+    k=k&(a$t!=0)&(a$s!=0)&(a$b!=0)
+    sum(k)
+    [1] 1
+    a[k,]
+             t i  c k l e r s a n b
+    33007270 9 0 10 6 1 4 5 8 3 7 2
+    x_tickler[k,]
+    [1] 16098615
+    x_strains[k,]
+    [1] 15699230
+    x_brains[k,]
+    [1] 399385
+
+    Note the digit 10 = 'a' in conventional base-11 notation.
+
+    The values for tickler, strains, and brains given in base 10!!!
+
+
+## 2019_1 Problem 1
+
+    Should be able to solve these with the standard
+    cryptic artithmetic tools with a digit set of
+    MIRROR, IMAGE + one more symbol.
+    
+    Need simultaneous solutions of:
+    
+         ******    MIRROR
+        +MIRROR   +IMAGE*
+         ------    ------
+         IMAGE*    *EGAMI
+
+    Only the sums are mirror images.
+
+    This is complicated by all the wildcards and constraints
+    Loop on the unknown digit after IMAGE in the right sum
+    and then check additional constraints:
+
+    Code:
+    
+    a=make_crypt_df("MIRRORIMAGE")
+
+    x_mirror=make_num(a,"MIRROR")
+    x_egami=make_num(a,"EGAMI")
+    x_image=make_num(a,"IMAGE")
+    
+    for (i in 0:9) {
+        x=x_mirror+(x_image*10+i)
+        k=(x<1000000) & ((x%%100000) == x_egami) & (a['M']!=0) & (a['I']!=0) & (x_image*10 > x_mirror)
+        if (any(k)) {
+            for (j in which(k)) {
+                if (any(a[j,]==0)) { next }
+                n1=x_mirror[j,]
+                n2=(x_image[j,]*10+i)
+                n3=as.numeric(paste0(rev(strsplit(as.character(n1+n2),"")[[1]]),collapse=""))
+                if (n3>n1) {
+                    n4=n3-n1
+                    print(sprintf("i = %d",i))
+                    print(as.matrix(a[j,]))
+                    print("Left sum:")
+                    print(sprintf("%6d         ",n4))
+                    print(sprintf("%6d = MIRROR",n1))
+                    print(sprintf("%6d = IMAGE*",n3))
+                    print("Right sum:")
+                    print(sprintf("%6d = MIRROR",n1))
+                    print(sprintf("%6d = IMAGE*",n2))
+                    print(sprintf("%6d = *EMAGI",n1+n2))
+                    print("-----")
+                }
+            }
+        }
+    }
+
+    Output:
+    
+    [1] "i = 3"
+           M I R O A G E
+    164072 2 7 4 3 1 6 9
+    
+    [1] "Left sum:"
+    [1] "447265         "
+    [1] "274434 = MIRROR"
+    [1] "721699 = IMAGE*"
+    [1] "Right sum:"
+    [1] "274434 = MIRROR"
+    [1] "721693 = IMAGE*"
+    [1] "996127 = *EMAGI"
+    [1] "-----"
+
+
+C'est fini
+
