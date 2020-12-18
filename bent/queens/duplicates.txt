@@ -1,0 +1,93 @@
+Duplicate Pattern Analysis for 8 Queens Problem
+R. G. Cronce
+2-Feb-2020
+
+There are 7 unique patterns in the 48 identified for the 8 queens
+problem.  These patterns are shown below with a `1` indicating the
+presence of a queen and a `.` an empty square.
+
+The notations to the right of the board matrix is the value of the
+pattern(s) that match (row number in solution set), along with the
+number of 90 CCW rotations applied and whether or not the final result
+was transposed (.T).  The two patterns that are symmetrial about the
+main diagonal cover 4 rows of the solutions and the remainder cover
+8 rows each.  This is a total of 5*8+2*4 = 48 solutions representing
+a total of 7 distinct patterns:
+
+b[11] = 
+
+    [. . 1 1 1 . . .]  match for i =  17    rot =  1
+    [. . . . . . . .]  match for i =  17    rot =  1  .T
+    [1 . . . 1 . . .]  match for i =  35    rot =  3
+    [1 . . . . . . .]  match for i =  35    rot =  3  .T
+    [1 . 1 . . . . .]  match for i =  36    rot =  2
+    [. . . . . . . .]  match for i =  36    rot =  2  .T
+    [. . . . . . . .]
+    [. . . . . . . .]
+
+b[8] = 
+
+    [. 1 . . . . 1 .]  match for i =  9    rot =  1
+    [1 . 1 . . . 1 .]  match for i =  9    rot =  1  .T
+    [. 1 . . . . . .]  match for i =  24    rot =  3
+    [. . . . . . . .]  match for i =  24    rot =  3  .T
+    [. . . . . . . .]  match for i =  25    rot =  2
+    [. . . . . . . .]  match for i =  25    rot =  2  .T
+    [1 1 . . . . . .]
+    [. . . . . . . .]
+
+b[7] = 
+
+    [. 1 . 1 . . . .]  match for i =  10    rot =  0  .T
+    [. . . . . . . .]  match for i =  16    rot =  1
+    [1 . . 1 . . . .]  match for i =  19    rot =  1  .T
+    [1 1 . . . . . .]  match for i =  34    rot =  3  .T
+    [1 1 . . . . . .]  match for i =  37    rot =  2
+    [. . . . . . . .]  match for i =  38    rot =  3
+    [. . . . . . . .]  match for i =  42    rot =  2  .T
+    [. . . . . . . .]
+
+b[6] = 
+
+    [. 1 1 . . . . .]  match for i =  14    rot =  1
+    [. . 1 1 . . . .]  match for i =  18    rot =  0  .T
+    [. . . . . . . .]  match for i =  22    rot =  1  .T
+    [. . . . . . . .]  match for i =  27    rot =  3  .T
+    [1 1 . . . . . .]  match for i =  30    rot =  2
+    [1 1 . . . . . .]  match for i =  40    rot =  3
+    [. . . . . . . .]  match for i =  43    rot =  2  .T
+    [. . . . . . . .]
+
+b[2] = 
+
+    [1 . 1 . . . . .]  match for i =  4    rot =  0  .T
+    [. 1 . 1 . . . .]  match for i =  12    rot =  1
+    [. . . . . . . .]  match for i =  23    rot =  1  .T
+    [. . . . . . . .]  match for i =  26    rot =  3  .T
+    [1 1 . . . . . .]  match for i =  31    rot =  2
+    [1 1 . . . . . .]  match for i =  41    rot =  3
+    [. . . . . . . .]  match for i =  45    rot =  2  .T
+    [. . . . . . . .]
+
+b[1] = 
+
+    [1 1 1 . . . . .]  match for i =  3    rot =  0  .T
+    [. 1 1 . . . . .]  match for i =  13    rot =  1
+    [. . . . . . . .]  match for i =  21    rot =  1  .T
+    [. . . . . . . .]  match for i =  28    rot =  3  .T
+    [1 . . . . . . .]  match for i =  32    rot =  2
+    [1 1 . . . . . .]  match for i =  46    rot =  3
+    [. . . . . . . .]  match for i =  47    rot =  2  .T
+    [. . . . . . . .]
+
+b[0] =
+
+    [1 1 1 . . . . .]  match for i =  5    rot =  0  .T
+    [. 1 1 1 . . . .]  match for i =  15    rot =  1
+    [. . . . . . . .]  match for i =  20    rot =  1  .T
+    [. . . . . . . .]  match for i =  29    rot =  3  .T
+    [. . . . . . . .]  match for i =  33    rot =  2
+    [1 1 . . . . . .]  match for i =  39    rot =  3
+    [. . . . . . . .]  match for i =  44    rot =  2  .T
+    [. . . . . . . .]
+
